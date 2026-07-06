@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.DS_Store
+fixtures/photo-folders/*
+!fixtures/photo-folders/README.md
+
