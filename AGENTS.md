@@ -8,9 +8,9 @@ a user-selected folder of JPEGs, with file-name-ordered navigation, embedded
 captions, and an optional split-screen map for the current photo. Its existing
 browser-native core is packaged with Electron for self-contained macOS testing.
 
-The repository is before implementation. Preserve the narrow accepted MVP while
-keeping the architecture hospitable to later thumbnail, multi-photo map,
-timeline, people, and topic views.
+The MVP implementation and local macOS DMG packaging path exist. Preserve the
+narrow accepted MVP while keeping the architecture hospitable to later
+thumbnail, multi-photo map, timeline, people, and topic views.
 
 ## Read this first
 
@@ -65,14 +65,31 @@ technology stack win. Update `project-context.md` when a durable decision change
 AGENTS.md                    agent and contributor handoff
 README.md                    human-facing repository entry point
 docs/product/                product history, MVP, and architecture decisions
+docs/deployment.md           executable macOS DMG deployment runbook
+electron/                    Electron main process for packaged desktop builds
+src/                         Svelte application, photo ingestion, and tests
 public/images/earth.jpg      provisional entry-screen Earth image
 public/images/README.md      asset purpose and provenance notes
 fixtures/photo-folders/      local representative photo collections (untracked)
 ```
 
-When the application is scaffolded, keep runtime code in `src/`, public files in
-Vite's `public/` directory, and tests beside relevant modules or in a named test
-directory. Prefer feature/domain names over generic buckets.
+Keep runtime code in `src/`, public files in Vite's `public/` directory, and
+tests beside relevant modules or in a named test directory. Prefer
+feature/domain names over generic buckets.
+
+## Documentation boundaries
+
+- Public project documentation belongs in `README.md`, `docs/`, and
+  `docs/product/`. Write it for external readers, contributors, and future
+  maintainers.
+- Personal learning notes, scratchpads, exploratory walkthroughs, and private
+  operating notes must not be committed. Keep them in ignored local files when
+  present.
+- Do not add links from public documentation to ignored or private files,
+  because those links will be broken for GitHub readers and fresh clones.
+- When a private note captures a durable project decision, promote only the
+  project-relevant decision into public docs; leave the personal explanation
+  private.
 
 ## Implementation boundaries
 

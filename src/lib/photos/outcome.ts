@@ -1,11 +1,15 @@
+import { DOMParser, onErrorStopParsing } from '@xmldom/xmldom'
 import ExifReader, { type ExpandedTags } from 'exifreader'
 import { emptyMetadata, normalizeMetadata } from './normalize'
 import type { ScanItem, ScanOutcome } from './types'
 
 type MetadataLoader = (file: File) => Promise<ExpandedTags>
 
+const xmpDomParser = new DOMParser({ onError: onErrorStopParsing })
+
 const defaultLoader: MetadataLoader = (file) =>
   ExifReader.load(file, {
+    domParser: xmpDomParser,
     expanded: true,
     includeOffsets: true,
     length: 'auto',

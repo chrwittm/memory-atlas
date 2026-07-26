@@ -11,7 +11,7 @@
 
 <main class="entry-screen">
   <div class="earth" aria-hidden="true">
-    <img src="/images/earth.jpg" alt="" />
+    <img src="./images/earth.jpg" alt="" />
   </div>
   <div class="entry-copy">
     <p class="eyebrow">A place for remembered moments</p>
@@ -37,4 +37,3 @@
     </p>
   </div>
 </main>
-

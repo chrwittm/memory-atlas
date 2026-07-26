@@ -1,7 +1,7 @@
 # Memory Atlas: Living Project Context
 
 Status: Browser MVP implemented; macOS packaging accepted  
-Last updated: 2026-07-06
+Last updated: 2026-07-25
 
 ## Purpose of this document
 
@@ -199,23 +199,36 @@ individual parser/read failures into photo outcomes. The display layer retains
 object URLs for only the current photo and one neighbor on each side and revokes
 them as the window changes or the viewer closes.
 
-The browser MVP is not yet packaged. The accepted next deployment slice is a
-macOS Electron shell around the existing Vite production build, producing
-versioned `.app` and `.dmg` artifacts for stable local testing and transfer to
-other compatible Macs. Electron was selected over a hosted PWA because the
-current testing requirement is a self-contained application with no web-host
-dependency, and over Tauri because bundled Chromium minimizes runtime variance
-for the already implemented browser APIs. See
-[`deployment-options.md`](deployment-options.md) for the comparison and release
-boundary.
+Because browser Web Workers do not expose `DOMParser`, metadata ingestion passes
+an `@xmldom/xmldom` parser to ExifReader so XMP captions and titles remain
+available in both browser and packaged builds.
+
+The browser MVP is packaged in a hardened macOS Electron shell around the Vite
+production build. Electron Forge produces versioned, architecture-specific
+`.app` and `.dmg` artifacts for local testing. The renderer has no Node.js
+integration or preload bridge and runs with context isolation, sandboxing, a
+restrictive Content Security Policy, and navigation limited to packaged content.
+The initial ad-hoc-signed build targets Apple silicon; normal transfer to other
+Macs still requires Developer ID signing, notarization, and compatible-hardware
+verification.
+Electron was selected over a hosted PWA because the current testing requirement
+is a self-contained application with no web-host dependency, and over Tauri
+because bundled Chromium minimizes runtime variance for the already implemented
+browser APIs. See [`deployment.md`](../deployment.md) for the executable runbook
+and [`deployment-options.md`](deployment-options.md) for the comparison and
+release boundary.
 
 ## Suggested starting point for the next session
 
-Package the smallest macOS Electron vertical slice and prove that folder
-selection, metadata scanning, image display, keyboard controls, fullscreen, and
-MapLibre work from a packaged `.app` without Vite or a hosted origin. Then test
-the implemented MVP against additional real folders, especially one with GPS,
-non-default orientation, malformed metadata, and an undecodable JPEG.
+Verify the packaged `.app` independently of Vite, then test the implemented MVP
+against additional real folders, especially one with GPS, non-default
+orientation, malformed metadata, and an undecodable JPEG. Add signing and
+notarization before routine distribution to other Macs.
+
+The post-MVP idea inventory and the shared refinement workflow live in
+[`product-backlog.md`](product-backlog.md). Backlog entries are not accepted
+scope: promote a selected feature into the MVP/release description, technology
+stack, and this context only once its interaction and boundaries are decided.
 
 ## Source history
 
@@ -228,3 +241,6 @@ non-default orientation, malformed metadata, and an undecodable JPEG.
 - 2026-07-05: **Memory Atlas** adopted as the final product and repository name; **Memory Explorer** retained only as the former working title.
 - 2026-07-06: macOS Electron packaging adopted for stable, self-contained MVP
   testing; hosted web, PWA, and other platform distribution deferred.
+- 2026-07-25: a living post-MVP product backlog and lightweight feature
+  refinement workflow were established; no post-MVP feature scope was accepted
+  by that act alone.

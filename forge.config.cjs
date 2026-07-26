@@ -1,0 +1,111 @@
+const { execFile } = require('node:child_process')
+const fs = require('node:fs/promises')
+const path = require('node:path')
+const { promisify } = require('node:util')
+const packageJson = require('./package.json')
+
+const execFileAsync = promisify(execFile)
+const forgeOutDir = '/private/tmp/memory-atlas-forge-out'
+const releaseDir = path.join(__dirname, 'out', 'make')
+let packagedOutputPaths = []
+
+async function stripFinderMetadata(targetPath) {
+  await execFileAsync('xattr', ['-dr', 'com.apple.FinderInfo', targetPath])
+  await execFileAsync('xattr', ['-dr', 'com.apple.ResourceFork', targetPath])
+}
+
+module.exports = {
+  // OneDrive can add FinderInfo attributes to .framework directories and
+  // invalidate a macOS signature. Build outside the synchronized workspace;
+  // postMake copies only the sealed DMG back into the repository.
+  outDir: forgeOutDir,
+  packagerConfig: {
+    name: packageJson.productName,
+    executableName: packageJson.productName,
+    appBundleId: 'com.memoryatlas.app',
+    appCategoryType: 'public.app-category.photography',
+    asar: true,
+    prune: true,
+    // A valid ad-hoc signature is sufficient for this originating-Mac test
+    // build. Transferable releases still require Developer ID + notarization.
+    osxSign: {
+      identity: '-',
+      identityValidation: false,
+      preAutoEntitlements: false,
+      preEmbedProvisioningProfile: false,
+      optionsForFile: () => ({
+        hardenedRuntime: false,
+        timestamp: 'none',
+      }),
+    },
+    ignore: [
+      /^\/.git($|\/)/,
+      /^\/docs($|\/)/,
+      /^\/fixtures($|\/)/,
+      /^\/node_modules($|\/)/,
+      /^\/public($|\/)/,
+      /^\/src($|\/)/,
+      /^\/out($|\/)/,
+      /^\/.*\.config\.(js|ts)$/,
+      /^\/\.gitignore$/,
+      /^\/forge\.config\.cjs$/,
+      /^\/index\.html$/,
+      /^\/package-lock\.json$/,
+      /^\/tsconfig.*\.json$/,
+      /^\/AGENTS\.md$/,
+      /^\/README\.md$/,
+      /^\/dist\/\.DS_Store$/,
+      /^\/dist\/images\/README\.md$/,
+    ],
+  },
+  makers: [
+    {
+      name: '@electron-forge/maker-dmg',
+      config: (arch) => ({
+        name: `${packageJson.productName}-${packageJson.version}-${arch}`,
+        format: 'UDZO',
+        overwrite: true,
+        additionalDMGOptions: {
+          filesystem: 'APFS',
+        },
+      }),
+    },
+  ],
+  hooks: {
+    packageAfterExtract: async (_forgeConfig, buildPath, _electronVersion, platform) => {
+      if (platform === 'darwin') {
+        // Finder/OneDrive attributes invalidate a macOS bundle signature. Strip
+        // them before osx-sign adds the signature attributes that must remain.
+        await execFileAsync('xattr', ['-cr', buildPath])
+      }
+    },
+    postPackage: async (_forgeConfig, packageResult) => {
+      packagedOutputPaths = packageResult.outputPaths
+      await Promise.all(packagedOutputPaths.map(stripFinderMetadata))
+    },
+    preMake: async () => {
+      // OneDrive may restore Finder metadata after the bundle is moved into
+      // out/. Remove only the forbidden attributes immediately before DMG copy.
+      await Promise.all(packagedOutputPaths.map(stripFinderMetadata))
+      // appdmg copies the app with macOS cp -R. Prevent that copy from carrying
+      // filesystem metadata into the disk image and invalidating signing.
+      process.env.COPYFILE_DISABLE = '1'
+    },
+    postMake: async (_forgeConfig, makeResults) => {
+      await fs.mkdir(releaseDir, { recursive: true })
+
+      const copiedResults = []
+      for (const result of makeResults) {
+        const artifacts = []
+        for (const artifact of result.artifacts) {
+          const destination = path.join(releaseDir, path.basename(artifact))
+          await fs.copyFile(artifact, destination)
+          artifacts.push(destination)
+        }
+        copiedResults.push({ ...result, artifacts })
+      }
+
+      return copiedResults
+    },
+  },
+}

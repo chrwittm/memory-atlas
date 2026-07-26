@@ -1,6 +1,7 @@
 node_modules/
 dist/
+out/
 .DS_Store
 fixtures/photo-folders/*
 !fixtures/photo-folders/README.md
-
+docs/private/
