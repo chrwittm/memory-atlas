@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte'
   import EntryScreen from './components/EntryScreen.svelte'
   import LoadingScreen from './components/LoadingScreen.svelte'
   import EmptyState from './components/EmptyState.svelte'
@@ -12,33 +13,49 @@
   let photos = $state<Photo[]>([])
   let folderName = $state('')
   let errorMessage = $state('')
+  let scanController: AbortController | undefined
 
   async function selectFolder(files: File[]) {
+    scanController?.abort()
+    const controller = new AbortController()
+    scanController = controller
     screen = 'loading'
     progress = { completed: 0, total: 0 }
     errorMessage = ''
     try {
-      const result = await scanFolder(files, (next) => (progress = next))
+      const result = await scanFolder(files, (next) => {
+        if (!controller.signal.aborted && scanController === controller) progress = next
+      }, {
+        signal: controller.signal,
+      })
+      if (controller.signal.aborted || scanController !== controller) return
       photos = result.photos
       folderName = result.folderName
       screen = photos.length ? 'viewer' : 'empty'
     } catch (error) {
+      if (controller.signal.aborted || scanController !== controller) return
       errorMessage = error instanceof Error ? error.message : 'The selected folder could not be opened.'
       screen = 'error'
+    } finally {
+      if (scanController === controller) scanController = undefined
     }
   }
 
   function reset() {
+    scanController?.abort()
+    scanController = undefined
     photos = []
     folderName = ''
     screen = 'entry'
   }
+
+  onDestroy(() => scanController?.abort())
 </script>
 
 {#if screen === 'entry'}
   <EntryScreen onSelect={selectFolder} />
 {:else if screen === 'loading'}
-  <LoadingScreen {progress} />
+  <LoadingScreen {progress} onCancel={reset} />
 {:else if screen === 'empty'}
   <EmptyState kind="empty" onBack={reset} />
 {:else if screen === 'error'}
@@ -46,4 +63,3 @@
 {:else}
   <Viewer {photos} {folderName} onChooseAnother={reset} />
 {/if}
-

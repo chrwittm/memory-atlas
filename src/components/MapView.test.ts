@@ -5,6 +5,12 @@ const mapState = vi.hoisted(() => ({
   options: undefined as Record<string, unknown> | undefined,
   removed: false,
   resized: false,
+  refreshedSources: [] as string[],
+  sources: {
+    basemap: { type: 'vector' },
+    labels: { type: 'vector' },
+  } as Record<string, unknown>,
+  listeners: {} as Record<string, Array<(event: { error?: Error }) => void>>,
 }))
 
 vi.mock('maplibre-gl', () => {
@@ -15,9 +21,13 @@ vi.mock('maplibre-gl', () => {
 
     addControl() {}
     easeTo() {}
+    getStyle() { return { sources: mapState.sources } }
+    refreshTiles(sourceId: string) { mapState.refreshedSources.push(sourceId) }
     resize() { mapState.resized = true }
     remove() { mapState.removed = true }
     on(event: string, callback: (event: { error?: Error }) => void) {
+      mapState.listeners[event] ??= []
+      mapState.listeners[event].push(callback)
       if (event === 'load') queueMicrotask(() => callback({}))
     }
   }
@@ -39,6 +49,8 @@ describe('MapView', () => {
     mapState.options = undefined
     mapState.removed = false
     mapState.resized = false
+    mapState.refreshedSources = []
+    mapState.listeners = {}
   })
 
   it('constructs the map immediately and clears the loading state on load', async () => {
@@ -56,5 +68,21 @@ describe('MapView', () => {
 
     view.unmount()
     expect(mapState.removed).toBe(true)
+  })
+
+  it('requests a source refresh on the online event and removes the listener on unmount', async () => {
+    const view = render(MapView, { location: { latitude: 47.456215, longitude: 10.99310432 } })
+    await waitFor(() => expect(screen.queryByText('Opening map…')).not.toBeInTheDocument())
+
+    for (const listener of mapState.listeners.error ?? []) {
+      listener({ error: new Error('Tile request failed while offline.') })
+    }
+    window.dispatchEvent(new Event('online'))
+
+    expect(mapState.refreshedSources).toEqual(['basemap', 'labels'])
+
+    view.unmount()
+    window.dispatchEvent(new Event('online'))
+    expect(mapState.refreshedSources).toEqual(['basemap', 'labels'])
   })
 })

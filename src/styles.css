@@ -128,6 +128,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @keyframes loader-turn { to { transform: rotate(360deg); } }
 .progress-track { width: min(22rem, 70vw); height: 1px; margin-top: 1.3rem; overflow: hidden; background: rgba(255,255,255,.12); }
 .progress-track span { display: block; height: 100%; background: var(--accent); transition: width 180ms ease; }
+.loading-cancel { margin-top: 1.4rem; padding: .55rem .8rem; border: 0; background: transparent; color: var(--muted); cursor: pointer; font: inherit; font-size: .76rem; letter-spacing: .08em; text-transform: uppercase; }
+.loading-cancel:hover, .loading-cancel:focus-visible { color: var(--paper); }
 .empty-mark { display: grid; place-items: center; width: 4rem; height: 4rem; margin-bottom: 1.8rem; border: 1px solid var(--line); border-radius: 50%; color: var(--accent); font-family: Georgia, serif; font-size: 2rem; }
 .empty-screen .choose-button { margin-top: 1.25rem; }
 

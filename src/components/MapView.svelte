@@ -28,6 +28,18 @@
     map.easeTo({ center: coordinates, duration: 500 })
   }
 
+  function refreshTilesAfterReconnect() {
+    if (!map || !loaded) return
+
+    try {
+      for (const sourceId of Object.keys(map.getStyle().sources)) {
+        map.refreshTiles(sourceId)
+      }
+    } catch (error) {
+      console.error('[Memory Atlas] Map tiles could not be refreshed after reconnecting.', error)
+    }
+  }
+
   onMount(() => {
     try {
       const coordinates: [number, number] = [location.longitude, location.latitude]
@@ -58,6 +70,7 @@
       loadTimer = setTimeout(() => {
         if (!loaded) reportError(new Error('Map load timed out after 15 seconds.'))
       }, 15_000)
+      window.addEventListener('online', refreshTilesAfterReconnect)
     } catch (error) {
       reportError(error)
     }
@@ -67,6 +80,7 @@
 
   onDestroy(() => {
     clearTimeout(loadTimer)
+    window.removeEventListener('online', refreshTilesAfterReconnect)
     resizeObserver?.disconnect()
     map?.remove()
   })

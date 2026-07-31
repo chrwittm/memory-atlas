@@ -1,7 +1,7 @@
 # Memory Atlas: Living Project Context
 
 Status: Browser MVP implemented; macOS packaging accepted  
-Last updated: 2026-07-25
+Last updated: 2026-07-31
 
 ## Purpose of this document
 
@@ -199,6 +199,12 @@ individual parser/read failures into photo outcomes. The display layer retains
 object URLs for only the current photo and one neighbor on each side and revokes
 them as the window changes or the viewer closes.
 
+The scan protocol is terminal on success and unexpected failure, exposes
+AbortSignal cancellation, terminates its worker on every terminal path, and
+prevents a cancelled or superseded folder scan from replacing the active
+application state. The loading screen lets the user cancel back to folder
+selection.
+
 Because browser Web Workers do not expose `DOMParser`, metadata ingestion passes
 an `@xmldom/xmldom` parser to ExifReader so XMP captions and titles remain
 available in both browser and packaged builds.
@@ -208,6 +214,9 @@ production build. Electron Forge produces versioned, architecture-specific
 `.app` and `.dmg` artifacts for local testing. The renderer has no Node.js
 integration or preload bridge and runs with context isolation, sandboxing, a
 restrictive Content Security Policy, and navigation limited to packaged content.
+The Electron session explicitly denies unneeded permission requests and checks,
+opens only validated HTTPS links outside the app, and surfaces a packaged
+renderer-load failure instead of leaving a hidden or blank window.
 The initial ad-hoc-signed build targets Apple silicon; normal transfer to other
 Macs still requires Developer ID signing, notarization, and compatible-hardware
 verification.

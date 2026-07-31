@@ -1,11 +1,20 @@
-const { app, BrowserWindow, shell } = require('electron')
+const { app, BrowserWindow, dialog, session, shell } = require('electron')
 const path = require('node:path')
+const { pathToFileURL } = require('node:url')
+const {
+  denyUnexpectedPermissions,
+  isSafeExternalUrl,
+  reportRendererLoadFailure,
+} = require('./security.cjs')
 
 const rendererPath = path.join(__dirname, '..', 'dist', 'index.html')
+const rendererUrl = pathToFileURL(rendererPath).href
 
 function openExternalUrl(url) {
-  if (url.startsWith('https://') || url.startsWith('http://')) {
-    void shell.openExternal(url)
+  if (isSafeExternalUrl(url)) {
+    void shell.openExternal(url).catch((error) => {
+      console.error(`Memory Atlas could not open the external URL ${url}.`, error)
+    })
   }
 }
 
@@ -32,17 +41,21 @@ function createWindow() {
   })
 
   window.webContents.on('will-navigate', (event, url) => {
-    if (url !== window.webContents.getURL()) {
-      event.preventDefault()
-      openExternalUrl(url)
-    }
+    if (url === rendererUrl) return
+    event.preventDefault()
+    openExternalUrl(url)
   })
 
-  window.once('ready-to-show', () => window.show())
-  void window.loadFile(rendererPath)
+  window.once('ready-to-show', () => {
+    if (!window.isDestroyed()) window.show()
+  })
+  void window.loadFile(rendererPath).catch((error) => {
+    reportRendererLoadFailure(window, dialog, error, rendererPath)
+  })
 }
 
 app.whenReady().then(() => {
+  denyUnexpectedPermissions(session.defaultSession)
   createWindow()
 
   app.on('activate', () => {

@@ -17,6 +17,51 @@ photos.
 
 Run every command below from the repository root, where `package.json` lives.
 
+## Test the current source in Electron
+
+Use this short workflow to manually exercise the current working tree without
+creating or installing a DMG. It is useful for focused UI checks during
+development, but it is not a replacement for the independent packaged-app
+smoke test below.
+
+1. Build the current renderer and open it in Electron:
+
+   ```bash
+   npm run build
+   ./node_modules/.bin/electron .
+   ```
+
+   The terminal remains occupied while the Electron window is open. Quit the
+   app with Command-Q to return to the shell.
+
+   `npm run desktop` performs the same production build before starting
+   Electron Forge. On a OneDrive-backed checkout, Forge can fail or stall while
+   reading a dependency with an `ETIMEDOUT` filesystem error. In that case, use
+   the direct Electron command above. Keeping the checkout and `node_modules`
+   available offline, or using a local non-synchronised working copy, prevents
+   that OneDrive-specific failure.
+
+2. Verify malformed-metadata resilience using the committed non-personal test
+   assets. In the app, choose another folder and select `src/test/fixtures/`.
+   It contains a malformed-XMP JPEG and a valid neighboring JPEG. Both photos
+   should display and Arrow-key navigation should work.
+
+   The malformed-XMP file is intentionally still a decodable JPEG. ExifReader
+   currently recovers from its malformed XMP block, so no visible error is
+   expected. The automated loader-rejection regression test covers the distinct
+   `metadata-error` path.
+
+3. Verify map and fullscreen Escape priority with a folder containing both a
+   GPS-tagged photo and a photo without GPS. The ignored local
+   `fixtures/photo-folders/test-cases/` folder can be used when present.
+
+   - On a GPS photo, press `M` and confirm the map opens.
+   - Press `F`, then press Escape once. Fullscreen exits and map mode remains
+     open.
+   - Press Escape again. Map mode closes.
+   - Navigate to a photo without GPS while map mode is open and confirm the
+     no-GPS placeholder appears instead of closing the map.
+
 ## Create the application and DMG
 
 1. Install exactly the dependency versions recorded in `package-lock.json`:
@@ -25,7 +70,18 @@ Run every command below from the repository root, where `package.json` lives.
    npm ci
    ```
 
-2. Run the release checks and create the macOS artifacts:
+2. Review both the shipped runtime tree and the complete build tree:
+
+   ```bash
+   npm run audit:prod
+   npm run audit:all
+   ```
+
+   Follow the reachability and residual-risk policy in
+   [`dependency-security.md`](dependency-security.md). A complete-tree advisory
+   count is not ignored merely because the affected packages are build tools.
+
+3. Run the release checks and create the macOS artifacts:
 
    ```bash
    npm run make:mac
@@ -36,7 +92,7 @@ Run every command below from the repository root, where `package.json` lives.
    targets the architecture of the Mac running the command unless `--arch` is
    supplied explicitly.
 
-3. Find the retained DMG under `out/`; Forge keeps the intermediate `.app` in
+4. Find the retained DMG under `out/`; Forge keeps the intermediate `.app` in
    `/private/tmp` so OneDrive cannot attach Finder metadata that invalidates its
    macOS signature:
 
@@ -48,6 +104,18 @@ Run every command below from the repository root, where `package.json` lives.
    On an Apple silicon Mac, `<architecture>` is `arm64`. On an Intel Mac, it is
    `x64`. The temporary `.app` working copy may be removed by macOS and is
    recreated by the next build; the DMG is the durable installation artifact.
+
+5. Strictly verify the exact temporary application before installing the DMG:
+
+   ```bash
+   codesign --verify --deep --strict --verbose=2 \
+     "/private/tmp/memory-atlas-forge-out/Memory Atlas-darwin-<architecture>/Memory Atlas.app"
+   codesign -dv --verbose=4 \
+     "/private/tmp/memory-atlas-forge-out/Memory Atlas-darwin-<architecture>/Memory Atlas.app"
+   ```
+
+   The first command must exit successfully. The detail output should identify
+   an ad-hoc signature for the local MVP workflow.
 
 ## Install the local testing build
 
@@ -76,12 +144,21 @@ Test the installed application without a Vite development server running:
 - open map mode for a located photo and confirm the no-GPS placeholder for an
   unlocated photo;
 - disconnect the network and confirm that photo viewing still works while map
-  tiles fail gracefully; and
+  tiles fail gracefully;
+- while offline, navigate far enough for an uncached map area to remain blank,
+  reconnect the network, and record whether the missing tiles load without
+  restarting the application—see
+  [`MA-001`](known-issues.md#ma-001-map-tiles-do-not-recover-after-an-offline-request);
 - confirm that source photo checksums are unchanged after testing.
 
 The packaged app loads only files embedded in the application. Selected photos
 and extracted metadata remain local; opening the optional map contacts the
 configured OpenFreeMap endpoints.
+
+After the installed smoke test, record the app version, target architecture,
+DMG SHA-256, signing/notarization state, source commit, audit result, and any
+manual checks still outstanding. A build is not a reproducible checkpoint until
+the recorded source state is committed.
 
 ## Rebuild or target an architecture explicitly
 

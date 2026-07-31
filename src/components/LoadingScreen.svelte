@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ScanProgress } from '../lib/photos/scanner'
-  let { progress }: { progress: ScanProgress } = $props()
+  let { progress, onCancel }: { progress: ScanProgress; onCancel: () => void } = $props()
   let percentage = $derived(progress.total ? Math.round((progress.completed / progress.total) * 100) : 0)
 </script>
 
@@ -12,5 +12,5 @@
   <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax={progress.total || 1} aria-valuenow={progress.completed}>
     <span style={`width: ${percentage}%`}></span>
   </div>
+  <button class="loading-cancel" type="button" onclick={onCancel}>Cancel</button>
 </main>
-

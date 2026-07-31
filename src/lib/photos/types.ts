@@ -49,4 +49,4 @@ export type WorkerResponse =
   | { type: 'progress'; completed: number; total: number; fileName: string }
   | { type: 'result'; outcome: ScanOutcome }
   | { type: 'complete'; total: number }
-
+  | { type: 'failed'; message: string }

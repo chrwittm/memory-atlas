@@ -56,6 +56,7 @@ module.exports = {
       /^\/README\.md$/,
       /^\/dist\/\.DS_Store$/,
       /^\/dist\/images\/README\.md$/,
+      /^\/electron\/.*\.test\.ts$/,
     ],
   },
   makers: [

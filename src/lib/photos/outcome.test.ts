@@ -37,7 +37,7 @@ describe('scan error isolation', () => {
   )
 
   it('reads the committed malformed-XMP JPEG fixture without hiding the photo', async () => {
-    const bytes = await readFile(new URL('../../test/fixtures/malformed-xmp-metadata.jpg', import.meta.url))
+    const bytes = await readFile('src/test/fixtures/malformed-xmp-metadata.jpg')
     const outcome = await createScanOutcome(
       {
         file: new File([bytes], 'malformed-xmp-metadata.jpg', { type: 'image/jpeg' }),

@@ -50,6 +50,9 @@ This is intentionally a narrow POC:
   automatic updates.
 - Public distribution still needs Apple Developer ID signing and notarization.
 
+See [known issues](docs/known-issues.md) for observed MVP defects and current
+workarounds.
+
 ## Run from source
 
 Memory Atlas requires Node.js 20.18.0 or later in the 20.x line and npm 10.9.0, as declared in
@@ -70,11 +73,15 @@ Quality checks:
 npm run check
 npm test
 npm run build
+npm run audit:prod
+npm run audit:all
 ```
 
 `svelte-check` is the project's source-quality gate. A separate formatting or
 linting tool is intentionally deferred until it provides checks that this gate
-does not already cover.
+does not already cover. Dependency audit results are evaluated under the
+[dependency security policy](docs/dependency-security.md), including
+development and packaging paths.
 
 Package a macOS DMG:
 
@@ -89,6 +96,9 @@ npm run make:mac
 - [Accepted MVP description](docs/product/mvp-description.md)
 - [Accepted technology stack](docs/product/mvp-technology-stack.md)
 - [macOS deployment instructions](docs/deployment.md)
+- [Dependency security policy and current review](docs/dependency-security.md)
+- [Known issues and workarounds](docs/known-issues.md)
+- [Latest Slice B packaged-build verification](docs/release-verification-2026-07-31.md)
 - [Deployment options and accepted packaging decision](docs/product/deployment-options.md)
 - [Repository guide for agents and contributors](AGENTS.md)
 
