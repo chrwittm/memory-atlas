@@ -52,10 +52,12 @@ This is intentionally a narrow POC:
 
 ## Run from source
 
-Memory Atlas requires Node.js 20 or newer.
+Memory Atlas requires Node.js 20.18.0 or later in the 20.x line and npm 10.9.0, as declared in
+`package.json`. Use `npm ci` to install the exact dependency versions from the
+lockfile.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -69,6 +71,10 @@ npm run check
 npm test
 npm run build
 ```
+
+`svelte-check` is the project's source-quality gate. A separate formatting or
+linting tool is intentionally deferred until it provides checks that this gate
+does not already cover.
 
 Package a macOS DMG:
 
@@ -100,6 +106,9 @@ public/images/        public visual assets served unchanged by Vite
 fixtures/             private local test-photo folders, ignored by Git
 forge.config.cjs      Electron Forge packaging configuration
 ```
+
+Generated, non-personal test assets live under `src/test/fixtures/`. Private
+photo folders remain under `fixtures/photo-folders/` and are ignored by Git.
 
 The local `fixtures/photo-folders/2026-06-20-Schlossherrenrunde/` collection is
 the representative corpus for metadata and viewer testing when present. It is

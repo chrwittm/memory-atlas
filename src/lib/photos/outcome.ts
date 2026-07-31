@@ -30,12 +30,13 @@ export async function createScanOutcome(
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Metadata could not be read'
-    const readFailure = /read|load|access|not.?found/i.test(message)
     return {
       originalIndex: item.originalIndex,
       fileName: item.file.name,
       metadata: emptyMetadata(),
-      status: readFailure ? 'read-error' : 'metadata-error',
+      // A metadata parser cannot establish whether the browser can display the
+      // image. The image load path is the authoritative decode check.
+      status: 'metadata-error',
       error: message,
     }
   }

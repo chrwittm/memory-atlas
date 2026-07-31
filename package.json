@@ -4,6 +4,10 @@
   "private": true,
   "version": "0.1.0",
   "description": "A local-first viewer for rediscovering photos through their embedded context.",
+  "engines": {
+    "node": ">=20.18.0 <21"
+  },
+  "packageManager": "npm@10.9.0",
   "main": "electron/main.cjs",
   "type": "module",
   "scripts": {

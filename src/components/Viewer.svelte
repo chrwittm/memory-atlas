@@ -22,6 +22,7 @@
   let controlsVisible = $state(true)
   let direction = $state<'next' | 'previous'>('next')
   let notice = $state('')
+  let decodeErrorIds = $state(new Set<string>())
   let hideControlsTimer: ReturnType<typeof setTimeout>
   let noticeTimer: ReturnType<typeof setTimeout>
   let viewer: HTMLElement
@@ -29,6 +30,9 @@
 
   let current = $derived(photos[currentIndex])
   let currentUrl = $derived(urlWindow.sync(photos, currentIndex))
+  let currentHasDecodeError = $derived(
+    current.status === 'decode-error' || decodeErrorIds.has(current.id),
+  )
   let readableCount = $derived(photos.filter((photo) => photo.status !== 'read-error').length)
 
   function showControls() {
@@ -147,14 +151,14 @@
     ) {
       event.preventDefault()
       void toggleFullscreen()
-    } else if (event.key === 'Escape' && mapOpen) {
+    } else if (event.key === 'Escape' && mapOpen && !document.fullscreenElement) {
       mapOpen = false
       showControls()
     }
   }
 
   function markDecodeError() {
-    current.status = 'decode-error'
+    decodeErrorIds = new Set([...decodeErrorIds, current.id])
   }
 
   function dateLabel(value?: string) {
@@ -193,7 +197,7 @@
 >
   <section class="photo-panel">
     {#key current.id}
-      {#if current.status === 'read-error' || current.status === 'decode-error'}
+      {#if current.status === 'read-error' || currentHasDecodeError}
         <div class="photo-error" role="status">
           <span aria-hidden="true">!</span>
           <h1>This photo can’t be displayed</h1>
@@ -212,7 +216,7 @@
       {/if}
     {/key}
 
-    {#if informationVisible && (current.caption || current.capturedAt) && current.status !== 'decode-error'}
+    {#if informationVisible && (current.caption || current.capturedAt) && !currentHasDecodeError}
       <div class="information-overlay">
         {#if current.caption}<p>{current.caption}</p>{/if}
         {#if current.capturedAt}<time datetime={current.capturedAt}>{dateLabel(current.capturedAt)}</time>{/if}

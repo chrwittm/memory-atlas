@@ -10,7 +10,7 @@ photos.
 
 ## Prerequisites
 
-- A Mac with Node.js 20 or newer and npm installed
+- A Mac with Node.js 20.18.0 or later in the 20.x line and npm 10.9.0
 - The Memory Atlas repository checked out locally
 - Dependencies installed with `npm install`
 - Enough free disk space for Electron's bundled Chromium and the build output

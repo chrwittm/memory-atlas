@@ -9,6 +9,26 @@ afterEach(() => {
 })
 
 describe('viewer keyboard behavior', () => {
+  it('attempts metadata-error photos and keeps neighboring photos navigable after a decode failure', async () => {
+    render(Viewer, {
+      photos: [
+        photo({ id: 'metadata-error', fileName: 'metadata-error.jpg', status: 'metadata-error' }),
+        photo({ id: 'neighbor', fileName: 'neighbor.jpg' }),
+      ],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+
+    const image = screen.getByAltText('metadata-error.jpg')
+    expect(image).toBeInTheDocument()
+
+    await fireEvent.error(image)
+    expect(screen.getByRole('status')).toHaveTextContent('This photo can’t be displayed')
+
+    await fireEvent.keyDown(window, { key: 'ArrowRight' })
+    expect(screen.getByAltText('neighbor.jpg')).toBeInTheDocument()
+  })
+
   it('shows available photo information and toggles it with I', async () => {
     const view = render(Viewer, {
       photos: [
@@ -129,6 +149,28 @@ describe('viewer keyboard behavior', () => {
 
     await fireEvent.keyDown(window, { key: 'F' })
     expect(exitFullscreen).toHaveBeenCalledOnce()
+  })
+
+  it('leaves map mode open for Escape in fullscreen, then closes it outside fullscreen', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'located', location: { latitude: 47.45, longitude: 10.99 } })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+
+    let fullscreenElement: Element | null = screen.getByRole('main')
+    Object.defineProperty(document, 'fullscreenElement', {
+      configurable: true,
+      get: () => fullscreenElement,
+    })
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    await fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.getByRole('button', { name: 'Close map' })).toBeInTheDocument()
+
+    fullscreenElement = null
+    await fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.getByRole('button', { name: 'Open map' })).toBeInTheDocument()
   })
 
   it('explains when fullscreen is unavailable', async () => {
