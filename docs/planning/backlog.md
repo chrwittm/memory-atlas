@@ -10,8 +10,8 @@ turning them into accepted scope.
 Memory Atlas has a working desktop MVP. This document is the shared planning
 surface for what comes next. A backlog item is an intention, not a commitment.
 Only an item that has been explicitly selected for a release becomes accepted
-scope; then update the MVP or release specification, the technology-stack
-decision if relevant, and `project-context.md`.
+scope; then create or update its product specification, record an architecture
+decision if relevant, and update [`context.md`](../product/context.md).
 
 ### Workflow
 
@@ -19,12 +19,14 @@ decision if relevant, and `project-context.md`.
    without solving it prematurely.
 2. **Refine** — before implementation, record the outcome, interaction model,
    non-goals, dependencies, privacy implications, and acceptance checks.
-3. **Select** — move a sufficiently specified item into a named next slice.
+3. **Select** — give a sufficiently refined item its own feature specification
+   under `product/specifications/features/` and place it in a named next slice.
    Keep the slice small enough to build and test end-to-end.
 4. **Implement and verify** — add focused tests, exercise a real photo folder,
    and test the packaged macOS app where applicable.
-5. **Record** — mark it delivered here, link the relevant PR/release when one
-   exists, and promote durable decisions into the authoritative documents.
+5. **Record** — mark it delivered here, link its specification and the relevant
+   PR/release when one exists, and promote durable decisions into the
+   authoritative documents.
 
 Use these states: **Idea**, **Needs research**, **Ready to specify**,
 **Ready to build**, **In progress**, **Delivered**, or **Parked**. Prefer a
@@ -60,7 +62,7 @@ heavy process.
 These are narrow, valuable changes that can be specified and delivered without
 changing the local-first model.
 
-### MA-001 — Image zoom and pan
+### MA-FEAT-001 — Image zoom and pan
 
 - **State:** Ready to specify
 - **User outcome:** While viewing a photo, I can inspect a detail such as text
@@ -81,7 +83,7 @@ changing the local-first model.
 - **Likely dependencies:** Viewer interaction state and object-URL/image-decoding
   behavior need regression tests.
 
-### MA-002 — Return to entry screen
+### MA-FEAT-002 — Return to entry screen
 
 - **State:** Ready to build
 - **User outcome:** I can leave a collection and choose another folder quickly.
@@ -93,7 +95,7 @@ changing the local-first model.
   entry-screen folder action.
 - **Non-goal:** Recent folders or persistent library history.
 
-### MA-003 — Filename on demand
+### MA-FEAT-003 — Filename on demand
 
 - **State:** Ready to specify
 - **User outcome:** I can reveal the technical file name when captions are not
@@ -103,11 +105,11 @@ changing the local-first model.
   Suggested shortcut: `D` for details; it may include filename and later other
   technical fields.
 - **Decision needed:** Is filename a second level of the information overlay,
-  or a separate details panel? The choice should align with MA-006's one-panel
+  or a separate details panel? The choice should align with MA-FEAT-006's one-panel
   model.
 - **Non-goal:** File rename or metadata editing.
 
-### MA-004 — Reveal or export the current original
+### MA-FEAT-004 — Reveal or export the current original
 
 - **State:** Needs research
 - **User outcome:** I can use the current original outside the viewer—either
@@ -123,7 +125,7 @@ changing the local-first model.
   not broaden renderer filesystem permissions.
 - **Non-goal:** General file management or editing originals.
 
-### MA-005 — Friendly local-first explanation and future About surface
+### MA-FEAT-005 — Friendly local-first explanation and future About surface
 
 - **State:** Ready to build
 - **User outcome:** I understand the privacy promise without repeatedly seeing
@@ -141,7 +143,7 @@ These features share one selected temporary collection and one current-photo
 selection. Their design should avoid fragmenting the viewer into unrelated
 screens.
 
-### MA-006 — One contextual side-panel framework
+### MA-FEAT-006 — One contextual side-panel framework
 
 - **State:** Ready to specify
 - **User outcome:** I can open context such as a map or tags while keeping the
@@ -151,10 +153,10 @@ screens.
   the full photo. Desktop begins with the current 80/20 split, while mobile
   receives a separate responsive interaction design.
 - **Decision needed:** Whether the multi-photo map is a panel mode, an overview
-  mode, or both. Resolve before MA-008.
+  mode, or both. Resolve before MA-FEAT-008.
 - **Non-goal:** A permanent dashboard/sidebar.
 
-### MA-007 — Thumbnail gallery / carousel
+### MA-FEAT-007 — Thumbnail gallery / carousel
 
 - **State:** Ready to specify
 - **User outcome:** I can see and jump among several photos instead of stepping
@@ -171,7 +173,7 @@ screens.
 - **Non-goal:** Editing, manual ordering, album management, or a permanent
   library.
 
-### MA-008 — Map all located photos and select from pins
+### MA-FEAT-008 — Map all located photos and select from pins
 
 - **State:** Ready to specify
 - **User outcome:** I can understand a folder spatially and jump from a map pin
@@ -179,7 +181,7 @@ screens.
 - **Proposed interaction:** A map overview renders every photo with valid GPS,
   with a clear selected-photo state. Clicking a pin changes the current photo;
   selecting a photo updates the map. Clustering is considered for dense sets.
-- **Questions to settle:** Entry point and relationship to MA-006; initial
+- **Questions to settle:** Entry point and relationship to MA-FEAT-006; initial
   viewport (fit all points versus current photo); duplicate coordinates;
   filtering/photos without GPS; marker previews; and keyboard access.
 - **Acceptance checks:** Metadata is normalized once during scan; two-way
@@ -187,7 +189,7 @@ screens.
   no photo or metadata is uploaded beyond normal map-tile location requests.
 - **Non-goal:** Route recording, editing GPS, or an offline map.
 
-### MA-009 — Map visual-style evaluation
+### MA-FEAT-009 — Map visual-style evaluation
 
 - **State:** Ready to specify
 - **User outcome:** The optional map feels as considered as the viewer while
@@ -203,7 +205,7 @@ screens.
 
 ## Context, tags, and people
 
-### MA-010 — Tags and keywords display
+### MA-FEAT-010 — Tags and keywords display
 
 - **State:** Needs research
 - **User outcome:** I can reveal the descriptive tags embedded in my photos.
@@ -215,7 +217,7 @@ screens.
   user value. The current primary corpus has no keyword examples.
 - **Non-goal:** Creating or editing tags in the app.
 
-### MA-011 — People names and face regions
+### MA-FEAT-011 — People names and face regions
 
 - **State:** Needs research
 - **User outcome:** I can discover photos by the people identified in their
@@ -235,7 +237,7 @@ screens.
 
 ## Platform expansion: iPhone and iPad
 
-### MA-012 — Mobile product and delivery strategy
+### MA-FEAT-012 — Mobile product and delivery strategy
 
 - **State:** Needs discovery
 - **User outcome:** I can browse a chosen photo collection on iPhone and iPad,
@@ -261,19 +263,19 @@ screens.
 
 ## Performance and derived data
 
-### MA-013 — Measure scanning and browsing performance
+### MA-FEAT-013 — Measure scanning and browsing performance
 
 - **State:** Ready to build when a representative large corpus is available
 - **User outcome:** Large collections open and browse smoothly, with changes
   driven by evidence rather than premature caching.
 - **Scope:** Establish measurement scenarios (photo count, JPEG dimensions,
   metadata richness, GPS density), scan duration, time to first photo, memory,
-  thumbnail cost when MA-007 begins, and map-marker cost when MA-008 begins.
+  thumbnail cost when MA-FEAT-007 begins, and map-marker cost when MA-FEAT-008 begins.
 - **Non-goal:** Persistence implementation before a measured need.
 
-### MA-014 — Disposable per-folder metadata index/cache
+### MA-FEAT-014 — Disposable per-folder metadata index/cache
 
-- **State:** Parked pending MA-013 and platform strategy
+- **State:** Parked pending MA-FEAT-013 and platform strategy
 - **User outcome:** Reopening a previously scanned collection can be faster
   without making the app the source of truth.
 - **Proposed boundary:** Derived JSON/cache data is disposable and invalidated
@@ -299,4 +301,4 @@ screens.
 | --- | --- | --- |
 | 2026-07-25 | Establish this living backlog and lightweight refinement workflow. | The desktop MVP is proven; follow-on ideas need a shared, traceable route from discovery to implementation. |
 | 2026-07-25 | Keep mobile, persistent indexing, face regions, and native file actions as discovery/research tracks. | Each changes platform, privacy, storage, or security boundaries and should not be implied by the desktop MVP. |
-| 2026-07-25 | Reserve `T` as the working proposal for thumbnail overview, not tags. | It makes the suggested keyboard scheme internally consistent; it remains provisional until MA-007 is specified. |
+| 2026-07-25 | Reserve `T` as the working proposal for thumbnail overview, not tags. | It makes the suggested keyboard scheme internally consistent; it remains provisional until MA-FEAT-007 is specified. |

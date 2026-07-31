@@ -6,9 +6,9 @@ Current product name: Memory Atlas
 This document preserves the original implementation-oriented proposal. Its MVP
 scope and technology suggestions—including a local backend, ExifTool, Leaflet,
 generated thumbnails, an album index, and multi-photo map pins—are not current
-decisions. Use [`mvp-description.md`](mvp-description.md) for accepted MVP
-behavior and [`mvp-technology-stack.md`](mvp-technology-stack.md) for the accepted
-implementation stack. [`project-context.md`](project-context.md) explains how
+decisions. Use [`mvp.md`](../../product/specifications/mvp.md) for accepted MVP
+behavior and [`0001-mvp-technology-stack.md`](../../architecture/decisions/0001-mvp-technology-stack.md) for the accepted
+implementation stack. [`context.md`](../../product/context.md) explains how
 this proposal informed the longer-term product direction.
 
 ## 1. Product Intent

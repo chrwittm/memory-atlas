@@ -23,7 +23,7 @@ testing, not Developer ID notarized, so macOS may ask you to Control-click the
 app and choose **Open** the first time.
 
 For maintainers, the exact packaging runbook is in
-[docs/deployment.md](docs/deployment.md). Generated DMGs belong on GitHub
+[docs/operations/macos-packaging.md](docs/operations/macos-packaging.md). Generated DMGs belong on GitHub
 Releases, not committed into the repository. If the Releases page has no DMG
 assets yet, no public build has been published.
 
@@ -50,7 +50,7 @@ This is intentionally a narrow POC:
   automatic updates.
 - Public distribution still needs Apple Developer ID signing and notarization.
 
-See [known issues](docs/known-issues.md) for observed MVP defects and current
+See [known issues](docs/planning/known-issues.md) for observed MVP defects and current
 workarounds.
 
 ## Run from source
@@ -80,7 +80,7 @@ npm run audit:all
 `svelte-check` is the project's source-quality gate. A separate formatting or
 linting tool is intentionally deferred until it provides checks that this gate
 does not already cover. Dependency audit results are evaluated under the
-[dependency security policy](docs/dependency-security.md), including
+[dependency security policy](docs/operations/dependency-security.md), including
 development and packaging paths.
 
 Package a macOS DMG:
@@ -91,19 +91,16 @@ npm run make:mac
 
 ## Project documentation
 
-- [Living project context](docs/product/project-context.md)
-- [Living product backlog and feature workflow](docs/product/product-backlog.md)
-- [Accepted MVP description](docs/product/mvp-description.md)
-- [Accepted technology stack](docs/product/mvp-technology-stack.md)
-- [macOS deployment instructions](docs/deployment.md)
-- [Dependency security policy and current review](docs/dependency-security.md)
-- [Known issues and workarounds](docs/known-issues.md)
-- [Latest Slice B packaged-build verification](docs/release-verification-2026-07-31.md)
-- [Deployment options and accepted packaging decision](docs/product/deployment-options.md)
+- [Documentation map and authoring workflow](docs/README.md)
+- [Living project context](docs/product/context.md)
+- [Living product backlog and feature workflow](docs/planning/backlog.md)
+- [Accepted MVP specification](docs/product/specifications/mvp.md)
+- [macOS deployment instructions](docs/operations/macos-packaging.md)
+- [Known issues and workarounds](docs/planning/known-issues.md)
 - [Repository guide for agents and contributors](AGENTS.md)
 
 The original proposal remains available at
-[docs/product/intent-v1.md](docs/product/intent-v1.md), but it is historical and
+[docs/archive/product/intent-v1.md](docs/archive/product/intent-v1.md), but it is historical and
 not an implementation specification.
 
 ## Repository structure
@@ -111,7 +108,7 @@ not an implementation specification.
 ```text
 src/                  Svelte app, photo ingestion, metadata normalization, tests
 electron/             Electron main process for the packaged desktop app
-docs/                 product, testing, and deployment documentation
+docs/                 product, planning, architecture, operations, and delivery records
 public/images/        public visual assets served unchanged by Vite
 fixtures/             private local test-photo folders, ignored by Git
 forge.config.cjs      Electron Forge packaging configuration

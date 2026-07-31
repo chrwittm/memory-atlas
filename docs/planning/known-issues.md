@@ -1,6 +1,9 @@
 # Known issues
 
-## MA-001: Map tiles do not recover after an offline request
+**Status:** Living issue register
+**Last updated:** 2026-07-31
+
+## MA-BUG-001: Map tiles do not recover after an offline request
 
 **Status:** Deferred after Slice B
 

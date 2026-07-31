@@ -1,5 +1,7 @@
 # Dependency security policy and current review
 
+**Status:** Living operational policy and risk review
+
 **Owner:** Memory Atlas maintainers
 
 **Last reviewed:** 2026-07-31

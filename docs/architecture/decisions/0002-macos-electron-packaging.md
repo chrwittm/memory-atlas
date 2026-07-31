@@ -1,4 +1,4 @@
-# Memory Atlas Deployment Options
+# Architecture Decision 0002: macOS Electron Packaging
 
 **Status:** Electron desktop packaging accepted for MVP testing  
 **Decision date:** 2026-07-06  

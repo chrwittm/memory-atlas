@@ -1,4 +1,4 @@
-# MVP Technology Stack
+# Architecture Decision 0001: MVP Technology Stack
 
 **Status:** Accepted  
 **Decision date:** 2026-07-05  
@@ -330,7 +330,7 @@ These are deferred decisions, not permanently prohibited technologies.
 ## Deployment and future publishing
 
 The accepted current path is the self-contained macOS Electron package described
-in [`deployment-options.md`](deployment-options.md). Vite still produces the
+in [`0002-macos-electron-packaging.md`](0002-macos-electron-packaging.md). Vite still produces the
 frontend assets embedded in that package.
 
 Vite produces a static website, so the same viewer can later be deployed to a

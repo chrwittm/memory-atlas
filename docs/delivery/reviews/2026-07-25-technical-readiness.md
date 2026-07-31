@@ -51,7 +51,7 @@ Reviewed areas:
 - component and module tests;
 - dependency and repository/release hygiene;
 - the product backlog, specifically the likely interaction between the current
-  viewer and MA-006 through MA-008.
+  viewer and MA-FEAT-006 through MA-FEAT-008.
 
 ## Verification snapshot
 
@@ -164,7 +164,7 @@ that malformed metadata must not prevent the photo from opening.
 
 ### MA-TR-002 — Shared collection selection needs a small explicit owner
 
-**Priority:** P1 before MA-006, MA-007, or MA-008  
+**Priority:** P1 before MA-FEAT-006, MA-FEAT-007, or MA-FEAT-008
 **Area:** Changeability  
 **Evidence:** The selected index, navigation, panel state, decode-status
 mutation, and object-URL synchronization all live inside `Viewer.svelte`.
@@ -351,7 +351,7 @@ regression test for fullscreen plus map mode.
 
 ### MA-TR-008 — Add Electron defense-in-depth before native capabilities
 
-**Priority:** P2; required before MA-004 or any preload bridge  
+**Priority:** P2; required before MA-FEAT-004 or any preload bridge
 **Area:** Desktop security  
 **Evidence:** The shell has a strong baseline but does not explicitly deny
 permission requests/checks, accepts external `http://` URLs as well as HTTPS,
@@ -412,7 +412,7 @@ on one corpus.
 
 ### MA-TR-010 — Measure scale before adding persistence or thumbnail machinery
 
-**Priority:** P2 before MA-007; otherwise ongoing  
+**Priority:** P2 before MA-FEAT-007; otherwise ongoing
 **Area:** Performance  
 **Evidence:** The current four-task scan, all-metadata-before-viewer flow, and
 three-photo URL window are sensible but have not been recorded against defined
@@ -427,7 +427,7 @@ unmeasured scaling can make gallery work accidentally decode too many originals.
   representative upper-bound photo count.
 - Record scan time, time to first view, peak renderer memory, worker memory,
   rapid-navigation behavior, and cleanup after folder replacement.
-- Define a thumbnail URL/cache budget before MA-007.
+- Define a thumbnail URL/cache budget before MA-FEAT-007.
 - Introduce a disposable index only when measured startup cost crosses an
   accepted threshold.
 
@@ -483,7 +483,7 @@ and verify both before beginning a substantial post-MVP feature.
 Slice C has a different role. It is not a prerequisite for every possible
 feature. Complete it immediately before, or as the enabling part of, the first
 feature that needs shared collection and selected-photo state—especially
-MA-006, MA-007, or MA-008. A narrow viewer feature that does not need this
+MA-FEAT-006, MA-FEAT-007, or MA-FEAT-008. A narrow viewer feature that does not need this
 shared state can proceed after Slices A and B without waiting for Slice C.
 
 The recommended overall sequence is:
@@ -576,7 +576,7 @@ Implement:
 **Suggested Codex task:**
 
 > Implement Slice A from
-> `docs/technical-readiness-review-2026-07-25.md`. Address MA-TR-001 and
+> `docs/delivery/reviews/2026-07-25-technical-readiness.md`. Address MA-TR-001 and
 > MA-TR-007, add the specified regression tests, and complete the source-level
 > reproducibility items from MA-TR-006 that belong in this slice. Preserve the
 > accepted MVP behavior and architecture. Do not begin Slice B, Slice C, or
@@ -610,11 +610,11 @@ Implement:
 **Suggested Codex task:**
 
 > Implement Slice B from
-> `docs/technical-readiness-review-2026-07-25.md`. Make the metadata scan
+> `docs/delivery/reviews/2026-07-25-technical-readiness.md`. Make the metadata scan
 > lifecycle terminal and cancellable, add the scanner and App integration
 > coverage, remediate and document the dependency advisories, harden Electron
 > permission and renderer-load-failure behavior, and produce and verify a fresh
-> packaged build according to `docs/deployment.md`. Preserve the accepted MVP
+> packaged build according to `docs/operations/macos-packaging.md`. Preserve the accepted MVP
 > and do not implement Slice C or post-MVP features. Run all automated checks
 > and clearly separate completed automated verification from manual checks that
 > still require the user.
@@ -652,7 +652,7 @@ changing architecture. Settle its interaction model, keyboard and pointer
 behavior, resource limits, privacy/platform implications, acceptance checks,
 and explicit non-goals.
 
-For example, before MA-007, decide whether the first thumbnail overview is a
+For example, before MA-FEAT-007, decide whether the first thumbnail overview is a
 grid or filmstrip, how it opens and closes, how keyboard focus works, how
 unreadable photos appear, and how many thumbnail resources may be retained.
 

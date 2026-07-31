@@ -16,22 +16,26 @@ thumbnail, multi-photo map, timeline, people, and topic views.
 
 Use these documents in this order:
 
-1. [`docs/product/project-context.md`](docs/product/project-context.md) — durable
+1. [`docs/README.md`](docs/README.md) — documentation map, authority rules, and
+   workflow for new specifications and plans.
+2. [`docs/product/context.md`](docs/product/context.md) — durable
    product handoff and current interpretation.
-2. [`docs/product/mvp-description.md`](docs/product/mvp-description.md) —
+3. [`docs/product/specifications/mvp.md`](docs/product/specifications/mvp.md) —
    authoritative MVP behavior and acceptance criteria.
-3. [`docs/product/mvp-technology-stack.md`](docs/product/mvp-technology-stack.md)
+4. [`docs/architecture/decisions/0001-mvp-technology-stack.md`](docs/architecture/decisions/0001-mvp-technology-stack.md)
    — authoritative implementation decisions.
-4. [`docs/product/deployment-options.md`](docs/product/deployment-options.md) —
+5. [`docs/architecture/decisions/0002-macos-electron-packaging.md`](docs/architecture/decisions/0002-macos-electron-packaging.md) —
    accepted macOS Electron packaging decision and alternatives.
-5. [`docs/product/project-name.md`](docs/product/project-name.md) — long-term
+6. [`docs/product/vision.md`](docs/product/vision.md) — long-term
    product vision and naming rationale.
-6. [`docs/product/intent-v1.md`](docs/product/intent-v1.md) — historical initial
+7. [`docs/archive/product/intent-v1.md`](docs/archive/product/intent-v1.md) — historical initial
    proposal only; its backend, ExifTool, thumbnail, index, and Leaflet choices
    are superseded.
 
-When documents disagree about the MVP, the accepted MVP description and
-technology stack win. Update `project-context.md` when a durable decision changes.
+When documents disagree about the MVP, the accepted MVP specification and
+technology-stack decision win. For post-MVP work, accepted feature
+specifications and later architecture decisions take precedence. Update
+`docs/product/context.md` when a durable decision changes.
 
 ## Current technical decisions
 
@@ -64,8 +68,12 @@ technology stack win. Update `project-context.md` when a durable decision change
 ```text
 AGENTS.md                    agent and contributor handoff
 README.md                    human-facing repository entry point
-docs/product/                product history, MVP, and architecture decisions
-docs/deployment.md           executable macOS DMG deployment runbook
+docs/product/                current product context, vision, and specifications
+docs/planning/               feature backlog and confirmed known issues
+docs/architecture/           accepted technical and platform decisions
+docs/operations/             executable runbooks and operational policy
+docs/delivery/               dated plans, reviews, and verification evidence
+docs/archive/                superseded documents retained for history
 electron/                    Electron main process for packaged desktop builds
 src/                         Svelte application, photo ingestion, and tests
 public/images/earth.jpg      provisional entry-screen Earth image
@@ -122,5 +130,7 @@ feature/domain names over generic buckets.
 - After implementation begins, run the repository's documented checks and add
   focused tests for metadata normalization, stable sorting, folder filtering,
   error isolation, keyboard behavior, and object-URL cleanup.
-- Keep documentation links valid when files move. Record accepted scope or stack
-  changes in all three current documents: context, MVP description, and stack.
+- Keep documentation links valid when files move. Preserve the MVP specification
+  as the accepted baseline except when correcting that baseline. Record new
+  accepted scope in its feature specification and the product context, and
+  record lasting technical changes in an architecture decision.

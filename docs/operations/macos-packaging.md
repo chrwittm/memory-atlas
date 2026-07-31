@@ -1,8 +1,11 @@
 # Deploy Memory Atlas on macOS
 
+**Status:** Current macOS packaging runbook
+**Last updated:** 2026-07-31
+
 This is the executable deployment runbook for producing the Memory Atlas MVP as
 a macOS application and disk image. The rationale and alternatives remain in
-[`product/deployment-options.md`](product/deployment-options.md).
+[`0002-macos-electron-packaging.md`](../architecture/decisions/0002-macos-electron-packaging.md).
 
 The current workflow creates an architecture-specific, ad-hoc-signed local
 testing build. It does not publish anything, upload photos, or modify source
@@ -148,7 +151,7 @@ Test the installed application without a Vite development server running:
 - while offline, navigate far enough for an uncached map area to remain blank,
   reconnect the network, and record whether the missing tiles load without
   restarting the application—see
-  [`MA-001`](known-issues.md#ma-001-map-tiles-do-not-recover-after-an-offline-request);
+  [`MA-BUG-001`](../planning/known-issues.md#ma-bug-001-map-tiles-do-not-recover-after-an-offline-request);
 - confirm that source photo checksums are unchanged after testing.
 
 The packaged app loads only files embedded in the application. Selected photos
@@ -194,7 +197,7 @@ publish the DMG as a GitHub Release asset:
 5. Upload the DMG in the release asset box.
 6. Include the checksum, supported architecture, install notes, and notarization
    caveat in the release notes. Use
-   [`.github/RELEASE_NOTES_TEMPLATE.md`](../.github/RELEASE_NOTES_TEMPLATE.md)
+   [`.github/RELEASE_NOTES_TEMPLATE.md`](../../.github/RELEASE_NOTES_TEMPLATE.md)
    as the starting point.
 
 Equivalent GitHub CLI shape, after replacing the version and file name:

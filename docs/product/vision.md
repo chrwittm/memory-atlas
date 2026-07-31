@@ -1,4 +1,8 @@
-# Project Name: Memory Atlas
+# Memory Atlas Product Vision
+
+**Status:** Accepted long-term vision and naming rationale
+
+**Last updated:** 2026-07-31
 
 ## Background
 

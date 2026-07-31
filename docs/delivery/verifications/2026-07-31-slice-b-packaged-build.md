@@ -36,7 +36,7 @@ Slice B source is reviewed and committed.
 including the available fixes for `fast-uri` and `postcss`. The residual
 `brace-expansion`, `tar`, and `tmp` paths are build-time-only, with exposure,
 ownership, and stable-upstream update triggers recorded in
-[`dependency-security.md`](dependency-security.md).
+[`dependency-security.md`](../../operations/dependency-security.md).
 
 ## Artifact identity
 
@@ -103,6 +103,6 @@ The user then installed the replacement DMG and repeated the physical
 disconnect/reconnect sequence. The blank tiles still did not recover. The mocked
 test therefore demonstrated handler wiring but did not demonstrate the real
 outcome. The issue is deferred as
-[`MA-001`](known-issues.md#ma-001-map-tiles-do-not-recover-after-an-offline-request),
+[`MA-BUG-001`](../../planning/known-issues.md#ma-bug-001-map-tiles-do-not-recover-after-an-offline-request),
 with application restart as the current workaround and a packaged-runtime
 investigation plan recorded there.

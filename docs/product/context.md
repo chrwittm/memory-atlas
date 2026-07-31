@@ -9,12 +9,13 @@ This is the durable handoff document for future work on Memory Atlas. It capture
 
 The product's historical evolution is captured in this order:
 
-1. [`intent-v1.md`](intent-v1.md) — the original, concrete proposal for a local metadata-rich photo presentation viewer.
-2. [`project-name.md`](project-name.md) — the later conceptual expansion from presenting photos to exploring memories.
+1. [`intent-v1.md`](../archive/product/intent-v1.md) — the original, concrete proposal for a local metadata-rich photo presentation viewer.
+2. [`vision.md`](vision.md) — the later conceptual expansion from presenting photos to exploring memories.
 
-For implementation, the accepted `mvp-description.md` and
-`mvp-technology-stack.md` take precedence over both historical documents. When
-the historical documents pull in different directions, `project-name.md` takes
+For implementation, the accepted [`MVP specification`](specifications/mvp.md)
+and [`MVP technology-stack decision`](../architecture/decisions/0001-mvp-technology-stack.md)
+take precedence over both historical documents. When the historical documents
+pull in different directions, `vision.md` takes
 precedence for the long-term product vision.
 
 ## Current working understanding
@@ -223,8 +224,8 @@ verification.
 Electron was selected over a hosted PWA because the current testing requirement
 is a self-contained application with no web-host dependency, and over Tauri
 because bundled Chromium minimizes runtime variance for the already implemented
-browser APIs. See [`deployment.md`](../deployment.md) for the executable runbook
-and [`deployment-options.md`](deployment-options.md) for the comparison and
+browser APIs. See [`macos-packaging.md`](../operations/macos-packaging.md) for the executable runbook
+and [`0002-macos-electron-packaging.md`](../architecture/decisions/0002-macos-electron-packaging.md) for the comparison and
 release boundary.
 
 ## Suggested starting point for the next session
@@ -235,17 +236,18 @@ orientation, malformed metadata, and an undecodable JPEG. Add signing and
 notarization before routine distribution to other Macs.
 
 The post-MVP idea inventory and the shared refinement workflow live in
-[`product-backlog.md`](product-backlog.md). Backlog entries are not accepted
-scope: promote a selected feature into the MVP/release description, technology
-stack, and this context only once its interaction and boundaries are decided.
+[`backlog.md`](../planning/backlog.md). Backlog entries are not accepted
+scope: give a selected feature its own accepted specification, record any
+lasting technical change as an architecture decision, and update this context
+only once its interaction and boundaries are decided.
 
 ## Source history
 
-- `intent-v1.md`: original implementation-oriented product specification.
-- `project-name.md`: later vision and naming exploration; expands the conceptual scope beyond photos and travel.
-- `project-context.md`: synthesis of both documents and the current working interpretation. It should evolve as decisions are made.
-- `mvp-description.md`: accepted behavioral definition and acceptance criteria for the first build.
-- `deployment-options.md`: deployment comparison and accepted macOS Electron
+- `archive/product/intent-v1.md`: original implementation-oriented product specification.
+- `vision.md`: later vision and naming exploration; expands the conceptual scope beyond photos and travel.
+- `context.md`: synthesis of both documents and the current working interpretation. It should evolve as decisions are made.
+- `specifications/mvp.md`: accepted behavioral definition and acceptance criteria for the first build.
+- `architecture/decisions/0002-macos-electron-packaging.md`: deployment comparison and accepted macOS Electron
   packaging decision.
 - 2026-07-05: **Memory Atlas** adopted as the final product and repository name; **Memory Explorer** retained only as the former working title.
 - 2026-07-06: macOS Electron packaging adopted for stable, self-contained MVP

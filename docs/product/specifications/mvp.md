@@ -194,7 +194,7 @@ the displayed area from the configured provider.
 
 Only macOS packaging is in scope. Windows, Linux, phones, tablets, app stores,
 hosted deployment, PWA installation, and automatic updates are deferred. See
-[`deployment-options.md`](deployment-options.md) for the alternatives and
+[`0002-macos-electron-packaging.md`](../../architecture/decisions/0002-macos-electron-packaging.md) for the alternatives and
 accepted boundary.
 
 ## 8. Explicitly outside this MVP
