@@ -36,6 +36,8 @@ assets yet, no public build has been published.
 - Opens a user-selected local folder of top-level `.jpg` and `.jpeg` files.
 - Shows photos in natural file-name order, so names like `001`, `002`, `003`
   control the sequence.
+- Zooms and pans readable photos for detail inspection, with fitted, native
+  100%, and per-photo remembered custom views.
 - Reads embedded EXIF, TIFF, IPTC, and XMP metadata in a Web Worker.
 - Shows embedded captions and capture time when available.
 - Opens an optional split photo-and-map view for the current geotagged photo.

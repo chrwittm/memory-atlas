@@ -2,7 +2,7 @@
 
 **Status:** Current MVP user documentation
 **Applies to:** Memory Atlas MVP 0.1.0
-**Last updated:** 2026-07-31
+**Last updated:** 2026-09-04
 
 Memory Atlas is a local-first macOS photo viewer. It opens a folder of JPEG
 photos, presents them in file-name order, shows embedded captions and capture
@@ -14,8 +14,10 @@ times, and can display the current photo beside its embedded GPS location.
 2. Select **Choose photo folder**.
 3. Choose a folder containing JPEG photos.
 4. Use the Left and Right Arrow keys, or click the left and right edges of the
-   viewer, to move through the photos.
-5. Press `I` for photo information, `M` for the map, or `F` for fullscreen.
+   fitted viewer, to move through the photos.
+5. Scroll over a photo or press `+` to inspect a detail, then drag or use the
+   Arrow keys to pan.
+6. Press `I` for photo information, `M` for the map, or `F` for fullscreen.
 
 ## Choosing a photo folder
 
@@ -39,11 +41,11 @@ folders, and it rescans a folder when it is selected again.
 
 ## Viewer controls
 
-The viewer fits the current photo into the available space without cropping or
-stretching it and respects the JPEG's embedded orientation. Controls fade after
-a short period of inactivity so the photo remains visually primary. Move the
-pointer or use keyboard focus to reveal them again. Keyboard shortcuts continue
-to work while the controls are hidden.
+The viewer initially fits the current photo into the available space without
+cropping or stretching it and respects the JPEG's embedded orientation.
+Controls fade after a short period of inactivity so the photo remains visually
+primary. Move the pointer or use keyboard focus to reveal them again. Keyboard
+shortcuts continue to work while the controls are hidden.
 
 | Location | Control | Action |
 | --- | --- | --- |
@@ -58,12 +60,40 @@ Hover over a control to see its name and shortcut. You can also use `Tab` and
 `Shift`+`Tab` to move focus between available controls, then activate a button
 with `Enter` or `Space`.
 
+## Inspecting photo details
+
+Zoom operates only when the pointer is over the photo or the photo region has
+keyboard focus. The complete fitted photo is the minimum. The maximum is 400%
+of the JPEG's native dimensions; a very small photo that already needs more
+than 400% to fit simply remains fitted.
+
+- Scroll a mouse wheel or use a trackpad zoom gesture over the photo. The detail
+  under the pointer stays in place unless an image edge reaches its bound.
+- Press `+` or `-` while the photo region has focus to zoom around its center.
+- Drag an enlarged photo, or use any Arrow key, to pan. Panning stops at the
+  photo edges and never adds empty canvas. The cursor changes from the normal
+  arrow to an open hand, then to a closed hand while dragging.
+- Press `Z` or double-click the photo to cycle through the fitted view, native
+  100% view, and the most recent custom view. Unavailable or duplicate views
+  are skipped. When you use `Z`, a short centered message names the selected
+  view; custom views also show their zoom percentage.
+- The left- and right-edge buttons always change photos, even while enlarged.
+
+Memory Atlas remembers the active view and inspected detail separately for each
+photo in the current folder. Returning to a photo restores its view. Opening or
+resizing the map, resizing the window, and entering fullscreen preserve that
+view as closely as the photo bounds allow. Choosing another folder clears all
+remembered views.
+
 ## Keyboard shortcuts
 
 | Key | Action |
 | --- | --- |
-| Left Arrow | Previous photo |
-| Right Arrow | Next photo |
+| `+` / `-` | Zoom the focused photo in or out around its center |
+| Left Arrow | Previous photo when fitted; pan left when enlarged |
+| Right Arrow | Next photo when fitted; pan right when enlarged |
+| Up / Down Arrow | Pan an enlarged photo vertically |
+| `Z` | Cycle fitted, native 100%, and remembered custom views, with brief mode feedback |
 | `I` | Show or hide photo information |
 | `M` | Open or close the map |
 | `F` | Enter or leave fullscreen |
@@ -103,6 +133,9 @@ The map represents the current photo only:
 - Drag the map to pan. Use the map's `+` and `−` controls, a mouse wheel, or a
   trackpad gesture to zoom.
 
+Pointer input over the map changes only the map. Photo zoom and pan remain
+scoped to the photo side of the split view.
+
 The divider can also be operated with the keyboard. Move focus to it with
 `Tab`, then use:
 
@@ -131,7 +164,8 @@ open and displays a brief explanation.
 Reveal the controls and select **Choose another folder** in the upper-left
 corner. This returns to the entry screen and clears the current collection,
 photo position, information preference, map state, and temporary image
-resources. It does not change the source folder or its photos.
+resources, including remembered zoom views. It does not change the source
+folder or its photos.
 
 ## Problems and recovery
 

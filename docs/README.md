@@ -1,7 +1,7 @@
 # Memory Atlas Documentation
 
 **Status:** Current documentation guide
-**Last updated:** 2026-07-31
+**Last updated:** 2026-09-04
 
 This directory organizes project documentation by purpose and lifecycle. Start
 with the product context and accepted specification, then consult architecture,
@@ -49,6 +49,9 @@ planning, operations, or delivery records as the task requires.
   — dated technical-readiness assessment and implementation guidance.
 - [`delivery/verifications/2026-07-31-slice-b-packaged-build.md`](delivery/verifications/2026-07-31-slice-b-packaged-build.md)
   — evidence for the verified Slice B package.
+- [`delivery/verifications/2026-09-04-ma-feat-001-image-zoom-and-pan.md`](delivery/verifications/2026-09-04-ma-feat-001-image-zoom-and-pan.md)
+  — automated implementation evidence and the remaining packaged interaction
+  check for image zoom and pan.
 - `delivery/plans/` — dated implementation plans for selected work.
 - [`archive/product/intent-v1.md`](archive/product/intent-v1.md) — historical
   initial proposal; not a current implementation authority.

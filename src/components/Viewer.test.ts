@@ -9,6 +9,30 @@ afterEach(() => {
 })
 
 describe('viewer keyboard behavior', () => {
+  async function loadPhotoAtSize(
+    surface: HTMLElement,
+    image: HTMLImageElement,
+    viewport: { width: number; height: number },
+    intrinsic: { width: number; height: number },
+  ) {
+    vi.spyOn(surface, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      right: viewport.width,
+      bottom: viewport.height,
+      width: viewport.width,
+      height: viewport.height,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    })
+    Object.defineProperties(image, {
+      naturalWidth: { configurable: true, value: intrinsic.width },
+      naturalHeight: { configurable: true, value: intrinsic.height },
+    })
+    await fireEvent.load(image)
+  }
+
   it('attempts metadata-error photos and keeps neighboring photos navigable after a decode failure', async () => {
     render(Viewer, {
       photos: [
@@ -52,6 +76,147 @@ describe('viewer keyboard behavior', () => {
     await fireEvent.keyDown(window, { key: 'i' })
     expect(view.container.querySelector('.information-overlay')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Show photo information' })).toBeInTheDocument()
+  })
+
+  it('zooms around the pointer, exposes the grab cursor state, and clamps drag panning', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'one', fileName: 'one.jpg' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+    const surface = screen.getByRole('region', { name: 'Current photo' })
+    const image = screen.getByAltText('one.jpg') as HTMLImageElement
+    await loadPhotoAtSize(surface, image, { width: 800, height: 800 }, { width: 1600, height: 1200 })
+
+    expect(image).toHaveStyle({ width: '800px', height: '600px', left: '0px', top: '100px' })
+    expect(surface).not.toHaveClass('can-pan')
+
+    await fireEvent(
+      surface,
+      new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: -350, clientX: 600, clientY: 350 }),
+    )
+    expect(surface).toHaveClass('can-pan')
+
+    const pointBeforeDrag = { left: Number.parseFloat(image.style.left), top: Number.parseFloat(image.style.top) }
+    await fireEvent(
+      surface,
+      new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0, clientX: 400, clientY: 400 }),
+    )
+    expect(surface).toHaveClass('dragging')
+    expect(screen.getByRole('main')).toHaveClass('photo-dragging')
+    await fireEvent(window, new MouseEvent('pointermove', { bubbles: true, clientX: 460, clientY: 430 }))
+    expect(Number.parseFloat(image.style.left)).toBeGreaterThan(pointBeforeDrag.left)
+    expect(Number.parseFloat(image.style.top)).toBeGreaterThan(pointBeforeDrag.top)
+    await fireEvent(window, new MouseEvent('pointerup', { bubbles: true }))
+    expect(surface).not.toHaveClass('dragging')
+    expect(screen.getByRole('main')).not.toHaveClass('photo-dragging')
+    expect(surface).toHaveClass('can-pan')
+  })
+
+  it('reserves every Arrow key for panning until the photo returns to fit', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'one', fileName: 'one.jpg' }), photo({ id: 'two', fileName: 'two.jpg' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+    const surface = screen.getByRole('region', { name: 'Current photo' })
+    const image = screen.getByAltText('one.jpg') as HTMLImageElement
+    await loadPhotoAtSize(surface, image, { width: 800, height: 800 }, { width: 1600, height: 1200 })
+
+    await fireEvent.keyDown(window, { key: '+' })
+    expect(surface).toHaveClass('can-pan')
+    for (let step = 0; step < 30; step += 1) await fireEvent.keyDown(window, { key: 'ArrowRight' })
+    expect(screen.getByAltText('one.jpg')).toBeInTheDocument()
+
+    await fireEvent(
+      surface,
+      new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: 5000, clientX: 400, clientY: 400 }),
+    )
+    expect(surface).not.toHaveClass('can-pan')
+    await fireEvent.keyDown(window, { key: 'ArrowRight' })
+    expect(screen.getByAltText('two.jpg')).toBeInTheDocument()
+  })
+
+  it('restores independent per-photo views and lets edge controls navigate while enlarged', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'one', fileName: 'one.jpg' }), photo({ id: 'two', fileName: 'two.jpg' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+    const surface = screen.getByRole('region', { name: 'Current photo' })
+    const firstImage = screen.getByAltText('one.jpg') as HTMLImageElement
+    await loadPhotoAtSize(surface, firstImage, { width: 800, height: 800 }, { width: 1600, height: 1200 })
+    await fireEvent.keyDown(window, { key: '+' })
+    const rememberedWidth = firstImage.style.width
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Next photo' }))
+    expect(screen.getByAltText('two.jpg')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: 'Previous photo' }))
+
+    expect(screen.getByAltText('one.jpg')).toHaveStyle({ width: rememberedWidth })
+    expect(surface).toHaveClass('can-pan')
+  })
+
+  it('cycles named views and preserves native scale when the viewport changes', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'one', fileName: 'one.jpg' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+    const surface = screen.getByRole('region', { name: 'Current photo' })
+    const image = screen.getByAltText('one.jpg') as HTMLImageElement
+    let viewportWidth = 800
+    vi.spyOn(surface, 'getBoundingClientRect').mockImplementation(() => ({
+      left: 0,
+      top: 0,
+      right: viewportWidth,
+      bottom: 800,
+      width: viewportWidth,
+      height: 800,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    }))
+    Object.defineProperties(image, {
+      naturalWidth: { configurable: true, value: 1600 },
+      naturalHeight: { configurable: true, value: 1200 },
+    })
+    await fireEvent.load(image)
+
+    await fireEvent.keyDown(window, { key: 'z' })
+    expect(image).toHaveStyle({ width: '1600px', height: '1200px' })
+
+    viewportWidth = 600
+    await fireEvent(window, new Event('resize'))
+    expect(image).toHaveStyle({ width: '1600px', height: '1200px' })
+
+    await fireEvent.dblClick(surface, { button: 0 })
+    expect(image).toHaveStyle({ width: '600px', height: '450px' })
+  })
+
+  it('briefly announces each zoom mode selected with Z', async () => {
+    vi.useFakeTimers()
+    render(Viewer, {
+      photos: [photo({ id: 'one', fileName: 'one.jpg' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+    const surface = screen.getByRole('region', { name: 'Current photo' })
+    const image = screen.getByAltText('one.jpg') as HTMLImageElement
+    await loadPhotoAtSize(surface, image, { width: 800, height: 800 }, { width: 1600, height: 1200 })
+
+    await fireEvent.keyDown(window, { key: 'z' })
+    expect(screen.getByRole('status')).toHaveTextContent('Zoom mode · 100%')
+
+    await fireEvent.keyDown(window, { key: '+' })
+    await fireEvent.keyDown(window, { key: 'z' })
+    expect(screen.getByRole('status')).toHaveTextContent('Zoom mode · Fitted view')
+    await fireEvent.keyDown(window, { key: 'z' })
+    await fireEvent.keyDown(window, { key: 'z' })
+    expect(screen.getByRole('status')).toHaveTextContent('Zoom mode · Custom (125%)')
+
+    await vi.advanceTimersByTimeAsync(1200)
+    expect(screen.queryByText('Zoom mode · Custom (125%)')).not.toBeInTheDocument()
   })
 
   it('resizes the photo and map split with the divider', async () => {

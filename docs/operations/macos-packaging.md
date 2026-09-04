@@ -1,7 +1,7 @@
 # Deploy Memory Atlas on macOS
 
 **Status:** Current macOS packaging runbook
-**Last updated:** 2026-07-31
+**Last updated:** 2026-09-04
 
 This is the executable deployment runbook for producing the Memory Atlas MVP as
 a macOS application and disk image. The rationale and alternatives remain in
@@ -64,6 +64,18 @@ smoke test below.
    - Press Escape again. Map mode closes.
    - Navigate to a photo without GPS while map mode is open and confirm the
      no-GPS placeholder appears instead of closing the map.
+
+4. Verify zoom and pan with representative large JPEGs:
+
+   - Zoom with a mouse wheel and trackpad over the photo; confirm the pointed-at
+     detail remains stationary until an edge bound is reached.
+   - Drag the enlarged photo to every edge and confirm no additional empty
+     canvas appears and the cursor changes from `grab` to `grabbing` only while
+     dragging.
+   - With the photo focused, use `+`, `-`, all Arrow keys, and `Z`; confirm Left
+     and Right Arrow navigate only after the photo returns to its fitted view.
+   - Navigate away and back, open and resize the map, and enter fullscreen;
+     confirm each photo's active view and focal detail are retained.
 
 ## Create the application and DMG
 
@@ -143,6 +155,8 @@ Test the installed application without a Vite development server running:
 - select a folder and confirm that only top-level JPEG files are included;
 - confirm natural file-name ordering, metadata progress, captions, capture time,
   image orientation, previous/next controls, `I`, `M`, `F`, and fullscreen exit;
+- confirm mouse-wheel and trackpad zoom, pointer drag, grab/grabbing cursor feel,
+  focused keyboard zoom and pan, named-view cycling, and per-photo restoration;
 - navigate across readable and unreadable files without losing the collection;
 - open map mode for a located photo and confirm the no-GPS placeholder for an
   unlocated photo;

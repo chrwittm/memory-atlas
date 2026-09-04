@@ -53,7 +53,7 @@ heavy process.
 
 | Horizon | Theme | Why it belongs here |
 | --- | --- | --- |
-| Next desktop refinements | Zoom, Home, file actions, and fullscreen reliability | High value while preserving the present single-photo viewer |
+| Next desktop refinements | Direct zoom/pan, a three-region focus loop, Home, file actions, and fullscreen reliability | High value while preserving the present viewer and making its keyboard model coherent |
 | Next exploration views | Thumbnail gallery, all-photo map, and GPX overlays | Natural extensions of the existing temporary collection and shared selection |
 | Media expansion | Videos in the file-name sequence | A demonstrated trip-viewing need that requires codec and playback-boundary research |
 | Context and people | Tags, filename, people regions | Depends on representative metadata and an intentional side-panel model |
@@ -63,11 +63,13 @@ heavy process.
 ### Suggested sequence for the 2026-09-04 field feedback
 
 1. Reproduce and fix MA-BUG-002 before changing the broader keyboard model.
-2. Extend the present map with MA-FEAT-008's all-photo mode and two-way pin
+2. Specify and implement MA-FEAT-001 and MA-FEAT-015 together because zoom,
+   collection navigation, and region focus share the Arrow keys.
+3. Extend the present map with MA-FEAT-008's all-photo mode and two-way pin
    selection.
-3. Inspect representative GPX files, then specify MA-FEAT-016 on top of that
+4. Inspect representative GPX files, then specify MA-FEAT-016 on top of that
    map-layer foundation.
-4. Inspect representative trip videos and packaged-runtime codec behavior, then
+5. Inspect representative trip videos and packaged-runtime codec behavior, then
    specify MA-FEAT-017 as a separate mixed-media vertical slice.
 
 ## Candidate next slice: desktop viewer essentials
@@ -77,24 +79,22 @@ changing the local-first model.
 
 ### MA-FEAT-001 — Image zoom and pan
 
-- **State:** Ready to specify
+- **State:** Implemented and user-tested 2026-09-04
+- **Specification:**
+  [`MA-FEAT-001 — Image zoom and pan`](../product/specifications/features/ma-feat-001-image-zoom-and-pan.md)
 - **User outcome:** While viewing a photo, I can inspect a detail such as text
   on a sign without leaving Memory Atlas.
-- **Proposed interaction:** `Z` enters/exits zoom mode. Mouse-wheel or
-  trackpad pinch changes scale; click-drag pans while enlarged. A visible quiet
-  control and a compact hint make the mode discoverable. Resetting returns to
-  the fitted, uncropped image.
-- **Questions to settle:** Should the first `Z` use a fixed useful scale or
-  center on the pointer? Should double-click also toggle zoom? What minimum and
-  maximum scale feel useful with very large JPEGs?
-- **Acceptance checks:** Fitted view remains the default; zoom never modifies
-  source files; panning cannot expose an empty canvas unintentionally; keyboard
-  photo navigation remains predictable; reduced-motion and touch behavior are
-  considered.
-- **Non-goal:** Image editing, crop, annotation, or permanently saving a zoom
-  position.
-- **Likely dependencies:** Viewer interaction state and object-URL/image-decoding
-  behavior need regression tests.
+- **Accepted interaction:** Direct mouse-wheel/trackpad and `+`/`-` zoom from a
+  fitted minimum through 400% of the JPEG's native scale; pointer zoom is
+  anchored at the pointer and keyboard zoom at the photo center. Drag or Arrow
+  keys pan an enlarged photo within its bounds. At fit, Left and Right Arrow
+  navigate the collection. `Z` or double-click cycles through the fitted,
+  native 100%, and per-photo remembered custom views, skipping unavailable or
+  duplicate entries.
+- **Implementation:** Photo zoom and pan dispatch is scoped to the focused photo
+  region, while the divider and map retain their own input. Per-photo view state
+  is transient, and the existing source-file and object-URL boundaries are
+  preserved. The broader three-region `Tab` loop remains tracked by MA-FEAT-015.
 
 ### MA-FEAT-002 — Return to entry screen
 
@@ -149,6 +149,36 @@ changing the local-first model.
 - **Acceptance checks:** Clearly distinguishes local photos/metadata from map
   tile requests; does not interrupt normal browsing; remains accessible.
 - **Non-goal:** A marketing site, account system, or legal policy program.
+
+### MA-FEAT-015 — Minimal viewer focus loop
+
+- **State:** Ready to specify
+- **User outcome:** I can move predictably between the large interactive areas
+  of the viewer without tabbing through every fading on-screen control.
+- **Proposed interaction:** In the main viewer, `Tab` and `Shift`+`Tab` cycle
+  only through visible interaction regions. With the map closed, the photo is
+  the only region. With the map open, the forward order is photo, divider, map;
+  reverse traversal uses the opposite order. The no-GPS map placeholder still
+  represents the visible map region.
+- **Region behavior:** A visible focus indicator identifies the active region.
+  Arrow and `+`/`-` input is dispatched by that focus: the photo zooms and pans
+  under MA-FEAT-001, the divider keeps its existing Arrow-key resizing, and the
+  map uses its normal pan and zoom behavior. Global shortcuts such as `I`, `M`,
+  and `F` remain available independent of the active region.
+- **Accessibility boundary:** Viewer buttons and MapLibre controls should not
+  lengthen this spatial focus loop. Every excluded viewer action must retain a
+  documented keyboard equivalent and an accessible name; the specification
+  must also define non-disruptive keyboard access to required map attribution.
+  Entry, loading, empty, and error screens retain their normal control-focused
+  tab order.
+- **Acceptance checks:** The loop contains exactly the regions currently
+  visible; opening or closing the map moves focus safely; focus never becomes
+  lost or trapped; the divider remains keyboard-resizable; and pointer use does
+  not make keyboard focus ambiguous.
+- **Non-goal:** Redesigning the visible controls or replacing global shortcuts.
+- **Likely dependencies:** Coordinate keyboard dispatch with MA-FEAT-001 and
+  ensure MA-FEAT-002 provides a keyboard route back to folder selection before
+  removing that visible action from the tab order.
 
 ## Exploration views
 
@@ -395,5 +425,7 @@ screens.
 | 2026-07-25 | Establish this living backlog and lightweight refinement workflow. | The desktop MVP is proven; follow-on ideas need a shared, traceable route from discovery to implementation. |
 | 2026-07-25 | Keep mobile, persistent indexing, face regions, and native file actions as discovery/research tracks. | Each changes platform, privacy, storage, or security boundaries and should not be implied by the desktop MVP. |
 | 2026-07-25 | Reserve `T` as the working proposal for thumbnail overview, not tags. | It makes the suggested keyboard scheme internally consistent; it remains provisional until MA-FEAT-007 is specified. |
+| 2026-09-04 | Replace MA-FEAT-001's modal `Z` concept with map-like direct zoom and pan. | First real trip use showed that shared pointer and focused-keyboard behavior is simpler than a separate image zoom mode. |
+| 2026-09-04 | Treat photo, divider, and map as the viewer's spatial focus regions. | A short `Tab`/`Shift`+`Tab` loop preserves the useful keyboard-resizable divider without traversing every transient control. |
 | 2026-09-04 | Grow the map through cumulative `G` modes and portable GPX files. | The desired experience connects the current photo, other photos, user-authored points of interest, and traveled tracks while keeping `M` as the map toggle. |
 | 2026-09-04 | Promote mixed photo/video playback from the parking lot to MA-FEAT-017. | Real trip presentation needs videos in the same explicit file-name sequence, with familiar `J`/`K`/`L` playback controls. |

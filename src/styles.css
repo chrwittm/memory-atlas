@@ -136,11 +136,14 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .viewer { position: relative; display: grid; grid-template-columns: 1fr; width: 100%; height: 100%; background: #0b0d0c; }
 .viewer.map-open { grid-template-columns: minmax(0, var(--photo-panel-width, 80%)) minmax(0, 1fr); }
 .viewer.resizing { cursor: col-resize; user-select: none; }
+.viewer.photo-dragging, .viewer.photo-dragging * { cursor: grabbing !important; }
 .photo-panel { position: relative; min-width: 0; height: 100%; overflow: hidden; background: #0b0d0c; }
-.current-photo { display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; animation: photo-in 170ms cubic-bezier(.2,.7,.25,1) both; }
-.current-photo.from-right { --entry-x: 1.2rem; }
-.current-photo.from-left { --entry-x: -1.2rem; }
-@keyframes photo-in { from { opacity: .45; transform: translateX(var(--entry-x)); } to { opacity: 1; transform: translateX(0); } }
+.photo-surface { position: absolute; inset: 0; z-index: 1; overflow: hidden; outline: 0; cursor: default; touch-action: none; }
+.photo-surface:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+.photo-surface.can-pan { cursor: grab; }
+.photo-surface.dragging { cursor: grabbing; }
+.current-photo { position: absolute; top: 0; left: 0; display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; animation: photo-in 170ms cubic-bezier(.2,.7,.25,1) both; }
+@keyframes photo-in { from { opacity: .45; } to { opacity: 1; } }
 
 .information-overlay {
   position: absolute;
@@ -174,7 +177,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .edge-control.previous { left: 0; }
 .edge-control.next { right: 0; }
 .edge-control.visible { opacity: 1; }
-.viewer:focus-within .edge-control:not(:disabled) { opacity: 1; }
+.edge-control:focus-visible:not(:disabled) { opacity: 1; }
 .edge-control:disabled { opacity: 0; cursor: default; }
 .edge-control:not(:disabled):hover { background: linear-gradient(90deg, rgba(0,0,0,.22), transparent); }
 .edge-control.next:not(:disabled):hover { background: linear-gradient(-90deg, rgba(0,0,0,.22), transparent); }
@@ -183,7 +186,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 .top-controls, .bottom-controls { position: absolute; z-index: 6; display: flex; align-items: center; opacity: 0; pointer-events: none; transition: opacity 260ms ease; }
 .top-controls.visible, .bottom-controls.visible { opacity: 1; pointer-events: auto; }
-.viewer:focus-within .top-controls, .viewer:focus-within .bottom-controls { opacity: 1; pointer-events: auto; }
+.top-controls:focus-within, .bottom-controls:focus-within { opacity: 1; pointer-events: auto; }
 .top-controls { top: 1.25rem; right: 1.25rem; left: 1.25rem; justify-content: space-between; }
 .bottom-controls { right: 1.25rem; bottom: 1.25rem; }
 .text-control, .icon-control {

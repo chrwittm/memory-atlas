@@ -1,7 +1,7 @@
 # Memory Atlas: Living Project Context
 
 Status: Browser MVP implemented; macOS packaging accepted  
-Last updated: 2026-07-31
+Last updated: 2026-09-04
 
 ## Purpose of this document
 
@@ -78,6 +78,14 @@ This is not a retreat from the broader vision. It is the smallest domain in whic
 - Browsing should be visually strong enough for full-screen presentation.
 - The viewer toggles true browser fullscreen with `F`; `Escape` retains its
   browser-standard fullscreen exit behavior.
+- Image zoom and pan is implemented for the desktop viewer. A photo fits
+  the current photo region at its minimum and zooms to 400% of the JPEG's native
+  dimensions. Pointer zoom is anchored under the pointer, keyboard zoom is
+  centered, and panning is clamped so it cannot reveal additional empty canvas.
+- At fitted scale, Left and Right Arrow navigate photos; at enlarged scales,
+  the Arrow keys pan. `Z` and double-click cycle through the fitted view, native
+  100% view, and a per-photo remembered custom view for the current folder
+  session, skipping views that are unavailable or duplicate.
 - Caption and capture time form one optional information overlay, shown by
   default and toggled with `I`; either value remains useful without the other.
 - Place is a meaningful exploration dimension, not merely a metadata field.
@@ -181,7 +189,10 @@ explanatory panel and the map returns for the next located photo. The combined
 caption and capture-time overlay is toggled with `I`, and either value displays
 when the other is absent. The viewer can enter and leave browser fullscreen with
 `F`, with graceful feedback
-when the Fullscreen API is unavailable or rejects the request. Photos use
+when the Fullscreen API is unavailable or rejects the request. Readable photos
+support pointer-anchored and centered keyboard zoom from fit through 400% of
+their native dimensions, clamped pointer and Arrow-key panning, and per-photo
+fitted/native/custom view restoration for the current folder session. Photos use
 case-insensitive natural file-name order so a numeric prefix explicitly controls
 the sequence; capture time is retained only as metadata. The
 representative 24-photo corpus established the following metadata behavior:
@@ -255,3 +266,9 @@ only once its interaction and boundaries are decided.
 - 2026-07-25: a living post-MVP product backlog and lightweight feature
   refinement workflow were established; no post-MVP feature scope was accepted
   by that act alone.
+- 2026-09-04: MA-FEAT-001 image zoom and pan was accepted for the next desktop
+  viewer slice, coordinated with MA-FEAT-015's interaction-region focus model.
+- 2026-09-04: MA-FEAT-001 was implemented with pointer-anchored and centered
+  keyboard zoom, bounded pointer and Arrow-key panning, per-photo remembered
+  named views, and responsive fit recalculation. The broader three-region
+  `Tab` loop remains tracked separately by MA-FEAT-015.

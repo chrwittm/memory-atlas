@@ -2,6 +2,19 @@
   import { onDestroy, onMount } from 'svelte'
   import LazyMap from './LazyMap.svelte'
   import { ObjectUrlWindow } from '../lib/photos/objectUrls'
+  import {
+    calculateImageGeometry,
+    createImageViewState,
+    cycleImageView,
+    KEYBOARD_PAN_DISTANCE,
+    KEYBOARD_ZOOM_FACTOR,
+    panImageBy,
+    reconcileImageView,
+    zoomImageAt,
+    type ImageViewState,
+    type Point,
+    type Size,
+  } from '../lib/viewer/imageView'
   import type { Photo } from '../lib/photos/types'
 
   let {
@@ -20,13 +33,21 @@
   let splitPercent = $state(80)
   let resizingSplit = $state(false)
   let controlsVisible = $state(true)
-  let direction = $state<'next' | 'previous'>('next')
   let notice = $state('')
   let decodeErrorIds = $state(new Set<string>())
+  let viewState = $state<ImageViewState>(createImageViewState())
+  let intrinsicSize = $state<Size | undefined>()
+  let viewportSize = $state<Size>({ width: 0, height: 0 })
+  let draggingPhoto = $state(false)
   let hideControlsTimer: ReturnType<typeof setTimeout>
   let noticeTimer: ReturnType<typeof setTimeout>
   let viewer: HTMLElement
+  let photoSurface: HTMLElement
+  let photoResizeObserver: ResizeObserver | undefined
+  let previousDragPoint: Point | undefined
   const urlWindow = new ObjectUrlWindow()
+  const viewStates = new Map<string, ImageViewState>()
+  const intrinsicSizes = new Map<string, Size>()
 
   let current = $derived(photos[currentIndex])
   let currentUrl = $derived(urlWindow.sync(photos, currentIndex))
@@ -34,12 +55,19 @@
     current.status === 'decode-error' || decodeErrorIds.has(current.id),
   )
   let readableCount = $derived(photos.filter((photo) => photo.status !== 'read-error').length)
+  let imageGeometry = $derived(
+    intrinsicSize && viewportSize.width > 0 && viewportSize.height > 0
+      ? calculateImageGeometry(viewState, intrinsicSize, viewportSize)
+      : undefined,
+  )
 
   function showControls() {
     controlsVisible = true
     clearTimeout(hideControlsTimer)
     hideControlsTimer = setTimeout(() => {
-      if (!viewer.contains(document.activeElement)) controlsVisible = false
+      if (!viewer.contains(document.activeElement) || document.activeElement === photoSurface) {
+        controlsVisible = false
+      }
     }, 2200)
   }
 
@@ -51,18 +79,22 @@
   function move(delta: number) {
     const next = Math.max(0, Math.min(photos.length - 1, currentIndex + delta))
     if (next === currentIndex) return
-    direction = delta > 0 ? 'next' : 'previous'
+    stopDraggingPhoto()
     currentIndex = next
+    const nextPhoto = photos[next]
+    viewState = viewStates.get(nextPhoto.id) ?? createImageViewState()
+    intrinsicSize = intrinsicSizes.get(nextPhoto.id)
     showControls()
   }
 
-  function showNotice(message: string) {
+  function showNotice(message: string, duration = 2600) {
     notice = message
     clearTimeout(noticeTimer)
-    noticeTimer = setTimeout(() => (notice = ''), 2600)
+    noticeTimer = setTimeout(() => (notice = ''), duration)
   }
 
   function toggleMap() {
+    stopDraggingPhoto()
     mapOpen = !mapOpen
     showControls()
   }
@@ -101,6 +133,126 @@
     splitPercent = Math.max(20, Math.min(80, ((clientX - bounds.left) / bounds.width) * 100))
   }
 
+  function measurePhotoSurface(): Size | undefined {
+    const bounds = photoSurface?.getBoundingClientRect()
+    if (!bounds?.width || !bounds.height) return undefined
+    const size = { width: bounds.width, height: bounds.height }
+    viewportSize = size
+    if (intrinsicSize) commitView(reconcileImageView(viewState, intrinsicSize, size))
+    return size
+  }
+
+  function commitView(next: ImageViewState) {
+    viewState = next
+    viewStates.set(current.id, next)
+  }
+
+  function handlePhotoLoad(event: Event) {
+    const image = event.currentTarget as HTMLImageElement
+    const width = image.naturalWidth || current.width || 0
+    const height = image.naturalHeight || current.height || 0
+    if (!width || !height) return
+    const size = { width, height }
+    intrinsicSizes.set(current.id, size)
+    intrinsicSize = size
+    const viewport = measurePhotoSurface()
+    if (viewport) commitView(reconcileImageView(viewState, size, viewport))
+  }
+
+  function photoContext() {
+    if (!intrinsicSize) return undefined
+    const viewport = measurePhotoSurface() ?? viewportSize
+    if (!viewport.width || !viewport.height) return undefined
+    return { image: intrinsicSize, viewport }
+  }
+
+  function focusPhoto() {
+    photoSurface?.focus({ preventScroll: true })
+  }
+
+  function handlePhotoWheel(event: WheelEvent) {
+    const context = photoContext()
+    if (!context) return
+    event.preventDefault()
+    focusPhoto()
+    const bounds = photoSurface.getBoundingClientRect()
+    const deltaPixels =
+      event.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? event.deltaY * 16
+        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? event.deltaY * context.viewport.height
+          : event.deltaY
+    const requestedScale = calculateImageGeometry(
+      viewState,
+      context.image,
+      context.viewport,
+    ).scale
+    commitView(
+      zoomImageAt(
+        viewState,
+        context.image,
+        context.viewport,
+        requestedScale * Math.exp(-deltaPixels * 0.002),
+        { x: event.clientX - bounds.left, y: event.clientY - bounds.top },
+      ),
+    )
+  }
+
+  function moveDraggedPhoto(event: PointerEvent) {
+    if (!previousDragPoint) return
+    const context = photoContext()
+    if (!context) return
+    const nextPoint = { x: event.clientX, y: event.clientY }
+    commitView(
+      panImageBy(viewState, context.image, context.viewport, {
+        x: nextPoint.x - previousDragPoint.x,
+        y: nextPoint.y - previousDragPoint.y,
+      }),
+    )
+    previousDragPoint = nextPoint
+  }
+
+  function stopDraggingPhoto() {
+    draggingPhoto = false
+    previousDragPoint = undefined
+    window.removeEventListener('pointermove', moveDraggedPhoto)
+    window.removeEventListener('pointerup', stopDraggingPhoto)
+    window.removeEventListener('pointercancel', stopDraggingPhoto)
+  }
+
+  function startDraggingPhoto(event: PointerEvent) {
+    if (event.button !== 0 || !imageGeometry?.canPan) return
+    event.preventDefault()
+    focusPhoto()
+    draggingPhoto = true
+    previousDragPoint = { x: event.clientX, y: event.clientY }
+    window.addEventListener('pointermove', moveDraggedPhoto)
+    window.addEventListener('pointerup', stopDraggingPhoto)
+    window.addEventListener('pointercancel', stopDraggingPhoto)
+  }
+
+  function cycleCurrentImageView(announce = false) {
+    const context = photoContext()
+    if (!context) return
+    const next = cycleImageView(viewState, context.image, context.viewport)
+    commitView(next)
+    if (announce) showNotice(zoomModeLabel(next, context.image, context.viewport), 1200)
+  }
+
+  function zoomModeLabel(state: ImageViewState, image: Size, viewport: Size) {
+    if (state.activeView === 'fit') return 'Zoom mode · Fitted view'
+    if (state.activeView === 'native') return 'Zoom mode · 100%'
+    const percentage = Math.round(calculateImageGeometry(state, image, viewport).scale * 100)
+    return `Zoom mode · Custom (${percentage}%)`
+  }
+
+  function handlePhotoDoubleClick(event: MouseEvent) {
+    if (event.button !== 0) return
+    event.preventDefault()
+    focusPhoto()
+    cycleCurrentImageView()
+  }
+
   function resizeSplit(event: PointerEvent) {
     setSplitFromPointer(event.clientX)
   }
@@ -134,9 +286,7 @@
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.defaultPrevented) return
-    if (event.key === 'ArrowLeft') move(-1)
-    else if (event.key === 'ArrowRight') move(1)
-    else if (event.key.toLowerCase() === 'i') {
+    if (event.key.toLowerCase() === 'i') {
       event.preventDefault()
       toggleInformation()
     } else if (event.key.toLowerCase() === 'm') {
@@ -154,11 +304,56 @@
     } else if (event.key === 'Escape' && mapOpen && !document.fullscreenElement) {
       mapOpen = false
       showControls()
+    } else if (document.activeElement === photoSurface) {
+      handlePhotoKeydown(event)
+    }
+  }
+
+  function handlePhotoKeydown(event: KeyboardEvent) {
+    const context = photoContext()
+    const geometry = context
+      ? calculateImageGeometry(viewState, context.image, context.viewport)
+      : undefined
+
+    if (event.key === 'ArrowLeft' && !geometry?.canPan) {
+      event.preventDefault()
+      move(-1)
+      return
+    }
+    if (event.key === 'ArrowRight' && !geometry?.canPan) {
+      event.preventDefault()
+      move(1)
+      return
+    }
+    if (event.key.startsWith('Arrow')) {
+      event.preventDefault()
+      if (!context || !geometry?.canPan) return
+      const deltas: Record<string, Point> = {
+        ArrowLeft: { x: KEYBOARD_PAN_DISTANCE, y: 0 },
+        ArrowRight: { x: -KEYBOARD_PAN_DISTANCE, y: 0 },
+        ArrowUp: { x: 0, y: KEYBOARD_PAN_DISTANCE },
+        ArrowDown: { x: 0, y: -KEYBOARD_PAN_DISTANCE },
+      }
+      const delta = deltas[event.key]
+      if (delta) commitView(panImageBy(viewState, context.image, context.viewport, delta))
+      return
+    }
+
+    if (!context) return
+    if (event.key === '+' || event.key === '-') {
+      event.preventDefault()
+      const factor = event.key === '+' ? KEYBOARD_ZOOM_FACTOR : 1 / KEYBOARD_ZOOM_FACTOR
+      commitView(zoomImageAt(viewState, context.image, context.viewport, geometry!.scale * factor))
+    } else if (event.key.toLowerCase() === 'z' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault()
+      cycleCurrentImageView(true)
     }
   }
 
   function markDecodeError() {
+    stopDraggingPhoto()
     decodeErrorIds = new Set([...decodeErrorIds, current.id])
+    intrinsicSize = undefined
   }
 
   function dateLabel(value?: string) {
@@ -172,12 +367,30 @@
     }).format(new Date(value))
   }
 
-  onMount(showControls)
+  onMount(() => {
+    showControls()
+    focusPhoto()
+    measurePhotoSurface()
+    if (typeof ResizeObserver !== 'undefined') {
+      photoResizeObserver = new ResizeObserver(measurePhotoSurface)
+      photoResizeObserver.observe(photoSurface)
+    }
+    photoSurface.addEventListener('wheel', handlePhotoWheel, { passive: false })
+    window.addEventListener('resize', measurePhotoSurface)
+    document.addEventListener('fullscreenchange', measurePhotoSurface)
+  })
 
   onDestroy(() => {
     clearTimeout(hideControlsTimer)
     clearTimeout(noticeTimer)
+    stopDraggingPhoto()
     stopResizingSplit()
+    photoResizeObserver?.disconnect()
+    photoSurface?.removeEventListener('wheel', handlePhotoWheel)
+    window.removeEventListener('resize', measurePhotoSurface)
+    document.removeEventListener('fullscreenchange', measurePhotoSurface)
+    viewStates.clear()
+    intrinsicSizes.clear()
     urlWindow.dispose()
   })
 </script>
@@ -188,6 +401,7 @@
   bind:this={viewer}
   class:map-open={mapOpen}
   class:resizing={resizingSplit}
+  class:photo-dragging={draggingPhoto}
   class:controls-hidden={!controlsVisible}
   class="viewer"
   style={`--photo-panel-width: ${splitPercent}%`}
@@ -196,6 +410,18 @@
   onfocusout={handleFocusOut}
 >
   <section class="photo-panel">
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_static_element_interactions (interactive image viewport) -->
+    <div
+      bind:this={photoSurface}
+      class:can-pan={imageGeometry?.canPan}
+      class:dragging={draggingPhoto}
+      class="photo-surface"
+      role="region"
+      aria-label="Current photo"
+      tabindex="0"
+      onpointerdown={startDraggingPhoto}
+      ondblclick={handlePhotoDoubleClick}
+    >
     {#key current.id}
       {#if current.status === 'read-error' || currentHasDecodeError}
         <div class="photo-error" role="status">
@@ -206,15 +432,18 @@
         </div>
       {:else if currentUrl}
         <img
-          class:from-right={direction === 'next'}
-          class:from-left={direction === 'previous'}
           class="current-photo"
           src={currentUrl}
           alt={current.caption || current.title || current.fileName}
+          style={imageGeometry
+            ? `width: ${imageGeometry.width}px; height: ${imageGeometry.height}px; left: ${imageGeometry.left}px; top: ${imageGeometry.top}px;`
+            : undefined}
+          onload={handlePhotoLoad}
           onerror={markDecodeError}
         />
       {/if}
     {/key}
+    </div>
 
     {#if informationVisible && (current.caption || current.capturedAt) && !currentHasDecodeError}
       <div class="information-overlay">
