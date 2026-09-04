@@ -9,6 +9,11 @@ planning, operations, or delivery records as the task requires.
 
 ## Documentation map
 
+### User documentation
+
+- [`user-guide.md`](user-guide.md) — current MVP features, controls, keyboard
+  shortcuts, map behavior, privacy notes, and recovery guidance.
+
 ### Product
 
 - [`product/context.md`](product/context.md) — durable current product

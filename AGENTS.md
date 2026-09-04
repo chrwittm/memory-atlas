@@ -68,6 +68,7 @@ specifications and later architecture decisions take precedence. Update
 ```text
 AGENTS.md                    agent and contributor handoff
 README.md                    human-facing repository entry point
+docs/user-guide.md           user-facing MVP features, controls, and help
 docs/product/                current product context, vision, and specifications
 docs/planning/               feature backlog and confirmed known issues
 docs/architecture/           accepted technical and platform decisions
@@ -134,3 +135,12 @@ feature/domain names over generic buckets.
   as the accepted baseline except when correcting that baseline. Record new
   accepted scope in its feature specification and the product context, and
   record lasting technical changes in an architecture decision.
+- Treat documentation as part of the definition of done in every subsequent
+  session. Proactively update every affected public document in the same change
+  without waiting for a separate documentation request. This includes the user
+  guide for user-facing features, controls, shortcuts, supported inputs, visible
+  states, and recovery paths; product specifications and context for accepted
+  behavior; architecture decisions for lasting technical choices; operations
+  documentation for changed workflows; and planning or delivery records when
+  their status or evidence changes. Do not rewrite unaffected documents merely
+  to create documentation activity.
