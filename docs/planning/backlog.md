@@ -1,7 +1,9 @@
 # Memory Atlas Product Backlog
 
-**Status:** Living post-MVP backlog  
-**Last updated:** 2026-07-25  
+**Status:** Living post-MVP backlog
+
+**Last updated:** 2026-09-04
+
 **Purpose:** Capture, refine, and sequence product ideas without accidentally
 turning them into accepted scope.
 
@@ -51,11 +53,22 @@ heavy process.
 
 | Horizon | Theme | Why it belongs here |
 | --- | --- | --- |
-| Next desktop refinements | Zoom, Home, file actions, calmer privacy wording | High value while preserving the present single-photo viewer |
-| Next exploration views | Thumbnail gallery and all-photo map | Natural extensions of the existing temporary collection and shared selection |
+| Next desktop refinements | Zoom, Home, file actions, and fullscreen reliability | High value while preserving the present single-photo viewer |
+| Next exploration views | Thumbnail gallery, all-photo map, and GPX overlays | Natural extensions of the existing temporary collection and shared selection |
+| Media expansion | Videos in the file-name sequence | A demonstrated trip-viewing need that requires codec and playback-boundary research |
 | Context and people | Tags, filename, people regions | Depends on representative metadata and an intentional side-panel model |
 | Platform strategy | iPhone and iPad | Requires a product, storage, and distribution decision—not a responsive-CSS-only change |
 | Performance and persistence | Disposable scan index/cache | Defer until measured scan cost justifies a new persistence boundary |
+
+### Suggested sequence for the 2026-09-04 field feedback
+
+1. Reproduce and fix MA-BUG-002 before changing the broader keyboard model.
+2. Extend the present map with MA-FEAT-008's all-photo mode and two-way pin
+   selection.
+3. Inspect representative GPX files, then specify MA-FEAT-016 on top of that
+   map-layer foundation.
+4. Inspect representative trip videos and packaged-runtime codec behavior, then
+   specify MA-FEAT-017 as a separate mixed-media vertical slice.
 
 ## Candidate next slice: desktop viewer essentials
 
@@ -178,16 +191,59 @@ screens.
 - **State:** Ready to specify
 - **User outcome:** I can understand a folder spatially and jump from a map pin
   to the associated photo.
-- **Proposed interaction:** A map overview renders every photo with valid GPS,
-  with a clear selected-photo state. Clicking a pin changes the current photo;
-  selecting a photo updates the map. Clustering is considered for dense sets.
+- **Proposed interaction:** While the map is open, `G` changes its content from
+  the current-photo-only view to a view containing every photo with valid GPS.
+  The current photo and other photos use distinct marker colors documented in a
+  compact legend. Clicking another photo marker changes the current photo;
+  selecting a photo in the viewer updates the selected marker.
+- **Evolution:** MA-FEAT-016 extends the same `G` cycle with cumulative GPX
+  point-of-interest and track layers. `M` continues to open or close the map;
+  `G` changes what an open map displays.
 - **Questions to settle:** Entry point and relationship to MA-FEAT-006; initial
   viewport (fit all points versus current photo); duplicate coordinates;
-  filtering/photos without GPS; marker previews; and keyboard access.
+  filtering/photos without GPS; marker previews; dense-set clustering; mode
+  persistence; and keyboard-accessible marker navigation.
 - **Acceptance checks:** Metadata is normalized once during scan; two-way
-  selection is reliable; map attribution/network disclosure remains visible;
-  no photo or metadata is uploaded beyond normal map-tile location requests.
-- **Non-goal:** Route recording, editing GPS, or an offline map.
+  selection is reliable; the current and other-photo categories stay visually
+  distinct; all-photo mode still shows located photos when the selected photo
+  has no GPS; the active mode is understandable without memorizing `G`; map
+  attribution/network disclosure remains visible; and no photo or metadata is
+  uploaded beyond normal map-tile location requests.
+- **Non-goal:** GPX parsing, route recording, editing GPS, or an offline map.
+
+### MA-FEAT-016 — GPX points of interest, tracks, and layered map modes
+
+- **State:** Needs research with representative trip GPX files
+- **User outcome:** I can place portable GPX files beside a trip's photos and
+  see noteworthy places and the traveled path as additional map context.
+- **Source model:** Read one or more top-level `.gpx` files from the selected
+  folder without modifying them. GPX waypoints are the first candidate for
+  points of interest; GPX tracks, and routes if present in the real files, are
+  rendered as lines. One invalid GPX file must not prevent photos or other GPX
+  files from loading.
+- **Proposed interaction:** With the map open, `G` cycles through cumulative
+  modes: (1) current photo, (2) all located photos, (3) photos plus GPX points
+  of interest, and (4) photos, points of interest, and all GPX tracks. The cycle
+  wraps and has a quiet visible mode indicator or control. Layers with no data
+  must produce an intentional state rather than a misleading empty map.
+- **Legend:** Define stable, distinguishable treatments for the current photo,
+  other photos, GPX points of interest, and tracks. Evaluate a small stable
+  palette for multiple tracks against real files; do not assume that every
+  track needs a unique color if labels, grouping, or selection communicates the
+  distinction more clearly.
+- **Research needed:** Inspect the trip files for GPX version, waypoints, routes,
+  track segments, names, timestamps, duplicate points, and multiple tracks per
+  file. Decide viewport fitting, layer ordering, malformed-coordinate handling,
+  and whether `G` visits unavailable modes or skips them while announcing the
+  result.
+- **Acceptance checks:** Multiple top-level GPX files are parsed locally and in
+  isolation; tracks do not obscure photo markers; the legend matches every
+  visible category; the mode cycle and pointer control agree; and coordinates
+  are not uploaded beyond ordinary basemap requests for the displayed area.
+- **Non-goal:** Recording, editing, correcting, or exporting tracks; route
+  planning; live location; or recursively scanning subfolders.
+- **Dependencies:** Builds on MA-FEAT-008's photo-marker and selection model and
+  may require a lasting ingestion/data-model architecture decision.
 
 ### MA-FEAT-009 — Map visual-style evaluation
 
@@ -286,12 +342,49 @@ screens.
   authorization or scan data.
 - **Non-goal:** A hidden library database or automatic upload/synchronization.
 
+## Additional media
+
+### MA-FEAT-017 — Videos in the collection sequence
+
+- **State:** Needs research with representative trip videos
+- **User outcome:** Photos and short videos from the same experience appear in
+  one uninterrupted presentation sequence.
+- **Source and order:** Accept an explicit, tested set of top-level video file
+  types and interleave readable videos with JPEGs using the same
+  case-insensitive natural file-name order. Unsupported or undecodable videos
+  must not prevent the rest of the collection from opening.
+- **Proposed interaction:** A video appears in the primary media region with a
+  restrained player for play/pause and timeline seeking. `K` toggles play and
+  pause, `J` seeks 10 seconds backward, and `L` seeks 10 seconds forward, in
+  line with the familiar YouTube shortcuts. Existing previous/next navigation
+  continues to move between sequence items.
+- **Playback lifecycle:** Videos do not autoplay when selected. Leaving a video
+  pauses it; choosing another folder releases its object URL and playback
+  resources. Seeking clamps safely at the beginning and end.
+- **Zoom boundary:** Do not add video zoom/pan in the first video slice. It is
+  technically possible to transform a video surface, but playback, seeking,
+  codec reliability, and predictable keyboard focus are the demonstrated needs.
+  Revisit zoom only after real use shows a need to inspect moving-image detail.
+- **Research needed:** Test the actual trip's containers and codecs in the
+  packaged Chromium runtime, especially phone-camera exports; choose the first
+  supported extension/codec matrix; verify rotation, audio, duration, large-file
+  memory behavior, and decode failures; and decide whether embedded video date,
+  caption, or GPS metadata enters the initial slice or is deferred.
+- **Acceptance checks:** Mixed media retains deterministic file-name order;
+  pointer controls and `J`/`K`/`L` work in the packaged app; shortcuts do not
+  fire while another applicable control is receiving text input; rapid
+  navigation does not leave audio playing; and one bad video is isolated.
+- **Non-goal:** Video editing, transcoding, automatic playback, subtitle
+  authoring, video zoom/pan, or promising every container and codec.
+- **Likely dependencies:** Generalize photo-specific collection/viewer types to
+  media items without weakening the JPEG metadata path or lazy resource cleanup.
+
 ## Parking lot / future prompts
 
 - A dedicated About/help surface, including shortcuts and a precise privacy/map
   network explanation.
-- Timeline, topics, relationships, non-JPEG media, and multi-folder memories,
-  consistent with the long-term product vision.
+- Timeline, topics, relationships, audio/document media, and multi-folder
+  memories, consistent with the long-term product vision.
 - Native filesystem integrations only when a narrowly scoped user outcome
   cannot be met by the browser-native core.
 
@@ -302,3 +395,5 @@ screens.
 | 2026-07-25 | Establish this living backlog and lightweight refinement workflow. | The desktop MVP is proven; follow-on ideas need a shared, traceable route from discovery to implementation. |
 | 2026-07-25 | Keep mobile, persistent indexing, face regions, and native file actions as discovery/research tracks. | Each changes platform, privacy, storage, or security boundaries and should not be implied by the desktop MVP. |
 | 2026-07-25 | Reserve `T` as the working proposal for thumbnail overview, not tags. | It makes the suggested keyboard scheme internally consistent; it remains provisional until MA-FEAT-007 is specified. |
+| 2026-09-04 | Grow the map through cumulative `G` modes and portable GPX files. | The desired experience connects the current photo, other photos, user-authored points of interest, and traveled tracks while keeping `M` as the map toggle. |
+| 2026-09-04 | Promote mixed photo/video playback from the parking lot to MA-FEAT-017. | Real trip presentation needs videos in the same explicit file-name sequence, with familiar `J`/`K`/`L` playback controls. |

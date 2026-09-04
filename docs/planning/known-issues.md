@@ -1,7 +1,7 @@
 # Known issues
 
 **Status:** Living issue register
-**Last updated:** 2026-07-31
+**Last updated:** 2026-09-04
 
 ## MA-BUG-001: Map tiles do not recover after an offline request
 
@@ -72,3 +72,45 @@ provider reachability, or a visible **Retry map** action that recreates the map
 after reachability is confirmed. The issue is resolved only after the original
 physical disconnect/reconnect sequence passes in an installed DMG; a mocked
 event-to-method test is not sufficient.
+
+## MA-BUG-002: `F` does not toggle fullscreen during normal viewer use
+
+**Status:** Needs reproduction
+
+**Severity:** Medium
+
+**Affected build:** Observed during the first real trip-viewing session; exact
+application version, build hash, viewer state, and focused element were not
+recorded.
+
+### Behavior
+
+Pressing `F` in the main viewer did not toggle fullscreen as documented. This
+blocks the keyboard path into and out of the intended presentation mode, while
+photo viewing otherwise remains usable.
+
+### Reproduction to confirm
+
+1. Open a representative photo folder in the packaged application.
+2. In the full-width photo view, press `F` and observe whether the app enters
+   fullscreen.
+3. If it enters, press `F` again and confirm that it exits.
+4. Repeat with the map open and with focus on each visible interaction region.
+5. Repeat in the Vite development build and production preview to determine
+   whether the failure is specific to Electron packaging.
+
+Expected: `F` enters fullscreen from the viewer and a second `F` exits it;
+standard `Escape` behavior continues to exit fullscreen.
+
+Actual in the reported session: the `F` toggle did not work.
+
+### Investigation and resolution path
+
+Record the exact packaged build and macOS version, then inspect keyboard-event
+dispatch, focused-element handling, Fullscreen API promise rejection, and any
+Electron-specific fullscreen behavior. Test both key directions rather than
+assuming one failed path explains the other.
+
+The issue is resolved when focused regression tests cover the viewer's keyboard
+dispatch and `F` reliably enters and exits fullscreen in an installed macOS
+build with both the full-width photo and split map layouts.
