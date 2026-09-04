@@ -53,7 +53,7 @@ heavy process.
 
 | Horizon | Theme | Why it belongs here |
 | --- | --- | --- |
-| Next desktop refinements | Direct zoom/pan, a three-region focus loop, Home, file actions, and fullscreen reliability | High value while preserving the present viewer and making its keyboard model coherent |
+| Next desktop refinements | Quick collection navigation, a three-region focus loop, Home, file actions, and fullscreen reliability | High value while preserving the present viewer and making its keyboard model coherent |
 | Next exploration views | Thumbnail gallery, all-photo map, and GPX overlays | Natural extensions of the existing temporary collection and shared selection |
 | Media expansion | Videos in the file-name sequence | A demonstrated trip-viewing need that requires codec and playback-boundary research |
 | Context and people | Tags, filename, people regions | Depends on representative metadata and an intentional side-panel model |
@@ -65,11 +65,13 @@ heavy process.
 1. Reproduce and fix MA-BUG-002 before changing the broader keyboard model.
 2. Specify and implement MA-FEAT-001 and MA-FEAT-015 together because zoom,
    collection navigation, and region focus share the Arrow keys.
-3. Extend the present map with MA-FEAT-008's all-photo mode and two-way pin
+3. Specify MA-FEAT-018's quick collection-navigation keys alongside the focus
+   model so their scope remains predictable.
+4. Extend the present map with MA-FEAT-008's all-photo mode and two-way pin
    selection.
-4. Inspect representative GPX files, then specify MA-FEAT-016 on top of that
+5. Inspect representative GPX files, then specify MA-FEAT-016 on top of that
    map-layer foundation.
-5. Inspect representative trip videos and packaged-runtime codec behavior, then
+6. Inspect representative trip videos and packaged-runtime codec behavior, then
    specify MA-FEAT-017 as a separate mixed-media vertical slice.
 
 ## Candidate next slice: desktop viewer essentials
@@ -107,6 +109,30 @@ changing the local-first model.
   transient viewer state are cleared; no files are changed; focus reaches the
   entry-screen folder action.
 - **Non-goal:** Recent folders or persistent library history.
+
+### MA-FEAT-018 — Quick collection navigation
+
+- **State:** Ready to specify
+- **User outcome:** I can quickly inspect a distant part of a large collection,
+  jump to its end, or restart at its beginning without stepping through every
+  intervening photo.
+- **Proposed interaction:** In the photo region, `Page Up` moves ten photos
+  backward and `Page Down` moves ten photos forward. `Home` (`Pos1`) selects the
+  first photo and `End` selects the last photo. Ten-photo jumps clamp to the
+  first or last photo when fewer than ten positions remain.
+- **Keyboard scope:** These shortcuts navigate the collection at both fitted
+  and enlarged photo scales. When another spatial region or applicable control
+  has focus, that region or control retains its established key behavior; in
+  particular, `Home` and `End` continue to resize the focused map divider.
+- **Acceptance checks:** All four shortcuts preserve case-insensitive natural
+  file-name order; work with key repeat without moving beyond collection
+  boundaries; keep the displayed photo, position indicator, metadata, map, and
+  transient per-photo view state synchronized; and do not fire from a control
+  that legitimately consumes the key.
+- **Non-goal:** A thumbnail overview, arbitrary numeric jump dialog, or new
+  pointer controls for ten-photo navigation.
+- **Likely dependency:** Coordinate shortcut dispatch with MA-FEAT-015's
+  spatial focus model.
 
 ### MA-FEAT-003 — Filename on demand
 
@@ -253,23 +279,37 @@ screens.
   files from loading.
 - **Proposed interaction:** With the map open, `G` cycles through cumulative
   modes: (1) current photo, (2) all located photos, (3) photos plus GPX points
-  of interest, and (4) photos, points of interest, and all GPX tracks. The cycle
-  wraps and has a quiet visible mode indicator or control. Layers with no data
-  must produce an intentional state rather than a misleading empty map.
+  of interest, and (4) photos, points of interest, and GPX tracks. On entering
+  the track mode, show by default every timed track whose time span intersects
+  the current photo's capture date. This allows a trip-wide track and a
+  same-day hike track to appear together while suppressing tracks from unrelated
+  days. The cycle wraps and has a quiet visible mode indicator or control.
+  Layers with no data must produce an intentional state rather than a misleading
+  empty map, and the user must be able to understand when the default date
+  filter excludes otherwise available tracks.
 - **Legend:** Define stable, distinguishable treatments for the current photo,
-  other photos, GPX points of interest, and tracks. Evaluate a small stable
-  palette for multiple tracks against real files; do not assume that every
-  track needs a unique color if labels, grouping, or selection communicates the
-  distinction more clearly.
+  other photos, GPX points of interest, and tracks. When multiple matching
+  tracks overlap, draw broader context such as a whole-trip track first in a
+  quieter color, then draw a shorter, more specific track such as an individual
+  hike above it in a stronger highlight color. Evaluate a small stable palette
+  and the definition of track specificity against real files; do not assume
+  that every track needs a unique color if labels, grouping, or selection
+  communicates the distinction more clearly.
 - **Research needed:** Inspect the trip files for GPX version, waypoints, routes,
   track segments, names, timestamps, duplicate points, and multiple tracks per
-  file. Decide viewport fitting, layer ordering, malformed-coordinate handling,
-  and whether `G` visits unavailable modes or skips them while announcing the
-  result.
+  file. Decide how a photo's local calendar date is compared with GPX timestamps
+  and time zones, how untimed or partially timed tracks behave, how broad versus
+  specific tracks are identified, viewport fitting, layer ordering,
+  malformed-coordinate handling, and whether `G` visits unavailable modes or
+  skips them while announcing the result.
 - **Acceptance checks:** Multiple top-level GPX files are parsed locally and in
-  isolation; tracks do not obscure photo markers; the legend matches every
-  visible category; the mode cycle and pointer control agree; and coordinates
-  are not uploaded beyond ordinary basemap requests for the displayed area.
+  isolation; entering track mode for a photo with a capture date shows all and
+  only the timed tracks intersecting that date by default; overlapping broad and
+  specific tracks remain distinguishable, with the specific track visible on
+  top; navigating to a photo on another date updates the default track set;
+  tracks do not obscure photo markers; the legend matches every visible
+  category; the mode cycle and pointer control agree; and coordinates are not
+  uploaded beyond ordinary basemap requests for the displayed area.
 - **Non-goal:** Recording, editing, correcting, or exporting tracks; route
   planning; live location; or recursively scanning subfolders.
 - **Dependencies:** Builds on MA-FEAT-008's photo-marker and selection model and
@@ -428,4 +468,5 @@ screens.
 | 2026-09-04 | Replace MA-FEAT-001's modal `Z` concept with map-like direct zoom and pan. | First real trip use showed that shared pointer and focused-keyboard behavior is simpler than a separate image zoom mode. |
 | 2026-09-04 | Treat photo, divider, and map as the viewer's spatial focus regions. | A short `Tab`/`Shift`+`Tab` loop preserves the useful keyboard-resizable divider without traversing every transient control. |
 | 2026-09-04 | Grow the map through cumulative `G` modes and portable GPX files. | The desired experience connects the current photo, other photos, user-authored points of interest, and traveled tracks while keeping `M` as the map toggle. |
+| 2026-09-04 | Default GPX track mode to tracks intersecting the current photo's date and layer specific tracks above broader context tracks. | A whole-trip track and a same-day hike should appear together with a clear visual hierarchy, without clutter from unrelated days. |
 | 2026-09-04 | Promote mixed photo/video playback from the parking lot to MA-FEAT-017. | Real trip presentation needs videos in the same explicit file-name sequence, with familiar `J`/`K`/`L` playback controls. |
