@@ -4,7 +4,7 @@
 
 **Owner:** Memory Atlas maintainers
 
-**Last reviewed:** 2026-07-31
+**Last reviewed:** 2026-09-04
 
 **Applies to:** Runtime, development, and macOS packaging dependencies
 
@@ -28,6 +28,43 @@ Available non-breaking fixes should be applied with the lockfile, followed by a
 clean `npm ci`, source checks, packaging, signature verification, and an
 installed-build smoke test. Do not force an unsupported major or pre-release
 build-tool upgrade only to reduce an advisory count.
+
+## 2026-09-04 review
+
+The 0.2.0 local macOS build used Node 20.18.0 and npm 10.9.0. The initial
+production audit found one moderate `@xmldom/xmldom` advisory. The compatible
+fix was applied by moving the declared range from `^0.9.10` to `^0.9.12`; a
+subsequent production audit passed with zero vulnerabilities.
+
+Non-force remediation also updated the compatible locked build transitives
+`browserslist`, `fast-uri`, `ip-address`, and `nanoid`. After a final clean
+install, the complete-tree audit reported 28 vulnerabilities (3 low, 24 high,
+1 critical). The remaining report is limited to Electron and Electron Forge
+packaging paths involving `electron`, `extract-zip`, `image-size`, `tar`, and
+`tmp`.
+
+The patched Electron 41 releases identified by npm require Node 22.12 or later,
+which is incompatible with the accepted Node 20.18.x release toolchain. The
+automatic non-force remediation therefore failed its engine check and did not
+change the locked Electron 41.7.1 version. Memory Atlas does not register custom
+Electron protocols or embed sandboxed iframes, which limits reachability of the
+two reported Electron behaviors. The app also denies unexpected permissions,
+blocks in-app navigation away from packaged content, and opens only validated
+HTTPS links externally. This is a time-bounded local-testing acceptance, not a
+claim that the affected Electron runtime is patched.
+
+The remaining Forge findings continue to be build-host risks: release inputs
+are repository-owned, the toolchain runs non-interactively, and untrusted
+archives, image assets, temporary-file names, photo metadata, and photo file
+names are not passed into the affected packaging operations. npm's suggested
+forced remediation would downgrade Forge across a breaking boundary and was
+not accepted.
+
+**Update trigger:** Reconcile the project's Node support range with a patched
+stable Electron release, then rerun clean installation, both audits, all source
+checks, packaging, signature verification, and the installed-app smoke test.
+Also accept compatible stable Forge updates that remove the remaining
+`extract-zip`, `image-size`, `tar`, and `tmp` paths.
 
 ## 2026-07-31 review
 

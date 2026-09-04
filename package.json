@@ -2,7 +2,7 @@
   "name": "memory-atlas",
   "productName": "Memory Atlas",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A local-first viewer for rediscovering photos through their embedded context.",
   "engines": {
     "node": ">=20.18.0 <21"
@@ -23,7 +23,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.9.10",
+    "@xmldom/xmldom": "^0.9.12",
     "exifreader": "^4.31.1",
     "maplibre-gl": "^5.2.0",
     "svelte": "^5.25.0"

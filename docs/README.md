@@ -11,6 +11,8 @@ planning, operations, or delivery records as the task requires.
 
 ### User documentation
 
+- [`../RELEASE_NOTES.md`](../RELEASE_NOTES.md) — versioned user-facing changes,
+  installation notes, checksums, and known limitations for packaged builds.
 - [`user-guide.md`](user-guide.md) — current MVP features, controls, keyboard
   shortcuts, map behavior, privacy notes, and recovery guidance.
 
@@ -52,6 +54,9 @@ planning, operations, or delivery records as the task requires.
 - [`delivery/verifications/2026-09-04-ma-feat-001-image-zoom-and-pan.md`](delivery/verifications/2026-09-04-ma-feat-001-image-zoom-and-pan.md)
   — automated implementation evidence and the remaining packaged interaction
   check for image zoom and pan.
+- [`delivery/verifications/2026-09-04-v0.2.0-packaged-build.md`](delivery/verifications/2026-09-04-v0.2.0-packaged-build.md)
+  — release-gate, dependency-audit, signature, and checksum evidence for the
+  local Apple silicon 0.2.0 DMG.
 - `delivery/plans/` — dated implementation plans for selected work.
 - [`archive/product/intent-v1.md`](archive/product/intent-v1.md) — historical
   initial proposal; not a current implementation authority.
