@@ -61,12 +61,18 @@ workarounds.
 
 Memory Atlas requires Node.js 20.18.0 or later in the 20.x line and npm 10.9.0, as declared in
 `package.json`. Use `npm ci` to install the exact dependency versions from the
-lockfile.
+lockfile. If Node.js is managed with NVM, activate the repository's `.nvmrc`
+version first.
 
 ```bash
+nvm use
 npm ci
 npm run dev
 ```
+
+If a new terminal reports `node: command not found` or `npm: command not found`,
+run `nvm use` from the repository root before retrying. Installing dependencies
+is unnecessary when `node_modules` is already current.
 
 Open the local address printed by Vite, choose a folder, and select it through
 the browser's folder picker.
