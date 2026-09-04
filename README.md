@@ -97,13 +97,24 @@ npm run audit:all
 linting tool is intentionally deferred until it provides checks that this gate
 does not already cover. Dependency audit results are evaluated under the
 [dependency security policy](docs/operations/dependency-security.md), including
-development and packaging paths.
+development and packaging paths. The audit commands contact npm's advisory
+service and submit the dependency metadata needed to perform that check.
 
-Package a macOS DMG:
+Create and automatically verify a macOS release candidate from a clean working
+tree:
 
 ```bash
-npm run make:mac
+npm run release:mac -- --allow-network-audit
 ```
+
+The explicit flag confirms the npm advisory lookup. The release gate installs
+the locked dependencies, checks the reviewed audit baseline, runs all source
+checks, creates the architecture-specific DMG, verifies its contents and macOS
+signatures, and writes an ignored machine report plus a verification-document
+draft under `out/release/`. It prints only a compact pass/fail summary; detailed
+command output stays in ignored log files. `npm run make:mac` remains the
+lower-level package command for focused troubleshooting, not the complete
+release gate.
 
 ## Project documentation
 
@@ -145,7 +156,8 @@ location metadata.
 Before pointing a blog post or external audience at the app:
 
 1. Choose the repository license and add a root `LICENSE` file.
-2. Run `npm run make:mac` on the target Mac architecture.
+2. Run `npm run release:mac -- --allow-network-audit` on the target Mac
+   architecture and complete the manual installed-app checklist.
 3. Create a [GitHub Release](../../releases/new), mark it as a pre-release if
    the POC caveats still apply, and upload the generated DMG as the release
    asset.

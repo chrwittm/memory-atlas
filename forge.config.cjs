@@ -3,9 +3,10 @@ const fs = require('node:fs/promises')
 const path = require('node:path')
 const { promisify } = require('node:util')
 const packageJson = require('./package.json')
+const releasePolicy = require('./scripts/release-policy.json')
 
 const execFileAsync = promisify(execFile)
-const forgeOutDir = '/private/tmp/memory-atlas-forge-out'
+const forgeOutDir = releasePolicy.forgeOutDir
 const releaseDir = path.join(__dirname, 'out', 'make')
 let packagedOutputPaths = []
 
@@ -45,6 +46,7 @@ module.exports = {
       /^\/node_modules($|\/)/,
       /^\/public($|\/)/,
       /^\/src($|\/)/,
+      /^\/scripts($|\/)/,
       /^\/out($|\/)/,
       /^\/.*\.config\.(js|ts)$/,
       /^\/\.gitignore$/,

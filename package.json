@@ -17,6 +17,7 @@
     "desktop": "npm run build && electron-forge start",
     "package:mac": "npm run build && electron-forge package --platform=darwin",
     "make:mac": "npm run check && npm test && npm run build && electron-forge make --platform=darwin",
+    "release:mac": "node scripts/release-mac.mjs",
     "audit:prod": "npm audit --omit=dev",
     "audit:all": "npm audit",
     "test": "vitest run",

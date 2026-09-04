@@ -43,6 +43,8 @@ specifications and later architecture decisions take precedence. Update
 - Svelte, TypeScript, Vite, and plain CSS; no SvelteKit for the MVP.
 - Browser-native Svelte application core packaged with Electron and bundled
   Chromium as a self-contained macOS `.app` and `.dmg` for MVP testing.
+- `npm run release:mac -- --allow-network-audit` as the deterministic release
+  gate; verbose logs and generated evidence stay under ignored `out/release/`.
 - Windows, Linux, phones, tablets, hosted web deployment, PWA installation, and
   automatic updates are deferred platform and distribution decisions.
 - Runtime folder selection through `<input type="file" webkitdirectory multiple>`;
@@ -76,6 +78,7 @@ docs/operations/             executable runbooks and operational policy
 docs/delivery/               dated plans, reviews, and verification evidence
 docs/archive/                superseded documents retained for history
 electron/                    Electron main process for packaged desktop builds
+scripts/                     deterministic macOS release gate, policy, and tests
 src/                         Svelte application, photo ingestion, and tests
 public/images/earth.jpg      provisional entry-screen Earth image
 public/images/README.md      asset purpose and provenance notes

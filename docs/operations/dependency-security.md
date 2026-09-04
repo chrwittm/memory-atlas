@@ -24,10 +24,32 @@ decision. Each finding is reviewed for severity, reachability, affected phase,
 fix availability, and whether the proposed update preserves the supported
 release path.
 
+`npm audit` submits package and lockfile dependency metadata to npm's advisory
+service. The automated release gate therefore requires the explicit
+`--allow-network-audit` flag; using it records the operator's authorization for
+that lookup. It does not authorize `npm audit fix`, package updates, or any
+other external action.
+
 Available non-breaking fixes should be applied with the lockfile, followed by a
 clean `npm ci`, source checks, packaging, signature verification, and an
 installed-build smoke test. Do not force an unsupported major or pre-release
 build-tool upgrade only to reduce an advisory count.
+
+## Automated release baseline
+
+Routine releases use the reviewed policy in `scripts/release-policy.json`.
+`npm run release:mac -- --allow-network-audit` requires zero production
+findings and permits complete-tree findings only when both conditions hold:
+
+- no severity count exceeds the last reviewed maximum; and
+- every reported leaf advisory URL is already present in the accepted set.
+
+A lower count or resolved advisory is allowed and recorded. A new advisory or
+higher count stops the release and becomes a separate dependency-security
+review; the release script never retries with a weaker audit mode and never
+runs automatic remediation. After that review, update this document and the
+machine policy together. Do not change the policy merely to make a failing
+release pass.
 
 ## 2026-09-04 review
 

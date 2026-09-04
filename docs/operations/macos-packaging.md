@@ -15,10 +15,78 @@ photos.
 
 - A Mac with Node.js 20.18.0 or later in the 20.x line and npm 10.9.0
 - The Memory Atlas repository checked out locally
-- Dependencies installed with `npm install`
 - Enough free disk space for Electron's bundled Chromium and the build output
+- A network connection for clean dependency installation and npm's advisory
+  lookup
 
 Run every command below from the repository root, where `package.json` lives.
+
+## Preferred automated release gate
+
+Use the automated gate for a release candidate. Before running it, set the
+intended version in `package.json` and `package-lock.json`, prepare the release
+notes, review the source, and commit that release-candidate state. The default
+gate requires a clean working tree so its source commit is unambiguous.
+
+```bash
+nvm use
+npm run release:mac -- --allow-network-audit
+```
+
+The explicit option authorizes npm to receive the dependency metadata needed
+for its two advisory lookups. It does not authorize dependency changes,
+publishing, commits, tags, application installation, or access to photo files.
+
+The gate performs these steps once, in order:
+
+1. verify macOS, architecture, Node, npm, source commit, and Git cleanliness;
+2. install exactly `package-lock.json` with `npm ci --no-audit --no-fund`,
+   avoiding npm's redundant automatic audit output;
+3. require zero production vulnerabilities and compare the complete audit with
+   the reviewed residual-risk policy in `scripts/release-policy.json`;
+4. run Svelte/TypeScript checks, automated tests, and the Vite build;
+5. make the architecture-specific Electron application and DMG;
+6. inspect the ASAR for the renderer, metadata worker, and Electron entry files;
+7. verify both the temporary app and the DMG-embedded app with deep/strict
+   `codesign` checks;
+8. verify the DMG, bundle versions, bundle identifier, and executable
+   architecture;
+9. confirm that the source tree did not change during the build; and
+10. calculate the DMG size and SHA-256 and generate release evidence.
+
+Successful terminal output is intentionally compact. Full stdout and stderr for
+every command, a machine-readable `release-report.json`, and a Markdown
+`verification-draft.md` are written below:
+
+```text
+out/release/<version>-<architecture>-<timestamp>/
+```
+
+`out/` is ignored by Git. Review the draft, copy the relevant evidence into a
+dated file under `docs/delivery/verifications/`, and complete the installed-app
+check below before calling the release verified. Do not paste verbose build
+logs into project documentation unless they explain a material failure.
+
+The gate stops at the first failed step and prints the failing log path plus a
+short tail of the output. Do not rerun it repeatedly when the failure is a new
+security advisory or changed dependency baseline; open a separate dependency
+review instead. The script never runs `npm audit fix`.
+
+For an intentionally non-reproducible local experiment only, the clean-tree
+check can be bypassed explicitly:
+
+```bash
+npm run release:mac -- --allow-network-audit --allow-dirty
+```
+
+The dirty paths are recorded in the report. Do not publish or tag such an
+artifact.
+
+The gate also refuses to overwrite a DMG with the same version and
+architecture. Normally, preserve the existing artifact and choose the correct
+new version. `--replace-artifact` exists only for an explicitly reviewed retry
+of an unaccepted artifact; never use it to replace an artifact that was already
+published or recorded as accepted.
 
 ## Test the current source in Electron
 
@@ -77,7 +145,11 @@ smoke test below.
    - Navigate away and back, open and resize the map, and enter fullscreen;
      confirm each photo's active view and focal detail are retained.
 
-## Create the application and DMG
+## Manual packaging and diagnostic fallback
+
+The commands in this section expose the individual operations for diagnosing a
+failed gate. They are not a substitute for `npm run release:mac`, because they
+do not create the consolidated machine report or verification draft.
 
 1. Install exactly the dependency versions recorded in `package-lock.json`:
 
@@ -105,7 +177,8 @@ smoke test below.
    This command runs the Svelte and TypeScript checks, automated tests, Vite
    production build, Electron packaging, and Electron Forge DMG maker. Forge
    targets the architecture of the Mac running the command unless `--arch` is
-   supplied explicitly.
+   supplied explicitly. The automated release gate invokes the same underlying
+   tools directly so that none of these checks is repeated.
 
 4. Find the retained DMG under `out/`; Forge keeps the intermediate `.app` in
    `/private/tmp` so OneDrive cannot attach Finder metadata that invalidates its
@@ -175,13 +248,15 @@ configured OpenFreeMap endpoints.
 After the installed smoke test, record the app version, target architecture,
 DMG SHA-256, signing/notarization state, source commit, audit result, and any
 manual checks still outstanding. A build is not a reproducible checkpoint until
-the recorded source state is committed.
+the recorded source state is committed. The automated gate's verification draft
+provides these fields but deliberately leaves the manual result outstanding.
 
 ## Rebuild or target an architecture explicitly
 
 `npm run make:mac` replaces artifacts with the same version and architecture.
-Update `version` in `package.json` before making a release that must coexist with
-an earlier build.
+The automated release gate refuses that replacement unless
+`--replace-artifact` is explicitly supplied. Update `version` in `package.json`
+before making a release that must coexist with an earlier build.
 
 To request a specific architecture, pass the Forge argument after `--`:
 

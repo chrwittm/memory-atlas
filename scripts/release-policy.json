@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "toolchain": {
+    "node": {
+      "minimum": "20.18.0",
+      "maximumExclusive": "21.0.0"
+    },
+    "npm": "10.9.0"
+  },
+  "forgeOutDir": "/private/tmp/memory-atlas-forge-out",
+  "signing": {
+    "mode": "ad-hoc",
+    "notarized": false
+  },
+  "audit": {
+    "reviewedOn": "2026-09-04",
+    "reviewDocument": "docs/operations/dependency-security.md",
+    "productionMaximum": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "completeMaximum": {
+      "info": 0,
+      "low": 3,
+      "moderate": 0,
+      "high": 24,
+      "critical": 1,
+      "total": 28
+    },
+    "acceptedAdvisoryUrls": [
+      "https://github.com/advisories/GHSA-23hp-3jrh-7fpw",
+      "https://github.com/advisories/GHSA-34x7-hfp2-rc4v",
+      "https://github.com/advisories/GHSA-52f5-9888-hmc6",
+      "https://github.com/advisories/GHSA-5p2g-fcmc-qvqq",
+      "https://github.com/advisories/GHSA-83g3-92jg-28cx",
+      "https://github.com/advisories/GHSA-8qq5-rm4j-mr97",
+      "https://github.com/advisories/GHSA-8x88-c5mf-7j5w",
+      "https://github.com/advisories/GHSA-9f4c-93c8-jc8g",
+      "https://github.com/advisories/GHSA-9ppj-qmqm-q256",
+      "https://github.com/advisories/GHSA-gvwx-54wh-qm9j",
+      "https://github.com/advisories/GHSA-jmr9-qjv8-65gv",
+      "https://github.com/advisories/GHSA-ph9p-34f9-6g65",
+      "https://github.com/advisories/GHSA-qffp-2rhf-9h96",
+      "https://github.com/advisories/GHSA-r292-9mhp-454m",
+      "https://github.com/advisories/GHSA-r4w5-6pfg-jxp5",
+      "https://github.com/advisories/GHSA-r6q2-hw4h-h46w",
+      "https://github.com/advisories/GHSA-vmf3-w455-68vh",
+      "https://github.com/advisories/GHSA-w3rx-r6r6-pgpr",
+      "https://github.com/advisories/GHSA-w8wr-v893-vjvp"
+    ]
+  },
+  "requiredAsarEntries": [
+    "/dist/index.html",
+    "/electron/main.cjs",
+    "/electron/security.cjs"
+  ],
+  "requiredAsarPatterns": [
+    "^/dist/assets/metadata\\.worker-[^/]+\\.js$"
+  ]
+}

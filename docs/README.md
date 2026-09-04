@@ -41,7 +41,7 @@ planning, operations, or delivery records as the task requires.
 - [`architecture/decisions/0002-macos-electron-packaging.md`](architecture/decisions/0002-macos-electron-packaging.md)
   — accepted macOS packaging decision and considered alternatives.
 - [`operations/macos-packaging.md`](operations/macos-packaging.md) — executable
-  macOS build, packaging, verification, and publishing runbook.
+  macOS release-gate, manual verification, and publishing runbook.
 - [`operations/dependency-security.md`](operations/dependency-security.md) —
   dependency policy, current risk assessment, and release controls.
 
@@ -57,6 +57,9 @@ planning, operations, or delivery records as the task requires.
 - [`delivery/verifications/2026-09-04-v0.2.0-packaged-build.md`](delivery/verifications/2026-09-04-v0.2.0-packaged-build.md)
   — release-gate, dependency-audit, signature, and checksum evidence for the
   local Apple silicon 0.2.0 DMG.
+- [`delivery/verifications/2026-09-04-release-gate-automation.md`](delivery/verifications/2026-09-04-release-gate-automation.md)
+  — source, policy, packaging, signature, and DMG evidence for the repeatable
+  macOS release automation.
 - `delivery/plans/` — dated implementation plans for selected work.
 - [`archive/product/intent-v1.md`](archive/product/intent-v1.md) — historical
   initial proposal; not a current implementation authority.

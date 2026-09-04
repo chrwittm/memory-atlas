@@ -232,6 +232,17 @@ renderer-load failure instead of leaving a hidden or blank window.
 The initial ad-hoc-signed build targets Apple silicon; normal transfer to other
 Macs still requires Developer ID signing, notarization, and compatible-hardware
 verification.
+
+The repeatable release path is automated by `npm run release:mac`. From a clean
+source commit, it installs the reviewed lockfile, checks the production audit
+and the accepted complete-tree advisory baseline, runs source checks, builds
+the architecture-specific Electron artifact outside OneDrive, and verifies the
+ASAR contents, temporary and DMG-embedded signatures, bundle version,
+architecture, DMG integrity, and SHA-256. Detailed logs and a verification
+draft remain in ignored `out/release/` output. Installation, interaction
+quality, real-photo checks, publishing, commits, and tags remain explicit human
+release decisions.
+
 Electron was selected over a hosted PWA because the current testing requirement
 is a self-contained application with no web-host dependency, and over Tauri
 because bundled Chromium minimizes runtime variance for the already implemented

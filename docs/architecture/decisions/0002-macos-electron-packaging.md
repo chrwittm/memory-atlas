@@ -2,6 +2,7 @@
 
 **Status:** Electron desktop packaging accepted for MVP testing  
 **Decision date:** 2026-07-06  
+**Last updated:** 2026-09-04
 **Scope:** MVP distribution and repeatable testing
 
 ## Decision summary
@@ -144,6 +145,24 @@ Automatic updates are deliberately deferred. MVP testers install a newer
 versioned build manually, which avoids requiring an update server and makes it
 easy to retain or return to a known build. Update infrastructure can be added
 when distribution frequency and tester count demonstrate the need.
+
+### Repeatable release gate
+
+The accepted packaging path is implemented as one deterministic maintainer
+command: `npm run release:mac -- --allow-network-audit`. The explicit flag
+acknowledges that npm receives dependency metadata for its advisory lookup.
+The command performs the automatable checks in this decision, compares audit
+results with a separately reviewed residual-risk baseline, stores verbose logs
+outside Git, and emits both a machine-readable report and a Markdown
+verification draft.
+
+The gate must stop on a new advisory, a vulnerability count above the reviewed
+baseline, a source/test/build failure, missing packaged content, an invalid
+signature, a bundle-version or architecture mismatch, or an invalid DMG. It
+must not remediate dependencies, install the application, publish, commit, or
+tag. Those operations require separate review or authorization. A dirty build
+is available only through an explicit escape hatch and is reported as
+non-reproducible.
 
 ## Verification requirements
 
