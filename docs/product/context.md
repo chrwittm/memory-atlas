@@ -1,7 +1,7 @@
 # Memory Atlas: Living Project Context
 
 Status: Browser MVP implemented; macOS packaging accepted  
-Last updated: 2026-09-04
+Last updated: 2026-09-07
 
 ## Purpose of this document
 
@@ -99,6 +99,17 @@ This is not a retreat from the broader vision. It is the smallest domain in whic
 - The long-term scope is memories and experiences, not photo management alone.
 - MVP desktop releases use versioned `.app` and `.dmg` artifacts with manual
   updates. A hosted website, PWA, and automatic update service are deferred.
+- The repository license is Apache-2.0. The first GitHub target is the owner's
+  public personal repository at `https://github.com/chrwittm/memory-atlas`,
+  followed by an explicitly unnotarized public tester prerelease. Normal
+  notarized distribution remains a separate later gate.
+- The durable macOS bundle identifier is `io.github.chrwittm.memoryatlas`,
+  with an original atlas/compass icon. Historical artifacts retain their recorded
+  generic identifier.
+- The public repository will use GitHub private vulnerability reporting as its
+  confidential security-reporting channel. A root `SECURITY.md` will direct
+  reporters there without publishing a personal email address or promising a
+  response time, bounty, or support contract.
 
 ## Historical alternatives and remaining open decisions
 
@@ -252,10 +263,15 @@ release boundary.
 
 ## Suggested starting point for the next session
 
-Verify the packaged `.app` independently of Vite, then test the implemented MVP
-against additional real folders, especially one with GPS, non-default
-orientation, malformed metadata, and an undecodable JPEG. Add signing and
-notarization before routine distribution to other Macs.
+Follow the accepted direction in the
+[`publication-readiness specification and delivery plan`](../delivery/plans/2026-09-04-publication-readiness.md):
+rewrite reachable commit identities to the owner's GitHub `noreply` address,
+reconcile Apache-2.0 and the placeholder public remote history, complete the
+privacy and asset-provenance checks, and establish the public GitHub baseline.
+Then prepare the explicitly unnotarized tester prerelease with a stable bundle
+identity, custom icon, current dependency review, fullscreen evidence, clean
+release gate, and installed-app verification. Signing and notarization remain
+required before routine distribution to other Macs.
 
 The post-MVP idea inventory and the shared refinement workflow live in
 [`backlog.md`](../planning/backlog.md). Backlog entries are not accepted
@@ -283,3 +299,19 @@ only once its interaction and boundaries are decided.
   keyboard zoom, bounded pointer and Arrow-key panning, per-photo remembered
   named views, and responsive fit recalculation. The broader three-region
   `Tab` loop remains tracked separately by MA-FEAT-015.
+- 2026-09-07: Apache-2.0, the public personal GitHub repository, removal of the
+  personal commit email, `io.github.chrwittm.memoryatlas`, and an unnotarized
+  public tester prerelease were selected as the publication direction. Normal
+  notarized distribution remains a later, independent gate.
+
+## Publication toolchain
+
+The accepted publication toolchain is Node 24.20.0 LTS and npm 11.19.0 with
+Electron 42.11.2 and stable Forge 7.11.2; see
+[ADR 0003](../architecture/decisions/0003-publication-toolchain-and-identity.md).
+The first hardened tester candidate is 0.2.1, preserving the immutable local
+0.2.0 artifact. Publication and installed-app verification are separate gates.
+
+Fullscreen now permits Electron’s documented permission only for the exact
+packaged main frame. Automated focus and rejection regressions pass; MA-BUG-002
+remains open until installed-app verification succeeds.

@@ -1,7 +1,7 @@
 # Deploy Memory Atlas on macOS
 
 **Status:** Current macOS packaging runbook
-**Last updated:** 2026-09-04
+**Last updated:** 2026-09-07
 
 This is the executable deployment runbook for producing the Memory Atlas MVP as
 a macOS application and disk image. The rationale and alternatives remain in
@@ -13,7 +13,7 @@ photos.
 
 ## Prerequisites
 
-- A Mac with Node.js 20.18.0 or later in the 20.x line and npm 10.9.0
+- A Mac with Node.js 24.20.0 or later in the 24.x line and npm 11.19.0
 - The Memory Atlas repository checked out locally
 - Enough free disk space for Electron's bundled Chromium and the build output
 - A network connection for clean dependency installation and npm's advisory
@@ -49,8 +49,8 @@ The gate performs these steps once, in order:
 6. inspect the ASAR for the renderer, metadata worker, and Electron entry files;
 7. verify both the temporary app and the DMG-embedded app with deep/strict
    `codesign` checks;
-8. verify the DMG, bundle versions, bundle identifier, and executable
-   architecture;
+8. verify the DMG, bundle versions, `io.github.chrwittm.memoryatlas` identity,
+   exact custom icon bytes, Electron license resources, and executable architecture;
 9. confirm that the source tree did not change during the build; and
 10. calculate the DMG size and SHA-256 and generate release evidence.
 
@@ -307,3 +307,20 @@ certificate and Apple notarization credentials. Configure Electron Packager's
 are available, then rebuild and verify with `codesign`, `spctl`, and `stapler`.
 Those credentials and release operations are intentionally outside this
 ad-hoc-signed local MVP workflow.
+
+## Application artwork
+
+The original atlas/compass icon and editable source are documented in
+[`assets/icon/README.md`](../../assets/icon/README.md). Run `npm run icon:mac`
+on macOS only when changing the artwork, then review and commit the generated
+iconset and ICNS. The release gate rejects an unexpected bundle identifier or
+icon. Check Finder, Dock, the application switcher, and the mounted DMG visually.
+
+## Public tester publication
+
+Source publication (Gate A), an explicitly unnotarized tester prerelease
+(Gate B), and ordinary notarized distribution (Gate C) are distinct. Follow the
+[publication plan](../delivery/plans/2026-09-04-publication-readiness.md).
+Keep 0.2.0 local artifact records unchanged; the next binary is 0.2.1. Use the
+Releases listing for prereleases because GitHub's `/releases/latest` excludes
+prereleases. Never tag or upload before the installed-app checklist passes.

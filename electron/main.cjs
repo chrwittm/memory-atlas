@@ -55,7 +55,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  denyUnexpectedPermissions(session.defaultSession)
+  denyUnexpectedPermissions(session.defaultSession, rendererUrl)
   createWindow()
 
   app.on('activate', () => {

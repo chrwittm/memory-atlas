@@ -1,7 +1,7 @@
 # Memory Atlas Documentation
 
 **Status:** Current documentation guide
-**Last updated:** 2026-09-04
+**Last updated:** 2026-09-07
 
 This directory organizes project documentation by purpose and lifecycle. Start
 with the product context and accepted specification, then consult architecture,
@@ -45,7 +45,13 @@ planning, operations, or delivery records as the task requires.
 - [`operations/dependency-security.md`](operations/dependency-security.md) —
   dependency policy, current risk assessment, and release controls.
 
+- [`architecture/decisions/0003-publication-toolchain-and-identity.md`](architecture/decisions/0003-publication-toolchain-and-identity.md)
+  — supported publication toolchain, stable identity, and version boundary.
+
 ### Delivery records and history
+
+- [`delivery/verifications/2026-09-07-publication-readiness.md`](delivery/verifications/2026-09-07-publication-readiness.md)
+  — publication implementation, privacy rewrite, and remaining release gates.
 
 - [`delivery/reviews/2026-07-25-technical-readiness.md`](delivery/reviews/2026-07-25-technical-readiness.md)
   — dated technical-readiness assessment and implementation guidance.
@@ -60,6 +66,9 @@ planning, operations, or delivery records as the task requires.
 - [`delivery/verifications/2026-09-04-release-gate-automation.md`](delivery/verifications/2026-09-04-release-gate-automation.md)
   — source, policy, packaging, signature, and DMG evidence for the repeatable
   macOS release automation.
+- [`delivery/plans/2026-09-04-publication-readiness.md`](delivery/plans/2026-09-04-publication-readiness.md)
+  — implementation-ready public-source and macOS-release gates, owner decisions,
+  privacy checks, work packages, and safe sub-agent delegation.
 - `delivery/plans/` — dated implementation plans for selected work.
 - [`archive/product/intent-v1.md`](archive/product/intent-v1.md) — historical
   initial proposal; not a current implementation authority.

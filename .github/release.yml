@@ -1,5 +1,5 @@
 # GitHub auto-generated release notes configuration.
-# See docs/deployment.md for the full Memory Atlas release runbook.
+# See docs/operations/macos-packaging.md for the full Memory Atlas release runbook.
 
 changelog:
   exclude:

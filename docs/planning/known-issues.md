@@ -1,7 +1,7 @@
 # Known issues
 
 **Status:** Living issue register
-**Last updated:** 2026-09-04
+**Last updated:** 2026-09-07
 
 ## MA-BUG-001: Map tiles do not recover after an offline request
 
@@ -75,7 +75,7 @@ event-to-method test is not sufficient.
 
 ## MA-BUG-002: `F` does not toggle fullscreen during normal viewer use
 
-**Status:** Needs reproduction
+**Status:** Candidate permission fix implemented; installed verification pending
 
 **Severity:** Medium
 
@@ -114,3 +114,14 @@ assuming one failed path explains the other.
 The issue is resolved when focused regression tests cover the viewer's keyboard
 dispatch and `F` reliably enters and exits fullscreen in an installed macOS
 build with both the full-width photo and split map layouts.
+
+### 2026-09-07 candidate fix
+
+Electron's unconditional permission denial also rejected its documented
+`fullscreen` permission. The 0.2.1 candidate permits only gesture-mediated
+fullscreen requests from the exact packaged main-frame URL. Other permissions,
+subframes, and automatic fullscreen remain denied. Regression tests cover both
+directions from the photo, folder button, map toggle, and split divider, plus
+rejection feedback and Escape priority. Native automation did not provide
+reliable installed-app evidence, so this issue remains open. See the
+[publication verification](../delivery/verifications/2026-09-07-publication-readiness.md).

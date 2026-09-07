@@ -5,7 +5,22 @@ their embedded captions, capture times, and locations. These notes cover the
 local proof-of-concept builds produced so far; no public release has been
 published yet.
 
-## 0.2.0 — 2026-09-04
+## 0.2.1 — Unreleased tester candidate
+
+- Apache-2.0 licensing, verified NASA asset provenance, and public repository metadata.
+- Original atlas/compass application icon and stable `io.github.chrwittm.memoryatlas` identity.
+- Node 24 LTS build toolchain and Electron 42.11.2, patching the two known Electron runtime advisories.
+- Candidate fullscreen permission fix with expanded focus and rejection regressions;
+  installed-app verification remains pending (MA-BUG-002).
+- Zero production audit findings; remaining Forge build-tool findings are reviewed
+  in the [dependency policy](docs/operations/dependency-security.md).
+
+This candidate is ad-hoc signed and unnotarized. No 0.2.1 public download is
+claimed until the release gate, installed-app checks, and upload verification
+are complete. The following 0.2.0 checksum identifies its historical local
+artifact and must not be reused for 0.2.1.
+
+## 0.2.0 — 2026-09-04 (unpublished local milestone)
 
 This release makes individual photos much more useful for close inspection by
 adding zoom, pan, and remembered views while preserving the calm presentation

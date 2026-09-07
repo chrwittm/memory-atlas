@@ -316,6 +316,57 @@ describe('viewer keyboard behavior', () => {
     expect(exitFullscreen).toHaveBeenCalledOnce()
   })
 
+  it.each(['photo', 'folder', 'divider', 'map toggle'])('toggles fullscreen from %s focus', async (focus) => {
+    render(Viewer, {
+      photos: [photo({ id: 'one' })], folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    const viewer = screen.getByRole('main')
+    let fullscreenElement: Element | null = null
+    const enter = vi.fn(async () => { fullscreenElement = viewer })
+    const exit = vi.fn(async () => { fullscreenElement = null })
+    Object.defineProperties(document, {
+      fullscreenEnabled: { configurable: true, value: true },
+      fullscreenElement: { configurable: true, get: () => fullscreenElement },
+      exitFullscreen: { configurable: true, value: exit },
+    })
+    Object.defineProperty(viewer, 'requestFullscreen', { configurable: true, value: enter })
+    const targets = {
+      photo: screen.getByRole('region', { name: 'Current photo' }),
+      folder: screen.getByRole('button', { name: 'Choose another folder' }),
+      divider: screen.getByRole('separator', { name: 'Resize photo and map' }),
+      'map toggle': screen.getByRole('button', { name: 'Close map' }),
+    }
+    const target = targets[focus as keyof typeof targets]
+    target.focus()
+    await fireEvent.keyDown(target, { key: 'f' })
+    expect(enter).toHaveBeenCalledOnce()
+    await fireEvent.keyDown(target, { key: 'f' })
+    expect(exit).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: 'Close map' })).toBeInTheDocument()
+  })
+
+  it('reports rejected fullscreen entry and exit promises', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'one' })], folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    const viewer = screen.getByRole('main')
+    let fullscreenElement: Element | null = null
+    Object.defineProperties(document, {
+      fullscreenEnabled: { configurable: true, value: true },
+      fullscreenElement: { configurable: true, get: () => fullscreenElement },
+      exitFullscreen: { configurable: true, value: vi.fn().mockRejectedValue(new Error('Denied')) },
+    })
+    Object.defineProperty(viewer, 'requestFullscreen', {
+      configurable: true, value: vi.fn().mockRejectedValue(new Error('Denied')),
+    })
+    await fireEvent.keyDown(window, { key: 'f' })
+    expect(screen.getByRole('status')).toHaveTextContent('Fullscreen could not be opened.')
+    fullscreenElement = viewer
+    await fireEvent.keyDown(window, { key: 'f' })
+    expect(screen.getByRole('status')).toHaveTextContent('Fullscreen could not be closed.')
+  })
+
   it('leaves map mode open for Escape in fullscreen, then closes it outside fullscreen', async () => {
     render(Viewer, {
       photos: [photo({ id: 'located', location: { latitude: 47.45, longitude: 10.99 } })],

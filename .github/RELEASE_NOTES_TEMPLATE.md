@@ -1,9 +1,9 @@
-# Memory Atlas <version> POC
+# Memory Atlas <version> — unnotarized tester prerelease
 
 ## Download
 
 - Apple silicon: `Memory Atlas-<version>-arm64.dmg`
-- Intel Mac: `Memory Atlas-<version>-x64.dmg`, if published
+- macOS / Apple silicon only unless another architecture has independent evidence.
 
 ## Install
 
@@ -36,3 +36,10 @@ notarized. macOS may ask you to Control-click the app in Finder and choose
 - Top-level folder files only
 - No automatic updates
 - No Developer ID notarization yet
+
+## Verification
+
+- Source commit: `<full commit>`
+- Automated release gate and installed-app checklist: `<evidence link>`
+- Signing: ad hoc; no Developer ID, no notarization or stapled ticket.
+- Verify the uploaded DMG by downloading it again and comparing SHA-256.

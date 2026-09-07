@@ -23,8 +23,15 @@ module.exports = {
   packagerConfig: {
     name: packageJson.productName,
     executableName: packageJson.productName,
-    appBundleId: 'com.memoryatlas.app',
+    appBundleId: releasePolicy.application.bundleIdentifier,
+    icon: path.join(__dirname, 'assets', 'icon', 'MemoryAtlas.icns'),
+    extraResource: [
+      path.join(__dirname, 'node_modules', 'electron', 'dist', 'LICENSE'),
+      path.join(__dirname, 'node_modules', 'electron', 'dist', 'LICENSES.chromium.html'),
+      path.join(__dirname, 'public', 'images', 'README.md'),
+    ],
     appCategoryType: 'public.app-category.photography',
+    extendInfo: { CFBundleIconFile: releasePolicy.application.iconFile },
     asar: true,
     prune: true,
     // A valid ad-hoc signature is sufficient for this originating-Mac test
@@ -42,6 +49,7 @@ module.exports = {
     ignore: [
       /^\/.git($|\/)/,
       /^\/docs($|\/)/,
+      /^\/assets($|\/)/,
       /^\/fixtures($|\/)/,
       /^\/node_modules($|\/)/,
       /^\/public($|\/)/,

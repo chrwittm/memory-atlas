@@ -41,12 +41,25 @@ specifications and later architecture decisions take precedence. Update
 
 - Product name: **Memory Atlas**. Use “Memory Explorer” only for naming history.
 - Svelte, TypeScript, Vite, and plain CSS; no SvelteKit for the MVP.
+- Node 24.20.0 LTS and npm 11.19.0 for development/releases; Electron 42.11.2
+  and stable Forge 7.11.2 for the 0.2.1 tester candidate.
 - Browser-native Svelte application core packaged with Electron and bundled
   Chromium as a self-contained macOS `.app` and `.dmg` for MVP testing.
 - `npm run release:mac -- --allow-network-audit` as the deterministic release
   gate; verbose logs and generated evidence stay under ignored `out/release/`.
 - Windows, Linux, phones, tablets, hosted web deployment, PWA installation, and
   automatic updates are deferred platform and distribution decisions.
+- The selected repository license is Apache-2.0. The initial GitHub target is
+  the owner's public personal `chrwittm/memory-atlas` repository, followed by
+  an explicitly unnotarized tester prerelease; normal public distribution still
+  requires Developer ID signing and notarization.
+- The selected durable macOS bundle identifier is
+  `io.github.chrwittm.memoryatlas`, with an original atlas/compass icon;
+  historical local artifacts retain their recorded identity.
+- Use GitHub private vulnerability reporting as the public repository's
+  confidential security-reporting route. The planned root `SECURITY.md` must
+  direct reporters there rather than expose a personal email address, and must
+  not promise response times, a bounty, or a support contract.
 - Runtime folder selection through `<input type="file" webkitdirectory multiple>`;
   retain only top-level `.jpg` and `.jpeg` files.
 - Case-insensitive natural file-name order controls the presentation sequence;
@@ -80,7 +93,7 @@ docs/archive/                superseded documents retained for history
 electron/                    Electron main process for packaged desktop builds
 scripts/                     deterministic macOS release gate, policy, and tests
 src/                         Svelte application, photo ingestion, and tests
-public/images/earth.jpg      provisional entry-screen Earth image
+public/images/earth.jpg      provenance-cleared NASA entry-screen Earth image
 public/images/README.md      asset purpose and provenance notes
 fixtures/photo-folders/      local representative photo collections (untracked)
 ```

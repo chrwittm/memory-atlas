@@ -2,7 +2,7 @@
 
 **Status:** Living post-MVP backlog
 
-**Last updated:** 2026-09-04
+**Last updated:** 2026-09-07
 
 **Purpose:** Capture, refine, and sequence product ideas without accidentally
 turning them into accepted scope.
@@ -59,6 +59,7 @@ heavy process.
 | Context and people | Tags, filename, people regions | Depends on representative metadata and an intentional side-panel model |
 | Platform strategy | iPhone and iPad | Requires a product, storage, and distribution decision—not a responsive-CSS-only change |
 | Performance and persistence | Disposable scan index/cache | Defer until measured scan cost justifies a new persistence boundary |
+| Development and release infrastructure | Representative public demo/test corpus | Public verification should not depend indefinitely on repetitive personal source photos or tiny synthetic fixtures |
 
 ### Suggested sequence for the 2026-09-04 field feedback
 
@@ -449,6 +450,37 @@ screens.
 - **Likely dependencies:** Generalize photo-specific collection/viewer types to
   media items without weakening the JPEG metadata path or lazy resource cleanup.
 
+## Development and release infrastructure
+
+### MA-FEAT-019 — Representative public demo and test corpus
+
+- **State:** Needs research
+- **Contributor outcome:** A fresh clone contains a compact, rights-cleared photo
+  collection that demonstrates Memory Atlas without requiring access to the
+  maintainer's personal source-photo folders.
+- **Interim position:** The owner considers the existing
+  `2026-06-20-Schlossherrenrunde` corpus useful for local testing, even though
+  several images are repetitive. Its name may remain in public documentation,
+  but the actual JPEGs remain private, read-only, ignored, and must not be
+  committed. This item supplies a separate purpose-built public corpus rather
+  than deriving one from those photos.
+- **Target corpus:** Prefer a small but varied set that covers natural filename
+  ordering, captions, capture time, valid/missing GPS, image orientation,
+  different dimensions, an unreadable or malformed-metadata outcome, and enough
+  visual variety for README screenshots and packaged smoke testing.
+- **Distribution boundary:** Store only intentional, checksum-recorded public
+  fixture copies in a dedicated tracked directory. Keep original personal
+  corpora ignored and read-only. Remove unrelated EXIF/XMP/IPTC fields, reduce
+  dimensions and file size to a documented budget, and include provenance and
+  reuse terms for every image.
+- **Acceptance checks:** The fixture works in a fresh clone; exercises the stated
+  metadata and viewer paths; contains no unreviewed faces, plates, documents,
+  coordinates, device identifiers, or editing history; has deterministic
+  checksums; and is small enough for ordinary Git rather than Git LFS.
+- **Non-goal:** Treating fixture publication as consent to upload arbitrary user
+  folders, replacing focused synthetic unit fixtures, or modifying the original
+  Schlossherrenrunde photos.
+
 ## Parking lot / future prompts
 
 - A dedicated About/help surface, including shortcuts and a precise privacy/map
@@ -470,3 +502,4 @@ screens.
 | 2026-09-04 | Grow the map through cumulative `G` modes and portable GPX files. | The desired experience connects the current photo, other photos, user-authored points of interest, and traveled tracks while keeping `M` as the map toggle. |
 | 2026-09-04 | Default GPX track mode to tracks intersecting the current photo's date and layer specific tracks above broader context tracks. | A whole-trip track and a same-day hike should appear together with a clear visual hierarchy, without clutter from unrelated days. |
 | 2026-09-04 | Promote mixed photo/video playback from the parking lot to MA-FEAT-017. | Real trip presentation needs videos in the same explicit file-name sequence, with familiar `J`/`K`/`L` playback controls. |
+| 2026-09-07 | Track a compact public demo/test corpus separately from personal source-photo folders. | The current real corpus is useful but repetitive; public verification and screenshots need intentional rights, privacy, metadata, and repository-size boundaries. |

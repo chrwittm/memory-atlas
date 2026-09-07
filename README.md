@@ -7,12 +7,14 @@ where available, location.
 Status: **MVP / proof of concept.** The core app is implemented and can be
 packaged as a self-contained macOS DMG for local testing.
 
+![Memory Atlas entry screen with a NASA Earth photograph and a Choose photo folder button](docs/assets/entry-screen.png)
+
 ## Try the app
 
 The intended public download path is
-[GitHub Releases](../../releases):
+[GitHub Releases](https://github.com/chrwittm/memory-atlas/releases):
 
-1. Open the [Releases page](../../releases).
+1. Open the [Releases page](https://github.com/chrwittm/memory-atlas/releases).
 2. Download the latest `Memory Atlas-<version>-<architecture>.dmg`.
 3. Open the DMG and drag **Memory Atlas** to **Applications**.
 4. Launch **Memory Atlas** and choose a local folder of JPEG photos.
@@ -58,14 +60,15 @@ This is intentionally a narrow POC:
 - JPEG folders only; no HEIC, RAW, videos, or nested folder import yet.
 - No library database, accounts, cloud sync, uploads, generated index, or
   automatic updates.
-- Public distribution still needs Apple Developer ID signing and notarization.
+- Normal distribution needs Apple Developer ID signing and notarization;
+  tester prereleases are explicitly unnotarized.
 
 See [known issues](docs/planning/known-issues.md) for observed MVP defects and current
 workarounds.
 
 ## Run from source
 
-Memory Atlas requires Node.js 20.18.0 or later in the 20.x line and npm 10.9.0, as declared in
+Memory Atlas requires Node.js 24.20.0 or later in the 24.x line and npm 11.19.0, as declared in
 `package.json`. Use `npm ci` to install the exact dependency versions from the
 lockfile. If Node.js is managed with NVM, activate the repository's `.nvmrc`
 version first.
@@ -155,18 +158,23 @@ location metadata.
 
 Before pointing a blog post or external audience at the app:
 
-1. Choose the repository license and add a root `LICENSE` file.
+1. Review the [publication gates](docs/delivery/plans/2026-09-04-publication-readiness.md),
+   asset provenance, and source privacy.
 2. Run `npm run release:mac -- --allow-network-audit` on the target Mac
    architecture and complete the manual installed-app checklist.
-3. Create a [GitHub Release](../../releases/new), mark it as a pre-release if
+3. Create a [GitHub Release](https://github.com/chrwittm/memory-atlas/releases/new), mark it as a pre-release if
    the POC caveats still apply, and upload the generated DMG as the release
    asset.
 4. Include the DMG SHA-256 checksum and the notarization caveat in the release
    notes.
-5. Link readers to the [latest release](../../releases/latest) rather than to a
+5. Link readers to the [latest release](https://github.com/chrwittm/memory-atlas/releases) rather than to a
    committed binary file.
 
 ## License
 
-No license has been selected yet. Until a license is added, the code is visible
-but not generally open source for reuse.
+Memory Atlas source code is licensed under [Apache-2.0](LICENSE). Third-party
+dependencies retain their own licenses. The NASA entry-screen image is covered
+by its separate [source and reuse record](public/images/README.md); NASA does
+not endorse Memory Atlas.
+
+Report vulnerabilities through the confidential route in [SECURITY.md](SECURITY.md).

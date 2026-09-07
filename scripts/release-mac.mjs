@@ -106,6 +106,15 @@ export function evaluateAudit(report, maximum, acceptedAdvisoryUrls = []) {
   }
 }
 
+export function verifyApplicationIdentity({ bundleIdentifier, iconFile, iconHash, expectedIconHash }, expected) {
+  if (bundleIdentifier !== expected.bundleIdentifier) {
+    throw new Error(`Unexpected bundle identifier: ${bundleIdentifier}`)
+  }
+  if (iconFile !== expected.iconFile || iconHash !== expectedIconHash) {
+    throw new Error('Packaged application icon does not match the approved source')
+  }
+}
+
 export function formatCounts(counts) {
   return `${counts.total} total (${counts.info} info, ${counts.low} low, ${counts.moderate} moderate, ${counts.high} high, ${counts.critical} critical)`
 }
@@ -419,6 +428,7 @@ async function main() {
 
   await runCommand({ ...npmInvocation(['run', 'check']), label: 'Svelte and TypeScript checks', logDir })
   await runCommand({ ...npmInvocation(['test']), label: 'automated tests', logDir })
+  await runCommand({ command: process.execPath, args: ['scripts/check-doc-links.mjs'], label: 'documentation links', logDir })
   await runCommand({ ...npmInvocation(['run', 'build']), label: 'Vite production build', logDir })
 
   const forgeCommand = path.join(rootDir, 'node_modules', '.bin', 'electron-forge')
@@ -512,6 +522,19 @@ async function main() {
     throw new Error(
       `Packaged versions do not match package.json: short=${bundleVersion}, build=${buildVersion}, expected=${packageJson.version}`,
     )
+  }
+
+  const iconFile = (await plistValue('CFBundleIconFile', 'bundle icon')).stdout.trim()
+  const iconPath = path.join(appPath, 'Contents', 'Resources', policy.application.iconFile)
+  await ensurePath(iconPath, 'Custom application icon')
+  verifyApplicationIdentity({
+    bundleIdentifier,
+    iconFile,
+    iconHash: await sha256(iconPath),
+    expectedIconHash: await sha256(path.join(rootDir, policy.application.iconSource)),
+  }, policy.application)
+  for (const license of ['LICENSE', 'LICENSES.chromium.html']) {
+    await ensurePath(path.join(appPath, 'Contents', 'Resources', license), `Electron ${license}`)
   }
 
   const executablePath = path.join(appPath, 'Contents', 'MacOS', packageJson.productName)

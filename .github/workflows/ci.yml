@@ -11,15 +11,15 @@ permissions:
 
 jobs:
   check:
-    name: Node 20 source checks
+    name: Node 24 source checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.18.0
+          node-version: 24.20.0
           cache: npm
-      - run: npm ci
+      - run: npm ci --no-audit --no-fund
       - run: npm run check
       - run: npm test
       - run: npm run build

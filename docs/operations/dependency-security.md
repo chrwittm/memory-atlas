@@ -4,7 +4,7 @@
 
 **Owner:** Memory Atlas maintainers
 
-**Last reviewed:** 2026-09-04
+**Last reviewed:** 2026-09-07
 
 **Applies to:** Runtime, development, and macOS packaging dependencies
 
@@ -50,6 +50,38 @@ review; the release script never retries with a weaker audit mode and never
 runs automatic remediation. After that review, update this document and the
 machine policy together. Do not change the policy merely to make a failing
 release pass.
+
+## 2026-09-07 publication review
+
+The approved supported-toolchain refresh uses Node 24.20.0 LTS, npm 11.19.0,
+Electron 42.11.2, and stable Forge 7.11.2. See
+[ADR 0003](../architecture/decisions/0003-publication-toolchain-and-identity.md).
+A clean install and fresh authorized audits found **zero production findings**
+and **27 complete-tree findings: 3 low, 23 high, 1 critical**. There are no new
+leaf advisories compared with the prior accepted review.
+
+Electron 42.11.2 patches the runtime session-cache isolation issue
+([GHSA-r4w5-6pfg-jxp5](https://github.com/electron/electron/security/advisories/GHSA-r4w5-6pfg-jxp5))
+and sandboxed-iframe popup issue
+([GHSA-9f4c-93c8-jc8g](https://github.com/electron/electron/security/advisories/GHSA-9f4c-93c8-jc8g)).
+Electron no longer appears in the audit findings. The production audit alone
+would not prove this, because Electron is declared as a development dependency
+but supplies the shipped runtime.
+
+The remaining critical/high archive-extraction, image parsing, and temporary-file
+findings are in Forge's build-host paths through `tar`, `extract-zip`,
+`image-size`, and `tmp`. They are not patched or eliminated: npm propagates them
+through 27 affected package entries. Release inputs are repository-owned; user
+photos, names, metadata, and untrusted archives are not passed to these tools.
+Locked dependency integrity and non-interactive fixed packaging inputs reduce
+reachability, but compromised upstream packages remain a build-chain risk.
+
+The existing trusted-build-input acceptance is retained for the limited,
+unnotarized tester prerelease, with the exact remaining leaf URLs and counts
+recorded in `scripts/release-policy.json`. No forced downgrade, override, or
+Forge 8 alpha was introduced. The first compatible stable Forge fix triggers
+another review and full release verification. Historical reviews below retain
+their original runtime and toolchain facts.
 
 ## 2026-09-04 review
 

@@ -6,6 +6,7 @@ import {
   createVerificationMarkdown,
   evaluateAudit,
   parseArgs,
+  verifyApplicationIdentity,
 } from './release-mac.mjs'
 
 function auditReport(counts, urls = []) {
@@ -91,7 +92,7 @@ describe('macOS release gate helpers', () => {
       },
       artifact: { relativePath: 'out/make/example.dmg', bytes: 1234, sha256: 'deadbeef' },
       application: {
-        bundleIdentifier: 'com.memoryatlas.app',
+        bundleIdentifier: 'io.github.chrwittm.memoryatlas',
         cdHash: 'abc',
         signing: 'Ad hoc',
         teamIdentifier: 'not set',
@@ -103,5 +104,16 @@ describe('macOS release gate helpers', () => {
     expect(markdown).toContain('Automated release gate passed')
     expect(markdown).toContain('installed-app interaction checks outstanding')
     expect(markdown).toContain('`deadbeef`')
+  })
+})
+
+ describe('packaged identity gate', () => {
+  const expected = { bundleIdentifier: 'io.github.chrwittm.memoryatlas', iconFile: 'MemoryAtlas.icns' }
+  const actual = { ...expected, iconHash: 'approved', expectedIconHash: 'approved' }
+  it('accepts only the configured bundle and exact icon bytes', () => {
+    expect(() => verifyApplicationIdentity(actual, expected)).not.toThrow()
+    expect(() => verifyApplicationIdentity({ ...actual, bundleIdentifier: 'com.memoryatlas.app' }, expected)).toThrow('bundle identifier')
+    expect(() => verifyApplicationIdentity({ ...actual, iconHash: 'default-electron-icon' }, expected)).toThrow('icon')
+    expect(() => verifyApplicationIdentity({ ...actual, iconFile: '../other.icns' }, expected)).toThrow('icon')
   })
 })

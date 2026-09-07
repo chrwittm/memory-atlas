@@ -11,7 +11,7 @@ const {
     setPermissionRequestHandler: (handler: (...args: never[]) => void) => void
     setPermissionCheckHandler: (handler: (...args: never[]) => boolean) => void
     setDevicePermissionHandler: (handler: (...args: never[]) => boolean) => void
-  }) => void
+  }, rendererUrl?: string) => void
   isSafeExternalUrl: (url: string) => boolean
   reportRendererLoadFailure: (
     window: { isDestroyed: () => boolean; destroy: () => void },
@@ -46,6 +46,34 @@ describe('Electron security boundary', () => {
     expect(callback).toHaveBeenCalledWith(false)
     expect(checkHandler?.()).toBe(false)
     expect(deviceHandler?.()).toBe(false)
+  })
+
+  it('allows fullscreen only for the exact live packaged main frame', () => {
+    let requestHandler: ((...args: never[]) => void) | undefined
+    const targetSession = {
+      setPermissionRequestHandler: vi.fn((handler) => { requestHandler = handler }),
+      setPermissionCheckHandler: vi.fn(),
+      setDevicePermissionHandler: vi.fn(),
+    }
+    const url = 'file:///app/dist/index.html'
+    const contents = { getURL: () => url, isDestroyed: () => false }
+    const details = { requestingUrl: url, isMainFrame: true }
+    denyUnexpectedPermissions(targetSession, url)
+    const request = (permission: string, wc: unknown = contents, frame: unknown = details) => {
+      const callback = vi.fn()
+      requestHandler?.(wc as never, permission as never, callback as never, frame as never)
+      return callback.mock.calls[0]?.[0]
+    }
+    expect(request('fullscreen')).toBe(true)
+    for (const permission of ['automatic-fullscreen', 'camera', 'media', 'geolocation', 'notifications', 'clipboard-read']) {
+      expect(request(permission)).toBe(false)
+    }
+    expect(request('fullscreen', null)).toBe(false)
+    expect(request('fullscreen', { ...contents, isDestroyed: () => true })).toBe(false)
+    expect(request('fullscreen', { ...contents, getURL: () => 'https://example.com' })).toBe(false)
+    expect(request('fullscreen', contents, { ...details, isMainFrame: false })).toBe(false)
+    expect(request('fullscreen', contents, { ...details, requestingUrl: 'file:///other.html' })).toBe(false)
+    expect(request('fullscreen', contents, {})).toBe(false)
   })
 
   it('surfaces renderer load failure and closes the hidden unusable window', () => {
