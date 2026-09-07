@@ -83,6 +83,11 @@ module.exports = {
     },
   ],
   hooks: {
+    generateAssets: async () => {
+      // Electron 42 downloads lazily instead of during npm ci. Ensure the
+      // exact locked distribution and its license files exist before copying.
+      await execFileAsync(process.execPath, [require.resolve('electron/install.js')])
+    },
     packageAfterExtract: async (_forgeConfig, buildPath, _electronVersion, platform) => {
       if (platform === 'darwin') {
         // Finder/OneDrive attributes invalidate a macOS bundle signature. Strip

@@ -68,8 +68,13 @@ identity. MA-BUG-002 must remain open pending reliable installed-app checks.
 
 ## Outstanding publication gates
 
-GitHub CLI has no authenticated account, and the in-app GitHub browser is signed
-out. Remote settings, source push, hosted CI, tag, release, and upload verification
-must be recorded only after they succeed. The installed-app checklist, including
+The existing macOS Git credential helper authenticated the owner successfully;
+the signed-out standalone CLI/browser were not the only available route. Remote
+settings, source push, hosted CI, tag, release, and upload verification must be
+recorded only after they succeed. The installed-app checklist, including
 fullscreen, map, zoom/pan, and icon surfaces, is still required before Gate B.
 No public binary or completed gate is claimed by this source record.
+
+The first automated packaging attempt exposed Electron 42’s lazy binary download:
+license resources were absent after `npm ci`. Forge now explicitly ensures the
+locked Electron distribution in its asset hook before copying license resources.
