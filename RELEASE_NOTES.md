@@ -10,8 +10,11 @@ published yet.
 - Apache-2.0 licensing, verified NASA asset provenance, and public repository metadata.
 - Original atlas/compass application icon and stable `io.github.chrwittm.memoryatlas` identity.
 - Node 24 LTS build toolchain and Electron 42.11.2, patching the two known Electron runtime advisories.
-- Candidate fullscreen permission fix with expanded focus and rejection regressions;
-  installed-app verification remains pending (MA-BUG-002).
+- Fixed Electron fullscreen permission handling; the owner verified both toggle
+  directions and Escape priority in the installed candidate (MA-BUG-002).
+- Bundled complete dependency notices and ExifReader MPL source in
+  `Memory Atlas.app/Contents/Resources/third-party`; see `SOURCE_AVAILABILITY.txt`
+  there for exact source-location and licensing details.
 - Zero production audit findings; remaining Forge build-tool findings are reviewed
   in the [dependency policy](docs/operations/dependency-security.md).
 

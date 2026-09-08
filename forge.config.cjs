@@ -29,6 +29,7 @@ module.exports = {
       path.join(__dirname, 'node_modules', 'electron', 'dist', 'LICENSE'),
       path.join(__dirname, 'node_modules', 'electron', 'dist', 'LICENSES.chromium.html'),
       path.join(__dirname, 'public', 'images', 'README.md'),
+      path.join(__dirname, 'out', 'legal', 'third-party'),
     ],
     appCategoryType: 'public.app-category.photography',
     extendInfo: { CFBundleIconFile: releasePolicy.application.iconFile },
@@ -87,6 +88,8 @@ module.exports = {
       // Electron 42 downloads lazily instead of during npm ci. Ensure the
       // exact locked distribution and its license files exist before copying.
       await execFileAsync(process.execPath, [require.resolve('electron/install.js')])
+      const { generate } = await import('./scripts/generate-third-party-notices.mjs')
+      generate(__dirname)
     },
     packageAfterExtract: async (_forgeConfig, buildPath, _electronVersion, platform) => {
       if (platform === 'darwin') {

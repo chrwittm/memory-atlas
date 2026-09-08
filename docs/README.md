@@ -48,7 +48,15 @@ planning, operations, or delivery records as the task requires.
 - [`architecture/decisions/0003-publication-toolchain-and-identity.md`](architecture/decisions/0003-publication-toolchain-and-identity.md)
   — supported publication toolchain, stable identity, and version boundary.
 
+- [`operations/third-party-notices.md`](operations/third-party-notices.md)
+  — packaged dependency notices and ExifReader source availability.
+
 ### Delivery records and history
+
+- [`delivery/verifications/2026-09-08-public-source.md`](delivery/verifications/2026-09-08-public-source.md)
+  — completed source import, GitHub CI, and repository security settings.
+- [`delivery/verifications/2026-09-08-v0.2.1-candidate.md`](delivery/verifications/2026-09-08-v0.2.1-candidate.md)
+  — exact candidate artifact identity and pending installed interaction evidence.
 
 - [`delivery/verifications/2026-09-07-publication-readiness.md`](delivery/verifications/2026-09-07-publication-readiness.md)
   — publication implementation, privacy rewrite, and remaining release gates.

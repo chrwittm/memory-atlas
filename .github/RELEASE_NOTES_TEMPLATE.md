@@ -13,8 +13,8 @@
 4. Launch **Memory Atlas** and choose a local JPEG folder.
 
 This proof-of-concept build is ad-hoc signed and not Apple Developer ID
-notarized. macOS may ask you to Control-click the app in Finder and choose
-**Open** the first time.
+notarized. After attempting launch, macOS may require **System Settings → Privacy &
+Security → Open Anyway**. Follow [Apple’s instructions](https://support.apple.com/guide/mac-help/mh40616/mac).
 
 ## Checksums
 
@@ -43,3 +43,9 @@ notarized. macOS may ask you to Control-click the app in Finder and choose
 - Automated release gate and installed-app checklist: `<evidence link>`
 - Signing: ad hoc; no Developer ID, no notarization or stapled ticket.
 - Verify the uploaded DMG by downloading it again and comparing SHA-256.
+
+## Third-party source and notices
+
+The application includes dependency licenses and unmodified ExifReader MPL source
+at `Memory Atlas.app/Contents/Resources/third-party`. Open
+`SOURCE_AVAILABILITY.txt` there for exact source-location and licensing details.

@@ -1,7 +1,7 @@
 # Memory Atlas: Living Project Context
 
 Status: Browser MVP implemented; macOS packaging accepted  
-Last updated: 2026-09-07
+Last updated: 2026-09-08
 
 ## Purpose of this document
 
@@ -106,8 +106,8 @@ This is not a retreat from the broader vision. It is the smallest domain in whic
 - The durable macOS bundle identifier is `io.github.chrwittm.memoryatlas`,
   with an original atlas/compass icon. Historical artifacts retain their recorded
   generic identifier.
-- The public repository will use GitHub private vulnerability reporting as its
-  confidential security-reporting channel. A root `SECURITY.md` will direct
+- The public repository uses GitHub private vulnerability reporting as its
+  confidential security-reporting channel. Root `SECURITY.md` directs
   reporters there without publishing a personal email address or promising a
   response time, bounty, or support contract.
 
@@ -313,5 +313,10 @@ The first hardened tester candidate is 0.2.1, preserving the immutable local
 0.2.0 artifact. Publication and installed-app verification are separate gates.
 
 Fullscreen now permits Electron’s documented permission only for the exact
-packaged main frame. Automated focus and rejection regressions pass; MA-BUG-002
-remains open until installed-app verification succeeds.
+packaged main frame. Automated focus and rejection regressions pass. The owner verified installed
+fullscreen entry, exit, and Escape priority on 2026-09-08, resolving MA-BUG-002.
+
+The public source import is complete and GitHub CI passed. Repository protection,
+private vulnerability reporting, dependency alerts, and secret scanning are
+enabled. The 0.2.1 candidate passed the automated macOS gate; its tester
+prerelease remains pending installed interaction checks.

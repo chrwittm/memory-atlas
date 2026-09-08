@@ -8,6 +8,7 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  readdir,
   rm,
   stat,
   writeFile,
@@ -253,6 +254,27 @@ async function sha256(filePath) {
   const hash = createHash('sha256')
   for await (const chunk of createReadStream(filePath)) hash.update(chunk)
   return hash.digest('hex')
+}
+
+async function verifyResourceTree(source, target) {
+  const collect = async (directory, prefix = '') => {
+    const files = []
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const relative = path.join(prefix, entry.name)
+      if (entry.isDirectory()) files.push(...await collect(path.join(directory, entry.name), relative))
+      else if (entry.isFile()) files.push(relative)
+      else throw new Error(`Unexpected resource type: ${relative}`)
+    }
+    return files.sort()
+  }
+  const expected = await collect(source)
+  const actual = await collect(target)
+  if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('Packaged legal resource inventory differs from generated inputs')
+  for (const file of expected) {
+    if (await sha256(path.join(source, file)) !== await sha256(path.join(target, file))) {
+      throw new Error(`Packaged legal resource differs: ${file}`)
+    }
+  }
 }
 
 function parseKeyValue(output, name) {
@@ -536,6 +558,10 @@ async function main() {
   for (const license of ['LICENSE', 'LICENSES.chromium.html']) {
     await ensurePath(path.join(appPath, 'Contents', 'Resources', license), `Electron ${license}`)
   }
+
+  const legalResources = path.join(appPath, 'Contents', 'Resources', 'third-party')
+  await verifyResourceTree(path.join(rootDir, 'out', 'legal', 'third-party'), legalResources)
+  process.stdout.write('PASS  packaged dependency notices and MPL source parity\n')
 
   const executablePath = path.join(appPath, 'Contents', 'MacOS', packageJson.productName)
   const fileResult = await runCommand({

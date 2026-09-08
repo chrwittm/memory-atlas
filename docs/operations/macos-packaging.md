@@ -1,7 +1,7 @@
 # Deploy Memory Atlas on macOS
 
 **Status:** Current macOS packaging runbook
-**Last updated:** 2026-09-07
+**Last updated:** 2026-09-08
 
 This is the executable deployment runbook for producing the Memory Atlas MVP as
 a macOS application and disk image. The rationale and alternatives remain in
@@ -50,7 +50,8 @@ The gate performs these steps once, in order:
 7. verify both the temporary app and the DMG-embedded app with deep/strict
    `codesign` checks;
 8. verify the DMG, bundle versions, `io.github.chrwittm.memoryatlas` identity,
-   exact custom icon bytes, Electron license resources, and executable architecture;
+   exact custom icon bytes, Electron license resources, full dependency notices and MPL source parity,
+   and executable architecture;
 9. confirm that the source tree did not change during the build; and
 10. calculate the DMG size and SHA-256 and generate release evidence.
 
@@ -214,8 +215,9 @@ do not create the consolidated machine report or verification draft.
 
 The MVP artifact has a local ad-hoc signature, not an Apple Developer ID
 signature, and is not notarized. macOS may block its first launch or report that
-it cannot verify the developer. For a build you created and trust, Control-click
-the application in Finder, choose **Open**, and confirm **Open**. Do not treat
+it cannot verify the developer. For a build you created and trust, follow Apple’s
+[unknown-developer instructions](https://support.apple.com/guide/mac-help/mh40616/mac):
+after attempting launch, open **System Settings → Privacy & Security → Open Anyway**. Do not treat
 this bypass as a public distribution method. Hardened Runtime is disabled only
 for this local ad-hoc signature because it requires a consistent Apple Team ID
 across Electron's nested frameworks.
@@ -324,3 +326,7 @@ Source publication (Gate A), an explicitly unnotarized tester prerelease
 Keep 0.2.0 local artifact records unchanged; the next binary is 0.2.1. Use the
 Releases listing for prereleases because GitHub's `/releases/latest` excludes
 prereleases. Never tag or upload before the installed-app checklist passes.
+
+The Forge asset hook generates [dependency notices and MPL source materials](third-party-notices.md)
+from the exact installed lockfile. These ship in `Contents/Resources/third-party`,
+and the release gate verifies every generated file against the packaged bytes.

@@ -1,7 +1,7 @@
 # Known issues
 
 **Status:** Living issue register
-**Last updated:** 2026-09-07
+**Last updated:** 2026-09-08
 
 ## MA-BUG-001: Map tiles do not recover after an offline request
 
@@ -75,7 +75,7 @@ event-to-method test is not sufficient.
 
 ## MA-BUG-002: `F` does not toggle fullscreen during normal viewer use
 
-**Status:** Candidate permission fix implemented; installed verification pending
+**Status:** Resolved in the 0.2.1 candidate; owner verified installed behavior on 2026-09-08
 
 **Severity:** Medium
 
@@ -125,3 +125,14 @@ directions from the photo, folder button, map toggle, and split divider, plus
 rejection feedback and Escape priority. Native automation did not provide
 reliable installed-app evidence, so this issue remains open. See the
 [publication verification](../delivery/verifications/2026-09-07-publication-readiness.md).
+
+### 2026-09-08 installed verification
+
+The owner confirmed the installed 0.2.1 candidate opens the entry screen and a
+JPEG folder, enters and exits fullscreen with `F` in both photo-only and split-map
+layouts, and lets Escape exit fullscreen before closing the map. This resolves
+the reported fullscreen failure. The tested artifact's source is
+`acc9eeeeadda516a05a2146c8a99480b2065879a`; see the
+[candidate record](../delivery/verifications/2026-09-08-v0.2.1-candidate.md).
+A packaging-only rebuild will add dependency notices and source materials before
+publication; its runtime equivalence and final artifact checks are separate.

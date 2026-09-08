@@ -5,7 +5,8 @@ photos through the context already embedded in them: captions, capture time, and
 where available, location.
 
 Status: **MVP / proof of concept.** The core app is implemented and can be
-packaged as a self-contained macOS DMG for local testing.
+packaged as a self-contained macOS DMG for local testing. The source is public;
+the 0.2.1 tester candidate is awaiting installed-app verification.
 
 ![Memory Atlas entry screen with a NASA Earth photograph and a Choose photo folder button](docs/assets/entry-screen.png)
 
@@ -23,14 +24,14 @@ The [Memory Atlas user guide](docs/user-guide.md) explains folder requirements,
 every viewer control, keyboard shortcuts, map behavior, and common recovery
 steps.
 
-The [release notes](RELEASE_NOTES.md) describe the current 0.2.0 local build
-and reconstruct the 0.1.0 packaged MVP baseline. No public release has been
+The [release notes](RELEASE_NOTES.md) describe the 0.2.1 tester candidate
+and the historical 0.2.0 and 0.1.0 local builds. No public release has been
 published yet.
 
 For Apple silicon Macs, download the `arm64` DMG. For Intel Macs, download the
 `x64` DMG if one is published. The current MVP build is ad-hoc signed for local
-testing, not Developer ID notarized, so macOS may ask you to Control-click the
-app and choose **Open** the first time.
+testing, not Developer ID notarized, so the first launch may require **System Settings → Privacy & Security →
+Open Anyway**. See [Apple’s instructions](https://support.apple.com/guide/mac-help/mh40616/mac).
 
 For maintainers, the exact packaging runbook is in
 [docs/operations/macos-packaging.md](docs/operations/macos-packaging.md). Generated DMGs belong on GitHub

@@ -1,8 +1,8 @@
 # Memory Atlas publication-readiness specification and delivery plan
 
-**Status:** Implementation in progress; source changes verified, publication gates pending
+**Status:** Gate A source import complete; Gate B installed verification pending
 **Plan date:** 2026-09-04
-**Last updated:** 2026-09-07
+**Last updated:** 2026-09-08
 **Scope:** First public GitHub source import and unnotarized tester prerelease
 **Source audit:** Repository state at `255efcb`
 
@@ -24,7 +24,8 @@ network audit, GitHub publication, signing operation, tag, release, or upload.
 
 On 2026-09-07 the owner authorized execution of all plan steps. See the
 [implementation verification](../verifications/2026-09-07-publication-readiness.md)
-for completed work and remaining installed-app/authentication gates. The
+and the [source import record](../verifications/2026-09-08-public-source.md)
+for completed work and remaining installed-app gates. The
 original requirements and historical baseline below remain the acceptance record.
 
 ## Current baseline
