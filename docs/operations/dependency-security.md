@@ -244,5 +244,6 @@ the machine policy adds this specific advisory without increasing any severity
 maximum. No runtime advisory is accepted, no forced Forge downgrade or override
 is used, and a compatible stable upstream fix triggers another review.
 
-The earlier hold remains historical; replacement publication still requires
-the complete clean release gate and installed-app verification.
+The earlier hold remains historical. The 0.2.2 replacement passed the clean
+release gate, installed-app checks and exact-source CI; see the
+[replacement record](../delivery/verifications/2026-09-11-v0.2.2-publication.md).

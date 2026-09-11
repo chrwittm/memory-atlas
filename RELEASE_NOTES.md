@@ -4,7 +4,7 @@ Memory Atlas is a local-first macOS photo viewer for browsing JPEG folders with
 their embedded captions, capture times, and locations. These notes cover the
 public tester prerelease and historical local proof-of-concept builds.
 
-## 0.2.2 — Security replacement candidate
+## 0.2.2 — 2026-09-11 (public security replacement prerelease)
 
 - Fixes MapLibre attribution sanitization vulnerability GHSA-jrc7-96c5-q579
   with upstream MapLibre 6.4.1; safely strips adjacent dangerous attributes.
@@ -14,8 +14,18 @@ public tester prerelease and historical local proof-of-concept builds.
 - Fresh production audit has zero findings. Reviewed packaging-tool risks
   remain; see the [dependency policy](docs/operations/dependency-security.md).
 
-This Apple silicon tester candidate remains ad-hoc signed and unnotarized.
-Publication awaits the clean release gate and installed-app checks.
+[Download 0.2.2](https://github.com/chrwittm/memory-atlas/releases/tag/v0.2.2) for Apple silicon. The clean release gate,
+64 tests, installed-app smoke checks, and source CI passed. The build is
+ad-hoc signed and unnotarized; see [installation guidance](README.md#try-the-app).
+
+```text
+Memory.Atlas-0.2.2-arm64.dmg
+SHA-256: 56089a8ec30fb015423bb02ab30b3a09b1ecbd4af71fef79f2b0b6fd88f24f42
+```
+
+See the [release verification](docs/delivery/verifications/2026-09-11-v0.2.2-publication.md).
+The offline tile-recovery limitation (MA-BUG-001) remains. No Intel build,
+automatic updates, or normal notarized distribution is included.
 
 ## 0.2.1 — 2026-09-11 (tester prerelease withdrawn)
 

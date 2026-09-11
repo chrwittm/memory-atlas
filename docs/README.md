@@ -53,6 +53,9 @@ planning, operations, or delivery records as the task requires.
 
 ### Delivery records and history
 
+- [`delivery/verifications/2026-09-11-v0.2.2-publication.md`](delivery/verifications/2026-09-11-v0.2.2-publication.md)
+  — patched MapLibre replacement, installed verification, and public checksum.
+
 - [`delivery/verifications/2026-09-08-public-source.md`](delivery/verifications/2026-09-08-public-source.md)
   — completed source import, GitHub CI, and repository security settings.
 - [`delivery/verifications/2026-09-08-v0.2.1-candidate.md`](delivery/verifications/2026-09-08-v0.2.1-candidate.md)

@@ -1,7 +1,7 @@
 # Deploy Memory Atlas on macOS
 
 **Status:** Current macOS packaging runbook
-**Last updated:** 2026-09-08
+**Last updated:** 2026-09-11
 
 This is the executable deployment runbook for producing the Memory Atlas MVP as
 a macOS application and disk image. The rationale and alternatives remain in
@@ -46,7 +46,8 @@ The gate performs these steps once, in order:
    the reviewed residual-risk policy in `scripts/release-policy.json`;
 4. run Svelte/TypeScript checks, automated tests, and the Vite build;
 5. make the architecture-specific Electron application and DMG;
-6. inspect the ASAR for the renderer, metadata worker, and Electron entry files;
+6. inspect the ASAR for the renderer, metadata worker, locally bundled MapLibre
+   worker, and Electron entry files;
 7. verify both the temporary app and the DMG-embedded app with deep/strict
    `codesign` checks;
 8. verify the DMG, bundle versions, `io.github.chrwittm.memoryatlas` identity,

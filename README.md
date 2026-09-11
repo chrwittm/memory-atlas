@@ -6,7 +6,7 @@ where available, location.
 
 Status: **MVP / proof of concept.** The core app is implemented and can be
 packaged as a self-contained macOS DMG for local testing. The source is public;
-the 0.2.1 tester prerelease was withdrawn pending a dependency security refresh.
+[0.2.2 is available as an unnotarized tester prerelease](https://github.com/chrwittm/memory-atlas/releases/tag/v0.2.2).
 
 ![Memory Atlas entry screen with a NASA Earth photograph and a Choose photo folder button](docs/assets/entry-screen.png)
 
@@ -16,7 +16,7 @@ Release availability is shown on
 [GitHub Releases](https://github.com/chrwittm/memory-atlas/releases):
 
 1. Open the [Releases page](https://github.com/chrwittm/memory-atlas/releases).
-2. Download the latest `Memory Atlas-<version>-<architecture>.dmg`.
+2. Download the latest `Memory.Atlas-<version>-<architecture>.dmg`.
 3. Open the DMG and drag **Memory Atlas** to **Applications**.
 4. Launch **Memory Atlas** and choose a local folder of JPEG photos.
 
@@ -24,7 +24,7 @@ The [Memory Atlas user guide](docs/user-guide.md) explains folder requirements,
 every viewer control, keyboard shortcuts, map behavior, and common recovery
 steps.
 
-The [release notes](RELEASE_NOTES.md) describe the public 0.2.1 tester prerelease
+The [release notes](RELEASE_NOTES.md) describe the public 0.2.2 security replacement
 and the historical 0.2.0 and 0.1.0 local builds.
 
 For Apple silicon Macs, download the `arm64` DMG. For Intel Macs, download the

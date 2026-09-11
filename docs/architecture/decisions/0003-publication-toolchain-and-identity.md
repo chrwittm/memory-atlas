@@ -39,3 +39,13 @@ review and exact release-policy update after installation.
 - [Electron stable releases](https://releases.electronjs.org/?channel=stable)
 - [Node 24.20.0 archive](https://nodejs.org/en/download/archive/v24.20.0)
 - [Electron Forge releases](https://github.com/electron/forge/releases)
+
+## 2026-09-11 security replacement
+
+Version 0.2.2 pins MapLibre 6.4.1 to fix its attribution-sanitizer vulnerability
+and uses Vitest 4.1.11. MapLibre 6 exposes named ESM exports and a separate
+worker module. Vite bundles that worker through `?worker&url`; the app supplies
+its local URL with `setWorkerUrl` before creating a map. This supports packaged
+`file://` loading without a CDN or broader content-security policy. The release
+gate requires the worker in ASAR. Map behavior and the Electron identity remain
+unchanged. See the [replacement verification](../../delivery/verifications/2026-09-11-v0.2.2-publication.md).
