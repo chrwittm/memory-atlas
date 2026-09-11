@@ -211,3 +211,13 @@ applies.
 - Verify the exact packaged app signature and DMG checksum after every
   dependency change.
 - Replace this risk acceptance when a supported upstream fix becomes available.
+
+## 2026-09-11 publication hold
+
+A final GitHub alert review found newly reported runtime MapLibre advisory
+[GHSA-jrc7-96c5-q579](https://github.com/maplibre/maplibre-gl-js/security/advisories/GHSA-jrc7-96c5-q579)
+and additional development-tool alerts. The 0.2.1 prerelease was withdrawn to
+draft; the September 8 audit is no longer a current security clearance. See the
+[withdrawal record](../delivery/verifications/2026-09-11-v0.2.1-publication.md).
+The release policy has not been relaxed to accept the new findings. A dependency
+refresh and fresh release gate are required for a replacement patch version.

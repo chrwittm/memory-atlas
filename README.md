@@ -6,13 +6,13 @@ where available, location.
 
 Status: **MVP / proof of concept.** The core app is implemented and can be
 packaged as a self-contained macOS DMG for local testing. The source is public;
-[0.2.1 is available as an unnotarized tester prerelease](https://github.com/chrwittm/memory-atlas/releases/tag/v0.2.1).
+the 0.2.1 tester prerelease was withdrawn pending a dependency security refresh.
 
 ![Memory Atlas entry screen with a NASA Earth photograph and a Choose photo folder button](docs/assets/entry-screen.png)
 
 ## Try the app
 
-Download the Apple silicon tester build from
+Release availability is shown on
 [GitHub Releases](https://github.com/chrwittm/memory-atlas/releases):
 
 1. Open the [Releases page](https://github.com/chrwittm/memory-atlas/releases).

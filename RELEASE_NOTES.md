@@ -4,7 +4,7 @@ Memory Atlas is a local-first macOS photo viewer for browsing JPEG folders with
 their embedded captions, capture times, and locations. These notes cover the
 public tester prerelease and historical local proof-of-concept builds.
 
-## 0.2.1 — 2026-09-11 (public tester prerelease)
+## 0.2.1 — 2026-09-11 (tester prerelease withdrawn)
 
 - Apache-2.0 licensing, verified NASA asset provenance, and public repository metadata.
 - Original atlas/compass application icon and stable `io.github.chrwittm.memoryatlas` identity.
@@ -14,10 +14,13 @@ public tester prerelease and historical local proof-of-concept builds.
 - Bundled complete dependency notices and ExifReader MPL source in
   `Memory Atlas.app/Contents/Resources/third-party`; see `SOURCE_AVAILABILITY.txt`
   there for exact source-location and licensing details.
-- Zero production audit findings; remaining Forge build-tool findings are reviewed
+- The September 8 audit had zero production findings; this predates the newly
+  disclosed MapLibre advisory. Build-tool findings are reviewed
   in the [dependency policy](docs/operations/dependency-security.md).
 
-[Download 0.2.1](https://github.com/chrwittm/memory-atlas/releases/tag/v0.2.1) for Apple silicon (`arm64`).
+The Apple silicon (`arm64`) prerelease was briefly published, then returned to
+draft after the final GitHub alert review found a new critical MapLibre advisory.
+It is not currently offered as a public download.
 This tester build is ad-hoc signed and unnotarized. Installed-app checks passed.
 See the [publication verification](docs/delivery/verifications/2026-09-11-v0.2.1-publication.md).
 

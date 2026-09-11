@@ -319,6 +319,8 @@ fullscreen entry, exit, and Escape priority on 2026-09-08, resolving MA-BUG-002.
 The public source import is complete and GitHub CI passed. Repository protection,
 private vulnerability reporting, dependency alerts, and secret scanning are
 enabled. The 0.2.1 build passed the automated macOS gate and owner-installed
-interaction checks. Its unnotarized Apple silicon tester prerelease is public;
+interaction checks. Its unnotarized Apple silicon tester prerelease was withdrawn to draft after
+a new critical MapLibre advisory was found during final publication checks;
 see the [publication record](../delivery/verifications/2026-09-11-v0.2.1-publication.md).
-Gates A and B are complete; Gate C remains deferred.
+Gate A is complete. Gate B needs a dependency security refresh and a newly
+versioned, verified artifact; Gate C remains deferred.

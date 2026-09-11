@@ -1,6 +1,6 @@
 # Memory Atlas publication-readiness specification and delivery plan
 
-**Status:** Gates A and B complete; Gate C deferred
+**Status:** Gate A complete; Gate B reopened for new security advisories; Gate C deferred
 **Plan date:** 2026-09-04
 **Last updated:** 2026-09-08
 **Scope:** First public GitHub source import and unnotarized tester prerelease
@@ -26,7 +26,7 @@ On 2026-09-07 the owner authorized execution of all plan steps. See the
 [implementation verification](../verifications/2026-09-07-publication-readiness.md)
 and the [source import record](../verifications/2026-09-08-public-source.md)
 for implementation evidence. The [final publication record](../verifications/2026-09-11-v0.2.1-publication.md)
-records owner verification and the published 0.2.1 tester prerelease. The
+records owner verification, the brief 0.2.1 publication, and its security withdrawal. The
 original requirements and historical baseline below remain the acceptance record.
 
 ## Current baseline
