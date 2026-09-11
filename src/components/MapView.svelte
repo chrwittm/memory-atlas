@@ -1,6 +1,10 @@
 <script lang="ts">
-  import maplibregl from 'maplibre-gl'
+  import * as maplibregl from 'maplibre-gl'
   import 'maplibre-gl/dist/maplibre-gl.css'
+  import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
+
+  // Bundle the ESM worker locally; MapLibre cannot infer its URL under file://.
+  maplibregl.setWorkerUrl(mapWorkerUrl)
   import { onDestroy, onMount } from 'svelte'
   import { MAP_INITIAL_ZOOM, MAP_STYLE_URL } from '../lib/map/config'
   import type { PhotoLocation } from '../lib/photos/types'

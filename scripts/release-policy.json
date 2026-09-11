@@ -13,7 +13,7 @@
     "notarized": false
   },
   "audit": {
-    "reviewedOn": "2026-09-07",
+    "reviewedOn": "2026-09-11",
     "reviewDocument": "docs/operations/dependency-security.md",
     "productionMaximum": {
       "info": 0,
@@ -36,6 +36,7 @@
       "https://github.com/advisories/GHSA-34x7-hfp2-rc4v",
       "https://github.com/advisories/GHSA-52f5-9888-hmc6",
       "https://github.com/advisories/GHSA-5p2g-fcmc-qvqq",
+      "https://github.com/advisories/GHSA-7pqw-9j4j-h8q3",
       "https://github.com/advisories/GHSA-83g3-92jg-28cx",
       "https://github.com/advisories/GHSA-8qq5-rm4j-mr97",
       "https://github.com/advisories/GHSA-8x88-c5mf-7j5w",
@@ -58,7 +59,8 @@
     "/LICENSE"
   ],
   "requiredAsarPatterns": [
-    "^/dist/assets/metadata\\.worker-[^/]+\\.js$"
+    "^/dist/assets/metadata\\.worker-[^/]+\\.js$",
+    "^/dist/assets/maplibre-gl-worker-[^/]+\\.js$"
   ],
   "application": {
     "bundleIdentifier": "io.github.chrwittm.memoryatlas",

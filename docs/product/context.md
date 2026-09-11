@@ -324,3 +324,11 @@ a new critical MapLibre advisory was found during final publication checks;
 see the [publication record](../delivery/verifications/2026-09-11-v0.2.1-publication.md).
 Gate A is complete. Gate B needs a dependency security refresh and a newly
 versioned, verified artifact; Gate C remains deferred.
+
+### 0.2.2 security replacement
+
+The owner authorized the replacement publication after the 0.2.1 withdrawal.
+MapLibre is pinned to patched 6.4.1 with named ESM exports and a separately
+bundled local worker; no worker is fetched from a CDN. Vitest is updated to
+4.1.11. Fresh audits and focused attribution regressions pass; the 0.2.2
+release candidate still needs the full packaged gate and installed verification.

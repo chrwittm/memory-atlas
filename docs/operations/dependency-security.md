@@ -4,7 +4,7 @@
 
 **Owner:** Memory Atlas maintainers
 
-**Last reviewed:** 2026-09-07
+**Last reviewed:** 2026-09-11
 
 **Applies to:** Runtime, development, and macOS packaging dependencies
 
@@ -221,3 +221,28 @@ draft; the September 8 audit is no longer a current security clearance. See the
 [withdrawal record](../delivery/verifications/2026-09-11-v0.2.1-publication.md).
 The release policy has not been relaxed to accept the new findings. A dependency
 refresh and fresh release gate are required for a replacement patch version.
+
+## 2026-09-11 remediation review
+
+The owner authorized remediation and replacement publication. Version 0.2.2
+pins MapLibre 6.4.1, the first upstream fix for GHSA-jrc7-96c5-q579, and updates
+Vitest to 4.1.11 for GHSA-82fw-gwwq-j7x9. MapLibre 6 uses named ESM exports and
+a separate worker, now bundled locally by Vite and required in the packaged
+ASAR. A regression exercises the actual MapLibre attribution control with
+adjacent dangerous attributes and confirms safe credit links survive.
+
+Fresh npm audits report zero production findings and 27 complete-tree findings
+(3 low, 23 high, 1 critical). The newly reviewed extract-zip advisory
+[GHSA-7pqw-9j4j-h8q3](https://github.com/advisories/GHSA-7pqw-9j4j-h8q3)
+concerns archive entries that overwrite through a previously planted symlink.
+It is limited here to the existing Forge/Electron download/build paths, which
+consume fixed trusted inputs, not user photos or user archives. It has no
+upstream patched version in the report. Lockfile integrity does not eliminate
+compromised-upstream risk. This residual build-host risk is accepted for the
+unnotarized tester gate on the same trusted-input basis as the earlier review;
+the machine policy adds this specific advisory without increasing any severity
+maximum. No runtime advisory is accepted, no forced Forge downgrade or override
+is used, and a compatible stable upstream fix triggers another review.
+
+The earlier hold remains historical; replacement publication still requires
+the complete clean release gate and installed-app verification.

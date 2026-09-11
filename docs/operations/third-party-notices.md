@@ -16,8 +16,7 @@ The generator writes ignored `out/legal/third-party/` containing:
 
 - `THIRD_PARTY_NOTICES.txt`: verbatim license/notice files from exact installed
   production-lockfile packages, including MapLibre's combined Mapbox, glfx.js,
-  and d3-color notices; MurmurHash's license from its README; and Microsoft's
-  tslib notice embedded in MapLibre's source map.
+  and d3-color notices, and MurmurHash's license from its README.
 - `SOURCE_AVAILABILITY.txt`: instructions for obtaining the bundled ExifReader
   source under MPL-2.0, separate from the project's Apache-2.0 license.
 - `source/exifreader-<version>/`: unmodified installed `src/`, `bin/` build scripts, license, README,
@@ -36,12 +35,11 @@ bundling any of these utilities, obtain and preserve its complete upstream
 notice before distribution. Missing notices and installed/locked version
 mismatches fail generation rather than silently dropping a component.
 
-MapLibre's precompiled source map identifies its embedded dependencies, including
-tslib, which is not separately installed. Its style-spec source map also embeds
-quickselect and json-stringify-pretty-compact; their installed production notices
-are included. When MapLibre changes, review these maps for dependencies outside
-the installed lockfile closure. Generated inventory versions describe installed
-packages; the embedded tslib entry deliberately claims no inferred version.
+MapLibre 6.4.1's ESM source maps contain no embedded tslib; the generator
+checks this assumption and fails if tslib reappears. Its other embedded package
+sources are covered by the production closure notices. Review these maps when
+MapLibre changes, including dependencies outside that closure. Historical
+0.2.1 materials retained the tslib notice required by MapLibre 5.
 
 ## Forge integration
 
@@ -61,6 +59,6 @@ separate notices, and rebuild/sign the complete artifact after changing any lega
 resource. Add a release-note pointer to the bundled `third-party` directory so
 recipients can find the ExifReader source availability instructions.
 
-The focused test verifies repeatable output, complete primary notices, embedded
-tslib/MurmurHash notices, absence of host paths, and byte-identical ExifReader
+The focused test verifies repeatable output, complete primary notices,
+MurmurHash notices, absence of host paths, and byte-identical ExifReader
 source files. The generator adds no runtime dependencies or network requests.

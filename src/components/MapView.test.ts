@@ -39,7 +39,7 @@ vi.mock('maplibre-gl', () => {
 
   class NavigationControl {}
 
-  return { default: { Map, Marker, NavigationControl } }
+  return { Map, Marker, NavigationControl, setWorkerUrl: vi.fn() }
 })
 
 import MapView from './MapView.svelte'

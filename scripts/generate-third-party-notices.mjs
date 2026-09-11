@@ -34,14 +34,13 @@ export function generate(projectRoot = root, outputDir = 'out/legal/third-party'
     for (const notice of notices) sections.push(`\n--- ${notice.name} ---\n${notice.text}\n`)
     inventory.push({ name: pkg.name, version: pkg.version, location, notices: notices.map(({ name, text }) => ({ name, sha256: digest(text) })) })
   }
-  // MapLibre ships a precompiled bundle containing tslib even though tslib is
-  // not an installed runtime dependency. Preserve its embedded upstream notice.
-  const map = JSON.parse(readFileSync(path.join(projectRoot, 'node_modules/maplibre-gl/dist/maplibre-gl.js.map'), 'utf8'))
-  const index = map.sources.findIndex(source => source.endsWith('/tslib/tslib.es6.js'))
-  const notice = index >= 0 && map.sourcesContent[index].match(/^\/\*[\s\S]*?\*\//)?.[0]
-  if (!notice || !notice.includes('Copyright (c) Microsoft Corporation.') || !notice.includes('Permission to use')) throw new Error('Missing embedded tslib notice')
-  sections.push(`\n${'='.repeat(72)}\ntslib embedded in MapLibre GL JS (upstream source-map notice)\n${notice}\n`)
-  inventory.push({ name: 'tslib (embedded)', source: 'maplibre-gl/dist/maplibre-gl.js.map', sha256: digest(notice) })
+  // MapLibre 6 ships ESM without the previously embedded tslib runtime.
+  // Fail closed if a future bundle reintroduces it without a bundled notice.
+  const mapDir = path.join(projectRoot, 'node_modules/maplibre-gl/dist')
+  for (const file of readdirSync(mapDir).filter(name => name.endsWith('.mjs.map'))) {
+    const map = JSON.parse(readFileSync(path.join(mapDir, file), 'utf8'))
+    if (map.sources.some(source => /\btslib\b/.test(source))) throw new Error('Review newly embedded tslib notice')
+  }
   const exif = JSON.parse(readFileSync(path.join(projectRoot, 'node_modules/exifreader/package.json'), 'utf8'))
   const sourcePath = `source/exifreader-${exif.version}`
   const access = `ExifReader ${exif.version} source availability\n\nExifReader is covered by Mozilla Public License 2.0. Its complete installed source is supplied alongside this notice at ${sourcePath}/src, with its MPL license at ${sourcePath}/LICENSE. These are unmodified upstream npm source files for the exact packaged version. Memory Atlas bundles/minifies this code for execution without editing those upstream source files. The source remains available under MPL-2.0; Memory Atlas's Apache-2.0 license does not replace it.\n`

@@ -21,7 +21,6 @@ test('legal materials are deterministic and include full notices and unchanged M
     assert.deepEqual(hashes(path.join(temp, 'one')), hashes(path.join(temp, 'two')))
     const notices = readFileSync(path.join(temp, 'one/THIRD_PARTY_NOTICES.txt'), 'utf8')
     for (const file of ['svelte/LICENSE.md', '@xmldom/xmldom/LICENSE', 'maplibre-gl/LICENSE.txt', 'exifreader/LICENSE']) assert.ok(notices.includes(readFileSync(path.join(root, 'node_modules', file), 'utf8')))
-    assert.ok(notices.includes('Copyright (c) Microsoft Corporation.'))
     assert.ok(notices.includes('Copyright (c) 2011 Gary Court'))
     assert.ok(!notices.includes(root))
     const pkg = JSON.parse(readFileSync(path.join(root, 'node_modules/exifreader/package.json')))
