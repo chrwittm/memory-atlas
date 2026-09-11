@@ -208,3 +208,12 @@ for details.
 
 For installation instructions and the complete list of current limitations,
 return to the [project README](../README.md).
+
+## Duplicate app in Spotlight
+
+Spotlight can find development builds outside Applications. If an old copy
+appears, select it in Spotlight and press Command-Return to reveal its location
+in Finder. Remove the obsolete app from that location; keep the current copy
+in Applications. For a source checkout, generated copies may be under
+`out/Memory Atlas-darwin-arm64/`. Eject old mounted installer images as well.
+Spotlight may take a little time to stop showing a removed copy.

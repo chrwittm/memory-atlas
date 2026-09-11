@@ -2,10 +2,9 @@
 
 Memory Atlas is a local-first macOS photo viewer for browsing JPEG folders with
 their embedded captions, capture times, and locations. These notes cover the
-local proof-of-concept builds produced so far; no public release has been
-published yet.
+public tester prerelease and historical local proof-of-concept builds.
 
-## 0.2.1 — Unreleased tester candidate
+## 0.2.1 — 2026-09-11 (public tester prerelease)
 
 - Apache-2.0 licensing, verified NASA asset provenance, and public repository metadata.
 - Original atlas/compass application icon and stable `io.github.chrwittm.memoryatlas` identity.
@@ -18,10 +17,20 @@ published yet.
 - Zero production audit findings; remaining Forge build-tool findings are reviewed
   in the [dependency policy](docs/operations/dependency-security.md).
 
-This candidate is ad-hoc signed and unnotarized. No 0.2.1 public download is
-claimed until the release gate, installed-app checks, and upload verification
-are complete. The following 0.2.0 checksum identifies its historical local
-artifact and must not be reused for 0.2.1.
+[Download 0.2.1](https://github.com/chrwittm/memory-atlas/releases/tag/v0.2.1) for Apple silicon (`arm64`).
+This tester build is ad-hoc signed and unnotarized. Installed-app checks passed.
+See the [publication verification](docs/delivery/verifications/2026-09-11-v0.2.1-publication.md).
+
+```text
+Memory.Atlas-0.2.1-arm64.dmg
+SHA-256: 2dfa3d5aa90085f66530944b38d9117c994e73694ca3737a00ad1529a78dfc2c
+```
+
+Open the DMG, drag Memory Atlas to Applications, and eject the image. If macOS
+blocks launch, follow the [installation instructions](README.md#try-the-app).
+Map tiles require internet; offline requests may require an app restart after
+reconnection (MA-BUG-001). Intel builds and normal notarized distribution are
+not included. Historical checksums below identify different local artifacts.
 
 ## 0.2.0 — 2026-09-04 (unpublished local milestone)
 

@@ -1,7 +1,7 @@
 # Memory Atlas Documentation
 
 **Status:** Current documentation guide
-**Last updated:** 2026-09-07
+**Last updated:** 2026-09-11
 
 This directory organizes project documentation by purpose and lifecycle. Start
 with the product context and accepted specification, then consult architecture,
@@ -56,7 +56,11 @@ planning, operations, or delivery records as the task requires.
 - [`delivery/verifications/2026-09-08-public-source.md`](delivery/verifications/2026-09-08-public-source.md)
   — completed source import, GitHub CI, and repository security settings.
 - [`delivery/verifications/2026-09-08-v0.2.1-candidate.md`](delivery/verifications/2026-09-08-v0.2.1-candidate.md)
-  — exact candidate artifact identity and pending installed interaction evidence.
+  — superseded candidate identity and owner fullscreen verification.
+- [`delivery/verifications/2026-09-08-v0.2.1-final-candidate.md`](delivery/verifications/2026-09-08-v0.2.1-final-candidate.md)
+  — final candidate identity and automated checks before owner verification.
+- [`delivery/verifications/2026-09-11-v0.2.1-publication.md`](delivery/verifications/2026-09-11-v0.2.1-publication.md)
+  — final owner verification, tester publication, and download checksum.
 
 - [`delivery/verifications/2026-09-07-publication-readiness.md`](delivery/verifications/2026-09-07-publication-readiness.md)
   — publication implementation, privacy rewrite, and remaining release gates.
