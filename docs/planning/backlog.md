@@ -2,7 +2,7 @@
 
 **Status:** Living post-MVP backlog
 
-**Last updated:** 2026-09-07
+**Last updated:** 2026-09-12
 
 **Purpose:** Capture, refine, and sequence product ideas without accidentally
 turning them into accepted scope.
@@ -57,7 +57,9 @@ heavy process.
 | Next exploration views | Thumbnail gallery, all-photo map, and GPX overlays | Natural extensions of the existing temporary collection and shared selection |
 | Media expansion | Videos in the file-name sequence | A demonstrated trip-viewing need that requires codec and playback-boundary research |
 | Context and people | Tags, filename, people regions | Depends on representative metadata and an intentional side-panel model |
+| Platform and OS integration | Open a Finder folder directly in Memory Atlas; later evaluate Windows Explorer integration | Makes the installed desktop app a natural part of the user's existing folder workflow, but requires a narrow native integration boundary |
 | Platform strategy | iPhone and iPad | Requires a product, storage, and distribution decision—not a responsive-CSS-only change |
+| Additional photo context | Elevation at the capture location | Makes embedded GPS altitude useful without requiring a new organizational model |
 | Performance and persistence | Disposable scan index/cache | Defer until measured scan cost justifies a new persistence boundary |
 | Development and release infrastructure | Representative public demo/test corpus | Public verification should not depend indefinitely on repetitive personal source photos or tiny synthetic fixtures |
 
@@ -332,6 +334,35 @@ screens.
 
 ## Context, tags, and people
 
+### MA-FEAT-021 — Display photo elevation
+
+- **State:** Needs research
+- **User outcome:** When a photo contains reliable elevation metadata, I can
+  see how high or low its capture location was as part of the photo's geographic
+  context.
+- **Source boundary:** Prefer embedded GPS altitude and altitude-reference
+  metadata from the original photo. Normalize below-sea-level values correctly
+  and distinguish a missing value from zero elevation. A terrain/elevation
+  lookup based only on latitude and longitude would introduce a network,
+  accuracy, provenance, and caching decision and is not implied by this item.
+- **Presentation options to evaluate:** (a) add elevation to a future Details
+  surface alongside coordinates and filename; (b) include it as a quiet third
+  line in the existing `I` photo-information overlay; or (c) show it as map
+  context near the current-photo marker. The first slice should expose one
+  consistent value rather than duplicate it across surfaces.
+- **Research needed:** Inspect representative photos for EXIF
+  `GPSAltitude`/`GPSAltitudeRef`, rational-number decoding, missing reference
+  fields, malformed or implausible values, and unit expectations. Decide
+  metric/imperial presentation, rounding, localization, and whether the label
+  should say elevation or altitude.
+- **Acceptance checks:** A valid embedded value is displayed with an explicit
+  unit; below-sea-level, zero, missing, and invalid values remain distinct; a
+  bad altitude field does not discard otherwise valid coordinates or prevent
+  the photo from opening; and no lookup or upload occurs unless a later
+  specification explicitly accepts it.
+- **Non-goal:** Correcting or writing GPS metadata, deriving terrain elevation
+  from a remote service, or treating camera altitude as survey-grade data.
+
 ### MA-FEAT-010 — Tags and keywords display
 
 - **State:** Needs research
@@ -361,6 +392,42 @@ screens.
   inconsistent tags.
 - **Non-goal:** Cloud recognition, person identity inference, or writing names
   back to originals.
+
+## Desktop operating-system integration
+
+### MA-FEAT-020 — Open a folder in Memory Atlas from Finder
+
+- **State:** Needs research
+- **User outcome:** In macOS Finder, I can right-click a folder and choose an
+  action such as **Open in Memory Atlas** to launch or activate the app and open
+  that folder as the current temporary collection.
+- **Platform direction:** Design and validate the first integration for macOS.
+  Keep folder-opening semantics behind a platform boundary so a comparable
+  Windows File Explorer action can be evaluated later without coupling the
+  browser-native viewer to macOS APIs.
+- **Behavior to define:** What happens when Memory Atlas is closed, already on
+  the entry screen, scanning another folder, or displaying a collection with
+  transient view state; whether multiple selected folders are rejected or
+  handled; and how an empty, inaccessible, or JPEG-free folder is explained.
+- **Research needed:** Compare supported macOS mechanisms—including opening a
+  folder with the app, a Finder Quick Action/Service, and a Finder extension—for
+  discoverability, installation and signing requirements, sandbox implications,
+  Electron lifecycle behavior, and maintenance cost. Confirm the best Windows
+  analogue separately before promising parity.
+- **Privacy and safety:** Validate that the incoming target is a folder; retain
+  the existing top-level JPEG filtering and read-only treatment of originals;
+  expose only the minimum native capability needed to hand the selected folder
+  to the ingestion path; and do not persist access or scan unrelated contents
+  implicitly.
+- **Acceptance checks:** The Finder action launches or focuses a packaged app;
+  opens exactly the chosen folder through the normal filtering, ordering, and
+  per-file failure path; produces an understandable empty/error state; handles
+  a second request predictably; and never changes source files.
+- **Non-goal:** General Finder replacement, recursive browsing, file editing,
+  automatic background folder monitoring, or committing to Windows delivery in
+  the macOS slice.
+- **Likely dependency:** Requires a lasting native-integration architecture
+  decision because the renderer currently has no filesystem bridge.
 
 ## Platform expansion: iPhone and iPad
 
@@ -503,3 +570,5 @@ screens.
 | 2026-09-04 | Default GPX track mode to tracks intersecting the current photo's date and layer specific tracks above broader context tracks. | A whole-trip track and a same-day hike should appear together with a clear visual hierarchy, without clutter from unrelated days. |
 | 2026-09-04 | Promote mixed photo/video playback from the parking lot to MA-FEAT-017. | Real trip presentation needs videos in the same explicit file-name sequence, with familiar `J`/`K`/`L` playback controls. |
 | 2026-09-07 | Track a compact public demo/test corpus separately from personal source-photo folders. | The current real corpus is useful but repetitive; public verification and screenshots need intentional rights, privacy, metadata, and repository-size boundaries. |
+| 2026-09-12 | Add Finder folder launch as a macOS-first native integration research item, with Windows parity deferred. | Opening an existing photo folder from its normal filesystem context would shorten the path into Memory Atlas, but the secure platform mechanism must be selected deliberately. |
+| 2026-09-12 | Add embedded photo elevation as a context-display research item without selecting its UI surface. | Elevation can enrich place context, but representative metadata, units, validity handling, and its relationship to the information overlay, details, and map need refinement first. |
