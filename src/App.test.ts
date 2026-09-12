@@ -100,4 +100,29 @@ describe('application folder journey', () => {
       expect(screen.getByRole('main', { name: 'New trip photo viewer' })).toBeInTheDocument()
     })
   })
+
+  it('returns with H from fullscreen, releases the collection, and focuses folder selection', async () => {
+    const revokeObjectUrl = vi.spyOn(URL, 'revokeObjectURL')
+    scanFolderMock.mockResolvedValueOnce({
+      photos: [photo({ id: 'first', fileName: 'first.jpg' })],
+      folderName: 'Trip',
+    })
+    render(App)
+    await select([file('first.jpg', 'Trip/first.jpg')])
+    const viewer = await screen.findByRole('main', { name: 'Trip photo viewer' })
+    let fullscreenElement: Element | null = viewer
+    const exitFullscreen = vi.fn(async () => { fullscreenElement = null })
+    Object.defineProperties(document, {
+      fullscreenElement: { configurable: true, get: () => fullscreenElement },
+      exitFullscreen: { configurable: true, value: exitFullscreen },
+    })
+
+    await fireEvent.keyDown(window, { key: 'h' })
+
+    const chooseButton = await screen.findByRole('button', { name: 'Choose photo folder' })
+    expect(exitFullscreen).toHaveBeenCalledOnce()
+    expect(revokeObjectUrl).toHaveBeenCalled()
+    expect(document.activeElement).toBe(chooseButton)
+    revokeObjectUrl.mockRestore()
+  })
 })

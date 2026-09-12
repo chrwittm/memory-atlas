@@ -1,7 +1,7 @@
 # Memory Atlas Documentation
 
 **Status:** Current documentation guide
-**Last updated:** 2026-09-11
+**Last updated:** 2026-09-12
 
 This directory organizes project documentation by purpose and lifecycle. Start
 with the product context and accepted specification, then consult architecture,
@@ -26,6 +26,9 @@ planning, operations, or delivery records as the task requires.
   behavior and acceptance criteria for the MVP baseline.
 - `product/specifications/features/` — accepted or proposed specifications for
   individual post-MVP features, created when a backlog item is selected.
+- [`product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md`](product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
+  — accepted quick collection navigation, spatial focus loop, and return-to-entry
+  keyboard behavior for the next desktop viewer slice.
 
 ### Planning
 
@@ -55,6 +58,9 @@ planning, operations, or delivery records as the task requires.
 
 - [`delivery/verifications/2026-09-11-v0.2.2-publication.md`](delivery/verifications/2026-09-11-v0.2.2-publication.md)
   — patched MapLibre replacement, installed verification, and public checksum.
+- [`delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md`](delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
+  — automated source and successful user verification for the desktop
+  keyboard-navigation slice, with its next packaged check deferred.
 
 - [`delivery/verifications/2026-09-08-public-source.md`](delivery/verifications/2026-09-08-public-source.md)
   — completed source import, GitHub CI, and repository security settings.

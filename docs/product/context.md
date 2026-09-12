@@ -1,7 +1,7 @@
 # Memory Atlas: Living Project Context
 
 Status: Browser MVP implemented; macOS packaging accepted  
-Last updated: 2026-09-11
+Last updated: 2026-09-12
 
 ## Purpose of this document
 
@@ -86,6 +86,12 @@ This is not a retreat from the broader vision. It is the smallest domain in whic
   the Arrow keys pan. `Z` and double-click cycle through the fitted view, native
   100% view, and a per-photo remembered custom view for the current folder
   session, skipping views that are unavailable or duplicate.
+- The implemented desktop keyboard slice adds photo-focused ten-position
+  `Page Up`/`Page Down` jumps, first/last `Home`/`End` navigation, and a global
+  `H` return to folder selection. `Tab` and `Shift`+`Tab` form a circular
+  photo/divider/map region loop in split view; shortcut-backed viewer controls
+  do not lengthen that loop, and viewer focus no longer draws yellow/gold
+  perimeter decoration.
 - Caption and capture time form one optional information overlay, shown by
   default and toggled with `I`; either value remains useful without the other.
 - Place is a meaningful exploration dimension, not merely a metadata field.
@@ -263,15 +269,11 @@ release boundary.
 
 ## Suggested starting point for the next session
 
-Follow the accepted direction in the
-[`publication-readiness specification and delivery plan`](../delivery/plans/2026-09-04-publication-readiness.md):
-rewrite reachable commit identities to the owner's GitHub `noreply` address,
-reconcile Apache-2.0 and the placeholder public remote history, complete the
-privacy and asset-provenance checks, and establish the public GitHub baseline.
-Then prepare the explicitly unnotarized tester prerelease with a stable bundle
-identity, custom icon, current dependency review, fullscreen evidence, clean
-release gate, and installed-app verification. Signing and notarization remain
-required before routine distribution to other Macs.
+Select the next focused feature slice after the implemented and user-tested
+[`MA-FEAT-002/015/018 desktop viewer keyboard-navigation specification`](specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md).
+No standalone DMG is needed for this slice; repeat its physical navigation,
+focus-loop, map-control, fullscreen-return, and quiet-focus checks with the next
+consolidated packaged feature build.
 
 The post-MVP idea inventory and the shared refinement workflow live in
 [`backlog.md`](../planning/backlog.md). Backlog entries are not accepted
@@ -303,6 +305,18 @@ only once its interaction and boundaries are decided.
   personal commit email, `io.github.chrwittm.memoryatlas`, and an unnotarized
   public tester prerelease were selected as the publication direction. Normal
   notarized distribution remains a later, independent gate.
+- 2026-09-12: MA-FEAT-002, MA-FEAT-015, and MA-FEAT-018 were accepted as one
+  desktop keyboard-navigation slice: `H` returns to folder selection,
+  `Page Up`/`Page Down` jump ten photos, `Home`/`End` reach the collection
+  boundaries from photo focus, and a circular photo/divider/map focus loop
+  replaces control-by-control tabbing and yellow/gold viewer focus outlines.
+- 2026-09-12: The combined keyboard-navigation slice was implemented in source.
+  Automated coverage now exercises both focus-loop directions and responsive
+  omission, region-specific dispatch, quick-jump boundaries and repeat, per-photo
+  view restoration, modified-key rejection, fullscreen `H` cleanup, resource
+  disposal, entry focus, and forced-color-safe focus selectors. Christian
+  subsequently confirmed successful interaction testing. A standalone DMG was
+  intentionally deferred until more features are ready for the next build.
 
 ## Publication toolchain
 

@@ -1,9 +1,19 @@
 <script lang="ts">
   import { onMount, type Component } from 'svelte'
+  import type { MapKeyboardHandler } from '../lib/map/keyboard'
   import type { PhotoLocation } from '../lib/photos/types'
 
-  let { location }: { location: PhotoLocation } = $props()
-  let LoadedMap = $state<Component<{ location: PhotoLocation }> | null>(null)
+  let {
+    location,
+    onKeyboardHandlerChange,
+  }: {
+    location: PhotoLocation
+    onKeyboardHandlerChange: (handler: MapKeyboardHandler | undefined) => void
+  } = $props()
+  let LoadedMap = $state<Component<{
+    location: PhotoLocation
+    onKeyboardHandlerChange: (handler: MapKeyboardHandler | undefined) => void
+  }> | null>(null)
   let loadError = $state('')
 
   onMount(() => {
@@ -32,11 +42,10 @@
 </script>
 
 {#if LoadedMap}
-  <LoadedMap {location} />
+  <LoadedMap {location} {onKeyboardHandlerChange} />
 {:else}
-  <section class="map-panel" aria-label="Opening map">
+  <div class="map-panel">
     <div class="map-loading" role="status">Loading map renderer…</div>
     {#if loadError}<p class="map-error" role="alert">{loadError}</p>{/if}
-  </section>
+  </div>
 {/if}
-

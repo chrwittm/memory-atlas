@@ -1,8 +1,8 @@
 # Memory Atlas User Guide
 
-**Status:** Current MVP user documentation
-**Applies to:** Memory Atlas MVP 0.2.0
-**Last updated:** 2026-09-04
+**Status:** Current user documentation
+**Applies to:** Current source; next packaged release after 0.2.2
+**Last updated:** 2026-09-12
 
 Memory Atlas is a local-first macOS photo viewer. It opens a folder of JPEG
 photos, presents them in file-name order, shows embedded captions and capture
@@ -17,7 +17,8 @@ times, and can display the current photo beside its embedded GPS location.
    fitted viewer, to move through the photos.
 5. Scroll over a photo or press `+` to inspect a detail, then drag or use the
    Arrow keys to pan.
-6. Press `I` for photo information, `M` for the map, or `F` for fullscreen.
+6. Press `I` for photo information, `M` for the map, `F` for fullscreen, or
+   `H` to return to folder selection.
 
 ## Choosing a photo folder
 
@@ -56,9 +57,16 @@ shortcuts continue to work while the controls are hidden.
 | Upper right | Map icon | Open or close the map for the current photo. |
 | Lower right | Information icon | Show or hide the caption and capture time together. |
 
-Hover over a control to see its name and shortcut. You can also use `Tab` and
-`Shift`+`Tab` to move focus between available controls, then activate a button
-with `Enter` or `Space`.
+Hover over a control to see its name and shortcut. The fading controls remain
+pointer-operable but are intentionally omitted from the viewer's `Tab` order.
+Their actions remain available through the keyboard shortcuts below.
+
+Within the viewer, `Tab` moves right through the visible interaction regions
+and `Shift`+`Tab` moves left. With the map closed, focus remains on the photo.
+In a desktop split, the circular order is photo, divider, map, then photo; the
+reverse shortcut follows the opposite order. In the narrow stacked layout, the
+hidden divider is skipped. Clicking a region makes it the active region without
+drawing a colored frame around the photo or map.
 
 ## Inspecting photo details
 
@@ -93,14 +101,23 @@ remembered views.
 | Left Arrow | Previous photo when fitted; pan left when enlarged |
 | Right Arrow | Next photo when fitted; pan right when enlarged |
 | Up / Down Arrow | Pan an enlarged photo vertically |
+| `Page Up` / `Page Down` | Jump ten photos backward or forward, stopping at the first or last photo |
+| `Home` / `End` | Open the first or last photo |
 | `Z` | Cycle fitted, native 100%, and remembered custom views, with brief mode feedback |
 | `I` | Show or hide photo information |
 | `M` | Open or close the map |
 | `F` | Enter or leave fullscreen |
+| `H` | Close the collection and return to folder selection |
 | `Escape` | Leave fullscreen first; otherwise close the map when it is open |
 
 If the map is open in fullscreen, the first `Escape` leaves fullscreen and
 keeps the map open. Press `Escape` again to close the map.
+
+Collection navigation keys apply while the photo region is focused, including
+when the photo is enlarged or cannot be displayed. The divider keeps its own
+Arrow, `Home`, and `End` behavior. A focused map uses the Arrow keys to pan and
+`+` or `-` to zoom; collection jumps do not affect it. Global `H`, `I`, `M`,
+`F`, and `Escape` behavior remains available from every region.
 
 ## Captions and capture time
 
@@ -132,6 +149,7 @@ The map represents the current photo only:
   can occupy between 20% and 80% of the viewer.
 - Drag the map to pan. Use the map's `+` and `−` controls, a mouse wheel, or a
   trackpad gesture to zoom.
+- With the map region focused, use the Arrow keys to pan and `+` or `-` to zoom.
 
 Pointer input over the map changes only the map. Photo zoom and pan remain
 scoped to the photo side of the split view.
@@ -161,11 +179,12 @@ open and displays a brief explanation.
 
 ## Choosing another folder
 
-Reveal the controls and select **Choose another folder** in the upper-left
-corner. This returns to the entry screen and clears the current collection,
-photo position, information preference, map state, and temporary image
-resources, including remembered zoom views. It does not change the source
-folder or its photos.
+Press `H`, or reveal the controls and select **Choose another folder** in the
+upper-left corner. This returns to the entry screen in one step, including from
+fullscreen, and focuses **Choose photo folder**. It clears the current
+collection, photo position, information preference, map and split state,
+notices, and temporary image resources, including remembered zoom views. It
+does not change the source folder or its photos.
 
 ## Problems and recovery
 

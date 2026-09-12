@@ -280,6 +280,220 @@ describe('viewer keyboard behavior', () => {
     expect(screen.queryByText('This photo doesn’t have GPS coordinates.')).not.toBeInTheDocument()
   })
 
+  it('loops focus through the visible spatial regions in both directions', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'unlocated' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+
+    const photoRegion = screen.getByRole('region', { name: 'Current photo' })
+    expect(document.activeElement).toBe(photoRegion)
+    await fireEvent.keyDown(window, { key: 'Tab' })
+    expect(document.activeElement).toBe(photoRegion)
+    await fireEvent.keyDown(window, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(photoRegion)
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    const divider = screen.getByRole('separator', { name: 'Resize photo and map' })
+    const mapRegion = screen.getByRole('region', { name: 'Map' })
+    expect(document.activeElement).toBe(photoRegion)
+
+    await fireEvent.keyDown(window, { key: 'Tab' })
+    expect(document.activeElement).toBe(divider)
+    await fireEvent.keyDown(window, { key: 'Tab' })
+    expect(document.activeElement).toBe(mapRegion)
+    await fireEvent.keyDown(window, { key: 'Tab' })
+    expect(document.activeElement).toBe(photoRegion)
+
+    await fireEvent.keyDown(window, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(mapRegion)
+    await fireEvent.keyDown(window, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(divider)
+    await fireEvent.keyDown(window, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(photoRegion)
+  })
+
+  it('omits the hidden divider from the narrow stacked focus loop', async () => {
+    const originalMatchMedia = window.matchMedia
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: () => ({
+        matches: true,
+        media: '(max-width: 760px)',
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }),
+    })
+
+    try {
+      render(Viewer, {
+        photos: [photo({ id: 'unlocated' })],
+        folderName: 'Trip',
+        onChooseAnother: () => undefined,
+      })
+      await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+      const photoRegion = screen.getByRole('region', { name: 'Current photo' })
+      const mapRegion = screen.getByRole('region', { name: 'Map' })
+      expect(screen.getByRole('separator')).toHaveAttribute('tabindex', '-1')
+
+      await fireEvent.keyDown(window, { key: 'Tab' })
+      expect(document.activeElement).toBe(mapRegion)
+      await fireEvent.keyDown(window, { key: 'Tab' })
+      expect(document.activeElement).toBe(photoRegion)
+    } finally {
+      Object.defineProperty(window, 'matchMedia', { configurable: true, value: originalMatchMedia })
+    }
+  })
+
+  it('keeps viewer controls out of the loop and returns pointer actions to photo focus', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'one' }), photo({ id: 'two' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+
+    const photoRegion = screen.getByRole('region', { name: 'Current photo' })
+    for (const button of screen.getAllByRole('button')) expect(button).toHaveAttribute('tabindex', '-1')
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Next photo' }))
+    expect(document.activeElement).toBe(photoRegion)
+    await fireEvent.click(screen.getByRole('button', { name: 'Hide photo information' }))
+    expect(document.activeElement).toBe(photoRegion)
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    expect(document.activeElement).toBe(photoRegion)
+  })
+
+  it('moves focus safely to the photo when map state is closed', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'unlocated' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+    const photoRegion = screen.getByRole('region', { name: 'Current photo' })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    const mapRegion = screen.getByRole('region', { name: 'Map' })
+    mapRegion.focus()
+
+    await fireEvent.keyDown(window, { key: 'Escape' })
+    await Promise.resolve()
+    expect(screen.queryByRole('region', { name: 'Map' })).not.toBeInTheDocument()
+    expect(document.activeElement).toBe(photoRegion)
+  })
+
+  it('jumps ten positions with repeat, clamps boundaries, and supports Home and End', async () => {
+    const photos = Array.from({ length: 25 }, (_, index) =>
+      photo({ id: `photo-${index + 1}`, fileName: `photo-${index + 1}.jpg` }),
+    )
+    render(Viewer, { photos, folderName: 'Trip', onChooseAnother: () => undefined })
+
+    await fireEvent.keyDown(window, { key: 'PageDown' })
+    expect(screen.getByLabelText('Photo 11 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'PageDown', repeat: true })
+    expect(screen.getByLabelText('Photo 21 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'PageDown', repeat: true })
+    expect(screen.getByLabelText('Photo 25 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'PageDown', repeat: true })
+    expect(screen.getByLabelText('Photo 25 of 25')).toBeInTheDocument()
+
+    await fireEvent.keyDown(window, { key: 'PageUp' })
+    expect(screen.getByLabelText('Photo 15 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'Home' })
+    expect(screen.getByLabelText('Photo 1 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'End' })
+    expect(screen.getByLabelText('Photo 25 of 25')).toBeInTheDocument()
+  })
+
+  it('synchronizes an unreadable-photo jump with information and map state', async () => {
+    const photos = Array.from({ length: 11 }, (_, index) => photo({ id: `photo-${index}` }))
+    photos[0] = photo({ id: 'unreadable', fileName: 'unreadable.jpg', status: 'read-error' })
+    photos[10] = photo({
+      id: 'destination',
+      fileName: 'destination.jpg',
+      caption: 'Distant memory',
+      capturedAt: '2026-09-12T12:00:00.000Z',
+      location: { latitude: 47.45, longitude: 10.99 },
+    })
+    const view = render(Viewer, { photos, folderName: 'Trip', onChooseAnother: () => undefined })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    expect(screen.getByText('This photo doesn’t have GPS coordinates.')).toBeInTheDocument()
+
+    await fireEvent.keyDown(window, { key: 'PageDown' })
+
+    expect(screen.getByAltText('Distant memory')).toBeInTheDocument()
+    expect(screen.getByLabelText('Photo 11 of 11')).toBeInTheDocument()
+    expect(view.container.querySelector('.information-overlay p')).toHaveTextContent('Distant memory')
+    expect(view.container.querySelector('.information-overlay time')).toHaveAttribute(
+      'datetime',
+      '2026-09-12T12:00:00.000Z',
+    )
+    expect(screen.queryByText('This photo doesn’t have GPS coordinates.')).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Map' })).toBeInTheDocument()
+  })
+
+  it('quick navigation works while enlarged and restores the destination photo view', async () => {
+    const photos = Array.from({ length: 11 }, (_, index) =>
+      photo({ id: `photo-${index + 1}`, fileName: `photo-${index + 1}.jpg` }),
+    )
+    render(Viewer, { photos, folderName: 'Trip', onChooseAnother: () => undefined })
+    const surface = screen.getByRole('region', { name: 'Current photo' })
+    const firstImage = screen.getByAltText('photo-1.jpg') as HTMLImageElement
+    await loadPhotoAtSize(surface, firstImage, { width: 800, height: 800 }, { width: 1600, height: 1200 })
+    await fireEvent.keyDown(window, { key: '+' })
+    const rememberedWidth = firstImage.style.width
+
+    await fireEvent.keyDown(window, { key: 'End' })
+    expect(screen.getByLabelText('Photo 11 of 11')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'Home' })
+    expect(screen.getByAltText('photo-1.jpg')).toHaveStyle({ width: rememberedWidth })
+  })
+
+  it('scopes collection keys to photo focus and keeps divider Home and End behavior', async () => {
+    const photos = Array.from({ length: 12 }, (_, index) => photo({ id: `photo-${index}` }))
+    render(Viewer, { photos, folderName: 'Trip', onChooseAnother: () => undefined })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    const viewer = screen.getByRole('main')
+    const divider = screen.getByRole('separator')
+    divider.focus()
+
+    await fireEvent.keyDown(divider, { key: 'Home' })
+    expect(viewer).toHaveStyle('--photo-panel-width: 20%')
+    expect(screen.getByLabelText('Photo 1 of 12')).toBeInTheDocument()
+    await fireEvent.keyDown(divider, { key: 'PageDown' })
+    expect(screen.getByLabelText('Photo 1 of 12')).toBeInTheDocument()
+    await fireEvent.keyDown(divider, { key: 'End' })
+    expect(viewer).toHaveStyle('--photo-panel-width: 80%')
+
+    screen.getByRole('region', { name: 'Map' }).focus()
+    await fireEvent.keyDown(window, { key: 'PageDown' })
+    await fireEvent.keyDown(window, { key: 'End' })
+    expect(screen.getByLabelText('Photo 1 of 12')).toBeInTheDocument()
+  })
+
+  it('does not invoke shortcuts while modifier keys or composition are active', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'one' }), photo({ id: 'two' })],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+    const photoRegion = screen.getByRole('region', { name: 'Current photo' })
+
+    await fireEvent.keyDown(window, { key: 'PageDown', ctrlKey: true })
+    await fireEvent.keyDown(window, { key: 'End', shiftKey: true })
+    await fireEvent.keyDown(window, { key: 'm', metaKey: true })
+    await fireEvent.keyDown(window, { key: 'i', isComposing: true })
+    await fireEvent.keyDown(window, { key: 'Tab', altKey: true })
+
+    expect(screen.getByLabelText('Photo 1 of 2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Open map' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Hide photo information' })).toBeInTheDocument()
+    expect(document.activeElement).toBe(photoRegion)
+  })
+
   it('toggles browser fullscreen with F', async () => {
     render(Viewer, {
       photos: [photo({ id: 'one' })],

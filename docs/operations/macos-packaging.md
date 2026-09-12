@@ -1,7 +1,7 @@
 # Deploy Memory Atlas on macOS
 
 **Status:** Current macOS packaging runbook
-**Last updated:** 2026-09-11
+**Last updated:** 2026-09-12
 
 This is the executable deployment runbook for producing the Memory Atlas MVP as
 a macOS application and disk image. The rationale and alternatives remain in
@@ -233,6 +233,21 @@ Test the installed application without a Vite development server running:
   image orientation, previous/next controls, `I`, `M`, `F`, and fullscreen exit;
 - confirm mouse-wheel and trackpad zoom, pointer drag, grab/grabbing cursor feel,
   focused keyboard zoom and pan, named-view cycling, and per-photo restoration;
+- with the map closed, confirm `Tab` and `Shift`+`Tab` keep focus on the photo;
+  with the desktop split open, confirm the circular photo → divider → map loop
+  in both directions and verify that fading viewer controls and embedded map
+  controls do not add focus stops;
+- verify the physical `Page Up`, `Page Down`, `Home`/`Pos1`, and `End` keys from
+  photo focus at fitted and enlarged scales, including ten-photo jumps, boundary
+  clamping, and key repeat; confirm divider `Home`/`End` still resize the split;
+- focus the map and confirm its Arrow-key pan and `+`/`-` zoom behavior, then
+  confirm that closing the map from map or divider focus safely returns focus to
+  the photo;
+- confirm that viewer focus adds no yellow or gold outline around the photo,
+  divider, map, or fading controls, while the focused divider retains its quiet
+  local handle cue;
+- enter fullscreen with the map open, press `H` once, and confirm that fullscreen
+  and the collection close together and **Choose photo folder** receives focus;
 - navigate across readable and unreadable files without losing the collection;
 - open map mode for a located photo and confirm the no-GPS placeholder for an
   unlocated photo;

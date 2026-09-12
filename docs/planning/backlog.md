@@ -53,12 +53,13 @@ heavy process.
 
 | Horizon | Theme | Why it belongs here |
 | --- | --- | --- |
-| Next desktop refinements | Quick collection navigation, a three-region focus loop, Home, file actions, and fullscreen reliability | High value while preserving the present viewer and making its keyboard model coherent |
+| Next desktop refinements | File actions and further fullscreen reliability | The coherent keyboard model is implemented; the remaining work preserves the viewer while adding carefully scoped OS integration |
 | Next exploration views | Thumbnail gallery, all-photo map, and GPX overlays | Natural extensions of the existing temporary collection and shared selection |
 | Media expansion | Videos in the file-name sequence | A demonstrated trip-viewing need that requires codec and playback-boundary research |
-| Context and people | Tags, filename, people regions | Depends on representative metadata and an intentional side-panel model |
+| Context and people | Information-overlay modes, technical camera details, tags, filename, and people regions | Keeps useful embedded context close at hand while requiring representative metadata and a calm presentation model |
 | Platform and OS integration | Open a Finder folder directly in Memory Atlas; later evaluate Windows Explorer integration | Makes the installed desktop app a natural part of the user's existing folder workflow, but requires a narrow native integration boundary |
 | Platform strategy | iPhone and iPad | Requires a product, storage, and distribution decision—not a responsive-CSS-only change |
+| Internationalization and localization | Prepare the UI for additional languages, with German as the first likely localization | American English remains the current default; localization should be designed deliberately when it becomes a selected product slice |
 | Additional photo context | Elevation at the capture location | Makes embedded GPS altitude useful without requiring a new organizational model |
 | Performance and persistence | Disposable scan index/cache | Defer until measured scan cost justifies a new persistence boundary |
 | Development and release infrastructure | Representative public demo/test corpus | Public verification should not depend indefinitely on repetitive personal source photos or tiny synthetic fixtures |
@@ -68,8 +69,8 @@ heavy process.
 1. Reproduce and fix MA-BUG-002 before changing the broader keyboard model.
 2. Specify and implement MA-FEAT-001 and MA-FEAT-015 together because zoom,
    collection navigation, and region focus share the Arrow keys.
-3. Specify MA-FEAT-018's quick collection-navigation keys alongside the focus
-   model so their scope remains predictable.
+3. MA-FEAT-002/015/018 was implemented and user-tested on 2026-09-12; repeat
+   its packaged checks with the next consolidated feature build.
 4. Extend the present map with MA-FEAT-008's all-photo mode and two-way pin
    selection.
 5. Inspect representative GPX files, then specify MA-FEAT-016 on top of that
@@ -103,23 +104,30 @@ changing the local-first model.
 
 ### MA-FEAT-002 — Return to entry screen
 
-- **State:** Ready to build
+- **State:** Delivered and user-tested 2026-09-12
+- **Specification:**
+  [`Desktop viewer keyboard navigation`](../product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **User outcome:** I can leave a collection and choose another folder quickly.
-- **Proposed interaction:** `H` returns to the Home/entry screen; provide a
-  quiet visible control. If fullscreen or a panel is open, define and document
-  whether `H` exits it directly (recommended) or requires a second press.
+- **Accepted interaction:** One unmodified `H` press returns from any viewer
+  region or state to the entry screen, leaving fullscreen if needed. The
+  existing quiet visible control remains pointer-operable but leaves the viewer
+  `Tab` loop.
 - **Acceptance checks:** Object URLs are released; current collection and
   transient viewer state are cleared; no files are changed; focus reaches the
   entry-screen folder action.
+- **Implementation evidence:**
+  [`2026-09-12 verification`](../delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **Non-goal:** Recent folders or persistent library history.
 
 ### MA-FEAT-018 — Quick collection navigation
 
-- **State:** Ready to specify
+- **State:** Delivered and user-tested 2026-09-12
+- **Specification:**
+  [`Desktop viewer keyboard navigation`](../product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **User outcome:** I can quickly inspect a distant part of a large collection,
   jump to its end, or restart at its beginning without stepping through every
   intervening photo.
-- **Proposed interaction:** In the photo region, `Page Up` moves ten photos
+- **Accepted interaction:** In the photo region, `Page Up` moves ten photos
   backward and `Page Down` moves ten photos forward. `Home` (`Pos1`) selects the
   first photo and `End` selects the last photo. Ten-photo jumps clamp to the
   first or last photo when fewer than ten positions remain.
@@ -134,8 +142,10 @@ changing the local-first model.
   that legitimately consumes the key.
 - **Non-goal:** A thumbnail overview, arbitrary numeric jump dialog, or new
   pointer controls for ten-photo navigation.
-- **Likely dependency:** Coordinate shortcut dispatch with MA-FEAT-015's
-  spatial focus model.
+- **Dependency:** Implement with MA-FEAT-015's accepted spatial focus model and
+  MA-FEAT-002's `H` route back to folder selection.
+- **Implementation evidence:**
+  [`2026-09-12 verification`](../delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 
 ### MA-FEAT-003 — Filename on demand
 
@@ -169,7 +179,7 @@ changing the local-first model.
 
 ### MA-FEAT-005 — Friendly local-first explanation and future About surface
 
-- **State:** Ready to build
+- **State:** Delivered and user-tested 2026-09-12
 - **User outcome:** I understand the privacy promise without repeatedly seeing
   a distracting pop-up.
 - **Scope:** Review the present entry-screen wording and any repeated runtime
@@ -181,19 +191,21 @@ changing the local-first model.
 
 ### MA-FEAT-015 — Minimal viewer focus loop
 
-- **State:** Ready to specify
+- **State:** Ready to build
+- **Specification:**
+  [`Desktop viewer keyboard navigation`](../product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **User outcome:** I can move predictably between the large interactive areas
   of the viewer without tabbing through every fading on-screen control.
-- **Proposed interaction:** In the main viewer, `Tab` and `Shift`+`Tab` cycle
+- **Accepted interaction:** In the main viewer, `Tab` and `Shift`+`Tab` cycle
   only through visible interaction regions. With the map closed, the photo is
   the only region. With the map open, the forward order is photo, divider, map;
   reverse traversal uses the opposite order. The no-GPS map placeholder still
   represents the visible map region.
-- **Region behavior:** A visible focus indicator identifies the active region.
-  Arrow and `+`/`-` input is dispatched by that focus: the photo zooms and pans
-  under MA-FEAT-001, the divider keeps its existing Arrow-key resizing, and the
-  map uses its normal pan and zoom behavior. Global shortcuts such as `I`, `M`,
-  and `F` remain available independent of the active region.
+- **Region behavior:** Arrow and `+`/`-` input is dispatched by focus: the photo
+  zooms and pans under MA-FEAT-001, the divider keeps its existing Arrow-key
+  resizing, and the map uses its normal pan and zoom behavior. The viewer does
+  not draw yellow/gold perimeter focus decoration; the divider retains only a
+  quiet local handle cue. Global shortcuts remain available from every region.
 - **Accessibility boundary:** Viewer buttons and MapLibre controls should not
   lengthen this spatial focus loop. Every excluded viewer action must retain a
   documented keyboard equivalent and an accessible name; the specification
@@ -205,9 +217,10 @@ changing the local-first model.
   lost or trapped; the divider remains keyboard-resizable; and pointer use does
   not make keyboard focus ambiguous.
 - **Non-goal:** Redesigning the visible controls or replacing global shortcuts.
-- **Likely dependencies:** Coordinate keyboard dispatch with MA-FEAT-001 and
-  ensure MA-FEAT-002 provides a keyboard route back to folder selection before
-  removing that visible action from the tab order.
+- **Dependencies:** Coordinate keyboard dispatch with MA-FEAT-001 and implement
+  with MA-FEAT-002 and MA-FEAT-018 as the accepted combined slice.
+- **Implementation evidence:**
+  [`2026-09-12 verification`](../delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 
 ## Exploration views
 
@@ -334,6 +347,51 @@ screens.
 
 ## Context, tags, and people
 
+### MA-FEAT-022 — Cycle title, caption, and camera details
+
+- **State:** Needs research with representative photos
+- **User outcome:** While presenting photos, I can press `I` repeatedly to choose
+  the kind of embedded information shown without opening a separate panel.
+- **Proposed interaction:** Replace the current shown/hidden `I` toggle with a
+  repeating cycle through (1) no information, (2) title, (3) caption, and
+  (4) technical camera details. The technical mode should present the available
+  shutter speed, aperture/f-number, ISO, and focal length in a compact,
+  Lightroom-like treatment while keeping the photo primary.
+- **Mode feedback:** Every `I` press briefly shows the selected mode in the
+  existing transient toast pattern used by the `Z` zoom cycle—for example,
+  **Photo information · Off**, **Title**, **Caption**, or **Camera details**.
+  The toast should also use the established non-disruptive status announcement
+  so the active mode is available to assistive technology.
+- **Metadata boundary:** Preserve title and caption as distinct normalized
+  values when both exist. Each textual mode prefers its matching field but falls
+  back to the other: Title mode shows caption when title is missing, and Caption
+  mode shows title when caption is missing. Thus a photo with only one textual
+  value remains described in both modes rather than unexpectedly appearing
+  blank; the mode toast still identifies the selected mode. Research the
+  representative Lightroom-exported metadata fields and ExifReader output for
+  exposure time, f-number/aperture, ISO, and focal length, including absent,
+  malformed, and equivalent vendor-specific values.
+- **Questions to settle:** Choose the initial mode for a newly selected folder;
+  define the intentional response when neither title nor caption exists; define
+  whether the selected mode persists while navigating the current collection;
+  and decide where capture time appears now that the existing combined caption-
+  and-time overlay becomes several modes. Clarify the visible information
+  control's label and state without lengthening the accepted spatial `Tab` loop.
+- **Acceptance checks:** `I` advances through the modes in a stable order and
+  wraps; the pointer control and keyboard cycle remain synchronized; each change
+  produces a short mode toast; title and caption remain semantically distinct
+  when both exist, while either one serves as the fallback when the selected
+  textual field is absent; camera values are formatted readably with their
+  units; missing or invalid metadata never prevents a photo from opening;
+  navigation updates the displayed values for the current photo; and no metadata
+  is written or uploaded.
+- **Non-goal:** Editing metadata, calculating exposure values that are not
+  embedded, adding histograms, or turning the overlay into a permanent camera
+  inspector.
+- **Related work:** Coordinate with MA-FEAT-003 before deciding whether filename
+  belongs in the camera-details mode or remains a separate details surface; this
+  item does not silently add filename to the requested `I` cycle.
+
 ### MA-FEAT-021 — Display photo elevation
 
 - **State:** Needs research
@@ -455,6 +513,29 @@ screens.
 - **Non-goal:** Committing now to NAS support, iCloud synchronization, accounts,
   or a cloud backend.
 
+## Internationalization and localization
+
+### MA-FEAT-023 — Localize Memory Atlas beyond American English
+
+- **State:** Idea
+- **User outcome:** I can use Memory Atlas in my preferred supported language
+  without losing the calm, clear experience of the American English interface.
+- **Initial direction:** Keep American English as the source and current default
+  language. Treat German as the first likely localization, while choosing an
+  approach that can support additional languages without redesigning each
+  feature.
+- **Questions to settle:** When localization becomes a selected slice, define
+  the translation-resource and fallback model; locale-aware date, time, number,
+  and keyboard-label formatting; language selection and persistence; treatment
+  of user-authored metadata; accessibility behavior; and layout verification
+  for text expansion.
+- **Design boundary:** Localization must preserve the product-wide simplicity
+  principle. Avoid exposing language machinery in normal use when the system or
+  a quiet preference can provide an obvious result.
+- **Non-goal:** Translating the application now, translating user-authored
+  captions or source files, or committing to languages beyond German before
+  their user need is established.
+
 ## Performance and derived data
 
 ### MA-FEAT-013 — Measure scanning and browsing performance
@@ -572,3 +653,5 @@ screens.
 | 2026-09-07 | Track a compact public demo/test corpus separately from personal source-photo folders. | The current real corpus is useful but repetitive; public verification and screenshots need intentional rights, privacy, metadata, and repository-size boundaries. |
 | 2026-09-12 | Add Finder folder launch as a macOS-first native integration research item, with Windows parity deferred. | Opening an existing photo folder from its normal filesystem context would shorten the path into Memory Atlas, but the secure platform mechanism must be selected deliberately. |
 | 2026-09-12 | Add embedded photo elevation as a context-display research item without selecting its UI surface. | Elevation can enrich place context, but representative metadata, units, validity handling, and its relationship to the information overlay, details, and map need refinement first. |
+| 2026-09-12 | Add an `I`-key information cycle for off, title, caption, and technical camera details, with transient mode feedback and reciprocal title/caption fallback. | Some photos carry distinct titles and captions while others use only one field; the available text should remain visible in either textual mode, and a Lightroom-like camera summary makes useful embedded exposure context available without permanently cluttering the viewer. |
+| 2026-09-12 | Add future internationalization and localization, with American English as the source/default language and German as the first likely localization. | Memory Atlas should eventually serve users in additional languages, but localization is an idea rather than accepted near-term scope and needs deliberate formatting, accessibility, fallback, and layout decisions. |

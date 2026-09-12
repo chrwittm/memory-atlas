@@ -2,7 +2,7 @@
 
 **Status:** Implemented and user-tested
 
-**Last updated:** 2026-09-04
+**Last updated:** 2026-09-12
 
 **Backlog item:** `MA-FEAT-001`
 
@@ -131,7 +131,7 @@ zoom and pan remain available whenever the photo is the active interaction
 region.
 
 Keyboard dispatch follows
-[`MA-FEAT-015`](../../../planning/backlog.md#ma-feat-015--minimal-viewer-focus-loop):
+[`MA-FEAT-015`](ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md):
 the photo receives these inputs when its region has focus, the divider keeps its
 resize keys, and the map keeps its own controls. Existing global shortcuts such
 as `I`, `M`, `F`, and `Escape` remain available.
@@ -189,8 +189,8 @@ and recovery behavior remains unchanged.
    work.
 11. Zoom and pan work in both the browser build and packaged macOS app without
     modifying, replacing, or uploading the source JPEG.
-12. Focused keyboard operation has a visible focus indication as defined by
-    MA-FEAT-015, and all zoom/pan behavior is usable without a pointer.
+12. Focused keyboard operation follows MA-FEAT-015's spatial focus and quiet
+    appearance rules, and all zoom/pan behavior is usable without a pointer.
 13. Automated tests cover scale clamping, pointer anchoring, pan clamping,
     cursor-state changes, keyboard/navigation dispatch, per-photo restoration,
     viewport changes, and cleanup when the folder session ends. A manual
@@ -220,8 +220,8 @@ remain deferred.
 - This feature refines
   [`MA-FEAT-001`](../../../planning/backlog.md#ma-feat-001--image-zoom-and-pan).
 - Keyboard focus and dispatch are coordinated with
-  [`MA-FEAT-015`](../../../planning/backlog.md#ma-feat-015--minimal-viewer-focus-loop)
-  and should be implemented in the same slice.
+  [`MA-FEAT-015`](ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
+  and are implemented by its accepted spatial focus loop.
 - Existing lazy object-URL and image-decoding behavior must remain intact.
 - The accepted [MVP specification](../mvp.md) remains the baseline for photo
   fitting, navigation, map mode, fullscreen, error isolation, and source-file

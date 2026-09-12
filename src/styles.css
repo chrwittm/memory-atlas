@@ -138,8 +138,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .viewer.resizing { cursor: col-resize; user-select: none; }
 .viewer.photo-dragging, .viewer.photo-dragging * { cursor: grabbing !important; }
 .photo-panel { position: relative; min-width: 0; height: 100%; overflow: hidden; background: #0b0d0c; }
-.photo-surface { position: absolute; inset: 0; z-index: 1; overflow: hidden; outline: 0; cursor: default; touch-action: none; }
-.photo-surface:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+.photo-surface { position: absolute; inset: 0; z-index: 1; overflow: hidden; cursor: default; touch-action: none; }
 .photo-surface.can-pan { cursor: grab; }
 .photo-surface.dragging { cursor: grabbing; }
 .current-photo { position: absolute; top: 0; left: 0; display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; animation: photo-in 170ms cubic-bezier(.2,.7,.25,1) both; }
@@ -214,7 +213,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .photo-error h1 { margin: 1.3rem 0 .4rem; font-family: Georgia, serif; font-size: 1.8rem; font-weight: 400; }
 .photo-error p { margin: .15rem 0; color: var(--muted); font-size: .8rem; }
 
-.map-panel { position: relative; min-width: 0; height: 100%; overflow: hidden; border-left: 1px solid rgba(255,255,255,.12); background: #e6e4dc; }
+.map-region { position: relative; min-width: 0; height: 100%; }
+.map-panel { position: relative; width: 100%; min-width: 0; height: 100%; overflow: hidden; border-left: 1px solid rgba(255,255,255,.12); background: #e6e4dc; }
 .split-divider {
   position: absolute;
   top: 0;
@@ -224,15 +224,13 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   width: 1rem;
   padding: 0;
   border: 0;
-  outline: 0;
   cursor: col-resize;
   touch-action: none;
   transform: translateX(-50%);
 }
 .split-divider::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: rgba(255,255,255,.3); transform: translateX(-50%); }
 .split-divider span { position: absolute; top: 50%; left: 50%; width: .3rem; height: 3.2rem; border: 1px solid rgba(255,255,255,.28); border-radius: 1rem; background: rgba(18,21,20,.65); box-shadow: 0 .2rem .8rem rgba(0,0,0,.25); transform: translate(-50%, -50%); transition: width 140ms ease, background 140ms ease; }
-.split-divider:hover span, .split-divider:focus-visible span, .viewer.resizing .split-divider span { width: .45rem; background: rgba(181,109,67,.9); }
-.split-divider:focus-visible::before { width: 2px; background: var(--accent); }
+.split-divider:hover span, .split-divider:focus-visible span, .viewer.resizing .split-divider span { width: .45rem; background: rgba(116,125,120,.95); }
 .map-canvas { position: absolute; inset: 0; z-index: 1; }
 .map-loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; color: #60635f; background: #e6e4dc; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
 .map-unavailable { position: absolute; inset: 0; display: grid; place-items: center; padding: 2rem; color: #60635f; font-size: .78rem; line-height: 1.5; text-align: center; }
@@ -250,6 +248,14 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   .text-control { font-size: 0; }
   .text-control span { margin: 0; font-size: 1rem; }
   .information-overlay { padding-right: 4rem; padding-left: 4rem; }
+}
+
+@media (forced-colors: none) {
+  .viewer :is(.photo-surface, .map-region, .split-divider, button):focus,
+  .viewer :is(.photo-surface, .map-region, .split-divider, button):focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

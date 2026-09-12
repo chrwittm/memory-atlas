@@ -1,12 +1,17 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
+
   let { onSelect }: { onSelect: (files: File[]) => void } = $props()
   let input: HTMLInputElement
+  let chooseButton: HTMLButtonElement
 
   function handleChange(event: Event) {
     const target = event.currentTarget as HTMLInputElement
     if (target.files?.length) onSelect(Array.from(target.files))
     target.value = ''
   }
+
+  onMount(() => chooseButton.focus({ preventScroll: true }))
 </script>
 
 <main class="entry-screen">
@@ -17,7 +22,7 @@
     <p class="eyebrow">A place for remembered moments</p>
     <h1>Memory Atlas</h1>
     <p class="intro">Rediscover a folder of photographs through the stories and places already held inside them.</p>
-    <button class="choose-button" type="button" onclick={() => input.click()}>
+    <button bind:this={chooseButton} class="choose-button" type="button" onclick={() => input.click()}>
       Choose photo folder
       <span aria-hidden="true">↗</span>
     </button>

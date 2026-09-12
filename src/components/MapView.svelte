@@ -7,13 +7,21 @@
   maplibregl.setWorkerUrl(mapWorkerUrl)
   import { onDestroy, onMount } from 'svelte'
   import { MAP_INITIAL_ZOOM, MAP_STYLE_URL } from '../lib/map/config'
+  import type { MapKeyboardHandler } from '../lib/map/keyboard'
   import type { PhotoLocation } from '../lib/photos/types'
 
-  let { location }: { location: PhotoLocation } = $props()
+  let {
+    location,
+    onKeyboardHandlerChange = () => undefined,
+  }: {
+    location: PhotoLocation
+    onKeyboardHandlerChange?: (handler: MapKeyboardHandler | undefined) => void
+  } = $props()
   let container: HTMLDivElement
   let map: import('maplibre-gl').Map | undefined
   let marker: import('maplibre-gl').Marker | undefined
   let resizeObserver: ResizeObserver | undefined
+  let tabStopObserver: MutationObserver | undefined
   let loaded = $state(false)
   let loadError = $state('')
   let loadTimer: ReturnType<typeof setTimeout>
@@ -44,6 +52,36 @@
     }
   }
 
+  function removeInternalTabStops() {
+    for (const element of container.querySelectorAll<HTMLElement>('a, button, summary, [tabindex]')) {
+      element.tabIndex = -1
+    }
+  }
+
+  const handleKeyboard: MapKeyboardHandler = (event) => {
+    if (!map) return false
+    const panOffsets: Record<string, [number, number]> = {
+      ArrowLeft: [100, 0],
+      ArrowRight: [-100, 0],
+      ArrowUp: [0, 100],
+      ArrowDown: [0, -100],
+    }
+    const offset = panOffsets[event.key]
+    if (offset) {
+      map.panBy(offset, { duration: 300 }, { originalEvent: event })
+      return true
+    }
+    if (event.key === '+' || event.key === '=') {
+      map.zoomIn({}, { originalEvent: event })
+      return true
+    }
+    if (event.key === '-') {
+      map.zoomOut({}, { originalEvent: event })
+      return true
+    }
+    return false
+  }
+
   onMount(() => {
     try {
       const coordinates: [number, number] = [location.longitude, location.latitude]
@@ -55,6 +93,12 @@
         attributionControl: {},
       })
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
+      removeInternalTabStops()
+      if (typeof MutationObserver !== 'undefined') {
+        tabStopObserver = new MutationObserver(removeInternalTabStops)
+        tabStopObserver.observe(container, { childList: true, subtree: true })
+      }
+      onKeyboardHandlerChange(handleKeyboard)
       if (typeof ResizeObserver !== 'undefined') {
         resizeObserver = new ResizeObserver(() => map?.resize())
         resizeObserver.observe(container)
@@ -86,11 +130,13 @@
     clearTimeout(loadTimer)
     window.removeEventListener('online', refreshTilesAfterReconnect)
     resizeObserver?.disconnect()
+    tabStopObserver?.disconnect()
+    onKeyboardHandlerChange(undefined)
     map?.remove()
   })
 </script>
 
-<section class="map-panel" aria-label="Map showing the current photo location">
+<div class="map-panel">
   <div
     class="map-canvas"
     style="position: absolute; inset: 0; width: 100%; height: 100%;"
@@ -98,4 +144,4 @@
   ></div>
   {#if !loaded && !loadError}<div class="map-loading" role="status">Opening map…</div>{/if}
   {#if loadError}<p class="map-error" role="alert">{loadError}</p>{/if}
-</section>
+</div>

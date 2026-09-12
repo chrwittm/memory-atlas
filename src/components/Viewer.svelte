@@ -16,6 +16,7 @@
     type Size,
   } from '../lib/viewer/imageView'
   import type { Photo } from '../lib/photos/types'
+  import type { MapKeyboardHandler } from '../lib/map/keyboard'
 
   let {
     photos,
@@ -43,7 +44,14 @@
   let noticeTimer: ReturnType<typeof setTimeout>
   let viewer: HTMLElement
   let photoSurface: HTMLElement
+  let divider = $state<HTMLElement | undefined>()
+  let mapRegion = $state<HTMLElement | undefined>()
   let photoResizeObserver: ResizeObserver | undefined
+  let narrowLayoutQuery: MediaQueryList | undefined
+  let syncNarrowLayout: (() => void) | undefined
+  let narrowLayout = $state(false)
+  let mapKeyboardHandler: MapKeyboardHandler | undefined
+  let returningToEntry = false
   let previousDragPoint: Point | undefined
   const urlWindow = new ObjectUrlWindow()
   const viewStates = new Map<string, ImageViewState>()
@@ -82,9 +90,14 @@
     stopDraggingPhoto()
     currentIndex = next
     const nextPhoto = photos[next]
+    if (!nextPhoto.location) mapKeyboardHandler = undefined
     viewState = viewStates.get(nextPhoto.id) ?? createImageViewState()
     intrinsicSize = intrinsicSizes.get(nextPhoto.id)
     showControls()
+  }
+
+  function moveTo(index: number) {
+    move(index - currentIndex)
   }
 
   function showNotice(message: string, duration = 2600) {
@@ -93,10 +106,22 @@
     noticeTimer = setTimeout(() => (notice = ''), duration)
   }
 
-  function toggleMap() {
+  function closeMap() {
     stopDraggingPhoto()
-    mapOpen = !mapOpen
+    const focusNeedsRecovery = divider === document.activeElement || mapRegion?.contains(document.activeElement)
+    mapOpen = false
+    mapKeyboardHandler = undefined
     showControls()
+    if (focusNeedsRecovery) queueMicrotask(focusPhoto)
+  }
+
+  function toggleMap() {
+    if (mapOpen) closeMap()
+    else {
+      stopDraggingPhoto()
+      mapOpen = true
+      showControls()
+    }
   }
 
   function toggleInformation() {
@@ -170,6 +195,39 @@
     photoSurface?.focus({ preventScroll: true })
   }
 
+  function focusDivider() {
+    divider?.focus({ preventScroll: true })
+  }
+
+  function focusMap() {
+    mapRegion?.focus({ preventScroll: true })
+  }
+
+  function visibleFocusRegions(): Array<() => void> {
+    if (!mapOpen) return [focusPhoto]
+    return narrowLayout ? [focusPhoto, focusMap] : [focusPhoto, focusDivider, focusMap]
+  }
+
+  function moveRegionFocus(reverse: boolean) {
+    const regions = visibleFocusRegions()
+    const elements = narrowLayout
+      ? [photoSurface, mapRegion]
+      : mapOpen
+        ? [photoSurface, divider, mapRegion]
+        : [photoSurface]
+    const active = document.activeElement
+    const activeIndex = elements.findIndex(
+      (element) => element === active || (active instanceof Node && element?.contains(active)),
+    )
+    const nextIndex =
+      activeIndex < 0
+        ? reverse
+          ? regions.length - 1
+          : 0
+        : (activeIndex + (reverse ? -1 : 1) + regions.length) % regions.length
+    regions[nextIndex]?.()
+  }
+
   function handlePhotoWheel(event: WheelEvent) {
     const context = photoContext()
     if (!context) return
@@ -221,9 +279,10 @@
   }
 
   function startDraggingPhoto(event: PointerEvent) {
-    if (event.button !== 0 || !imageGeometry?.canPan) return
-    event.preventDefault()
+    if (event.button !== 0) return
     focusPhoto()
+    if (!imageGeometry?.canPan) return
+    event.preventDefault()
     draggingPhoto = true
     previousDragPoint = { x: event.clientX, y: event.clientY }
     window.addEventListener('pointermove', moveDraggedPhoto)
@@ -267,6 +326,7 @@
   function startResizingSplit(event: PointerEvent) {
     if (event.button !== 0) return
     event.preventDefault()
+    focusDivider()
     resizingSplit = true
     setSplitFromPointer(event.clientX)
     window.addEventListener('pointermove', resizeSplit)
@@ -275,6 +335,7 @@
   }
 
   function handleDividerKeydown(event: KeyboardEvent) {
+    if (hasShortcutModifier(event) || event.shiftKey) return
     const steps: Record<string, number> = { ArrowLeft: -2, ArrowRight: 2 }
     if (event.key in steps) splitPercent = Math.max(20, Math.min(80, splitPercent + steps[event.key]))
     else if (event.key === 'Home') splitPercent = 20
@@ -284,32 +345,86 @@
     event.stopPropagation()
   }
 
+  function hasShortcutModifier(event: KeyboardEvent) {
+    return event.altKey || event.ctrlKey || event.metaKey || event.isComposing
+  }
+
+  function isPlainLetterShortcut(event: KeyboardEvent, letter: string) {
+    return !hasShortcutModifier(event) && !event.shiftKey && event.key.toLowerCase() === letter
+  }
+
+  async function returnToEntry() {
+    if (returningToEntry) return
+    returningToEntry = true
+    stopDraggingPhoto()
+    stopResizingSplit()
+    if (document.fullscreenElement && document.exitFullscreen) {
+      try {
+        await document.exitFullscreen()
+      } catch {
+        // Returning to folder selection must not require a second key press.
+      }
+    }
+    onChooseAnother()
+  }
+
   function handleKeydown(event: KeyboardEvent) {
     if (event.defaultPrevented) return
-    if (event.key.toLowerCase() === 'i') {
+    if (event.key === 'Tab' && !hasShortcutModifier(event)) {
+      event.preventDefault()
+      moveRegionFocus(event.shiftKey)
+    } else if (isPlainLetterShortcut(event, 'h') && !event.repeat) {
+      event.preventDefault()
+      void returnToEntry()
+    } else if (isPlainLetterShortcut(event, 'i') && !event.repeat) {
       event.preventDefault()
       toggleInformation()
-    } else if (event.key.toLowerCase() === 'm') {
+    } else if (isPlainLetterShortcut(event, 'm') && !event.repeat) {
       event.preventDefault()
       toggleMap()
     } else if (
-      event.key.toLowerCase() === 'f' &&
+      isPlainLetterShortcut(event, 'f') &&
       !event.repeat &&
-      !event.altKey &&
-      !event.ctrlKey &&
-      !event.metaKey
+      !event.shiftKey
     ) {
       event.preventDefault()
       void toggleFullscreen()
     } else if (event.key === 'Escape' && mapOpen && !document.fullscreenElement) {
-      mapOpen = false
-      showControls()
+      closeMap()
     } else if (document.activeElement === photoSurface) {
       handlePhotoKeydown(event)
+    } else if (mapRegion?.contains(document.activeElement) && !hasShortcutModifier(event)) {
+      const shiftAllowedForPlus = event.key === '+'
+      if ((!event.shiftKey || shiftAllowedForPlus) && mapKeyboardHandler?.(event)) {
+        event.preventDefault()
+      }
     }
   }
 
   function handlePhotoKeydown(event: KeyboardEvent) {
+    if (hasShortcutModifier(event) || (event.shiftKey && event.key !== '+')) return
+
+    if (event.key === 'PageUp') {
+      event.preventDefault()
+      move(-10)
+      return
+    }
+    if (event.key === 'PageDown') {
+      event.preventDefault()
+      move(10)
+      return
+    }
+    if (event.key === 'Home') {
+      event.preventDefault()
+      moveTo(0)
+      return
+    }
+    if (event.key === 'End') {
+      event.preventDefault()
+      moveTo(photos.length - 1)
+      return
+    }
+
     const context = photoContext()
     const geometry = context
       ? calculateImageGeometry(viewState, context.image, context.viewport)
@@ -344,7 +459,7 @@
       event.preventDefault()
       const factor = event.key === '+' ? KEYBOARD_ZOOM_FACTOR : 1 / KEYBOARD_ZOOM_FACTOR
       commitView(zoomImageAt(viewState, context.image, context.viewport, geometry!.scale * factor))
-    } else if (event.key.toLowerCase() === 'z' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+    } else if (event.key.toLowerCase() === 'z' && !event.shiftKey) {
       event.preventDefault()
       cycleCurrentImageView(true)
     }
@@ -378,6 +493,15 @@
     photoSurface.addEventListener('wheel', handlePhotoWheel, { passive: false })
     window.addEventListener('resize', measurePhotoSurface)
     document.addEventListener('fullscreenchange', measurePhotoSurface)
+    if (typeof window.matchMedia === 'function') {
+      narrowLayoutQuery = window.matchMedia('(max-width: 760px)')
+      syncNarrowLayout = () => {
+        narrowLayout = narrowLayoutQuery?.matches ?? false
+        if (narrowLayout && document.activeElement === divider) focusPhoto()
+      }
+      syncNarrowLayout()
+      narrowLayoutQuery.addEventListener('change', syncNarrowLayout)
+    }
   })
 
   onDestroy(() => {
@@ -389,6 +513,7 @@
     photoSurface?.removeEventListener('wheel', handlePhotoWheel)
     window.removeEventListener('resize', measurePhotoSurface)
     document.removeEventListener('fullscreenchange', measurePhotoSurface)
+    if (syncNarrowLayout) narrowLayoutQuery?.removeEventListener('change', syncNarrowLayout)
     viewStates.clear()
     intrinsicSizes.clear()
     urlWindow.dispose()
@@ -456,7 +581,11 @@
       class="edge-control previous"
       class:visible={controlsVisible}
       type="button"
-      onclick={() => move(-1)}
+      tabindex="-1"
+      onclick={() => {
+        move(-1)
+        focusPhoto()
+      }}
       disabled={currentIndex === 0}
       aria-label="Previous photo"
       title="Previous photo (Left Arrow)"
@@ -465,14 +594,24 @@
       class="edge-control next"
       class:visible={controlsVisible}
       type="button"
-      onclick={() => move(1)}
+      tabindex="-1"
+      onclick={() => {
+        move(1)
+        focusPhoto()
+      }}
       disabled={currentIndex === photos.length - 1}
       aria-label="Next photo"
       title="Next photo (Right Arrow)"
     ><span aria-hidden="true">›</span></button>
 
     <div class="top-controls" class:visible={controlsVisible}>
-      <button type="button" class="text-control" onclick={onChooseAnother} title="Choose another folder">
+      <button
+        type="button"
+        class="text-control"
+        tabindex="-1"
+        onclick={() => void returnToEntry()}
+        title="Choose another folder (H)"
+      >
         <span aria-hidden="true">＋</span> Choose another folder
       </button>
       <span class="counter" aria-label={`Photo ${currentIndex + 1} of ${photos.length}`}>
@@ -482,7 +621,11 @@
         type="button"
         class:active={mapOpen}
         class="icon-control"
-        onclick={toggleMap}
+        tabindex="-1"
+        onclick={() => {
+          toggleMap()
+          focusPhoto()
+        }}
         aria-label={mapOpen ? 'Close map' : 'Open map'}
         title={`${mapOpen ? 'Close' : 'Open'} map (M)`}
       >
@@ -495,7 +638,11 @@
         type="button"
         class:active={informationVisible}
         class="icon-control information-control"
-        onclick={toggleInformation}
+        tabindex="-1"
+        onclick={() => {
+          toggleInformation()
+          focusPhoto()
+        }}
         aria-label={informationVisible ? 'Hide photo information' : 'Show photo information'}
         title={`${informationVisible ? 'Hide' : 'Show'} photo information (I)`}
       >
@@ -507,6 +654,7 @@
   {#if mapOpen}
     <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions (ARIA window splitter pattern) -->
     <div
+      bind:this={divider}
       class="split-divider"
       role="separator"
       aria-label="Resize photo and map"
@@ -514,17 +662,30 @@
       aria-valuemin="20"
       aria-valuemax="80"
       aria-valuenow={Math.round(splitPercent)}
-      tabindex="0"
+      tabindex={narrowLayout ? -1 : 0}
       onpointerdown={startResizingSplit}
       onkeydown={handleDividerKeydown}
     ><span aria-hidden="true"></span></div>
-    {#if current.location}
-      <LazyMap location={current.location} />
-    {:else}
-      <section class="map-panel" aria-label="No map location for current photo">
-        <div class="map-unavailable" role="status">This photo doesn’t have GPS coordinates.</div>
-      </section>
-    {/if}
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_static_element_interactions (interactive map region) -->
+    <div
+      bind:this={mapRegion}
+      class="map-region"
+      role="region"
+      aria-label="Map"
+      tabindex="0"
+      onpointerdown={() => queueMicrotask(focusMap)}
+    >
+      {#if current.location}
+        <LazyMap
+          location={current.location}
+          onKeyboardHandlerChange={(handler) => (mapKeyboardHandler = handler)}
+        />
+      {:else}
+        <div class="map-panel">
+          <div class="map-unavailable" role="status">This photo doesn’t have GPS coordinates.</div>
+        </div>
+      {/if}
+    </div>
   {/if}
 
   {#if notice}<div class="toast" role="status">{notice}</div>{/if}
