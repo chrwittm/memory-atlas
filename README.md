@@ -6,9 +6,8 @@ where available, location.
 
 Status: **MVP / proof of concept.** The core app is implemented and can be
 packaged as a self-contained macOS DMG for local testing. The source is public;
-[0.2.2 is available as an unnotarized tester prerelease](https://github.com/chrwittm/memory-atlas/releases/tag/v0.2.2).
-The current source and exact installed artifact are the verified 0.3.0
-navigation and map tester candidate described below; public upload is pending.
+[0.3.0 is available as an unnotarized tester prerelease](https://github.com/chrwittm/memory-atlas/releases/tag/v0.3.0).
+It is the verified navigation and map release described below.
 
 ![Memory Atlas entry screen with a NASA Earth photograph and a Choose photo folder button](docs/assets/entry-screen.png)
 
@@ -26,8 +25,8 @@ The [Memory Atlas user guide](docs/user-guide.md) explains folder requirements,
 every viewer control, keyboard shortcuts, map behavior, and common recovery
 steps.
 
-The [release notes](RELEASE_NOTES.md) describe the verified 0.3.0 candidate,
-public 0.2.2 security replacement, and historical local builds.
+The [release notes](RELEASE_NOTES.md) describe the public 0.3.0 navigation and
+map release, the 0.2.2 security replacement, and historical local builds.
 
 For Apple silicon Macs, download the `arm64` DMG. For Intel Macs, download the
 `x64` DMG if one is published. The current MVP build is ad-hoc signed for local

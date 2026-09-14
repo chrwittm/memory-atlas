@@ -466,9 +466,9 @@ a new critical MapLibre advisory was found during final publication checks;
 see the [publication record](../delivery/verifications/2026-09-11-v0.2.1-publication.md).
 The 0.2.2 security replacement completes Gates A and B; Gate C remains deferred.
 
-### 0.3.0 navigation and map verified candidate
+### 0.3.0 navigation and map tester release
 
-Version 0.3.0 is the consolidated verified tester candidate for the implemented desktop
+Version 0.3.0 is the consolidated tester release for the implemented desktop
 keyboard-navigation and MA-FEAT-008/016/024 map slices. It adds universal quick
 collection navigation, the spatial focus loop, top-level GPX ingestion, three
 cumulative map-content modes, photo and cluster selection, named temporal and
@@ -478,8 +478,9 @@ preparation keeps MA-BUG-001 as a documented limitation and
 defers additional GPX sources, points of interest, alternate map layouts, and
 the carousel to later work. The exact candidate and its two caught-and-resolved
 packaged regressions are recorded in the
-[0.3.0 verification](../delivery/verifications/2026-09-14-v0.3.0-publication.md);
-public GitHub download verification remains pending.
+[0.3.0 verification](../delivery/verifications/2026-09-14-v0.3.0-publication.md).
+The [public tester prerelease](https://github.com/chrwittm/memory-atlas/releases/tag/v0.3.0)
+and its independent download checksum are verified.
 
 ### 0.2.2 security replacement
 
