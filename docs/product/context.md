@@ -356,13 +356,12 @@ edge cases without copying the private corpus into version control.
 
 ## Suggested starting point for the next session
 
-Use the next consolidated packaged feature build to complete the combined
-MA-FEAT-008/016/024 physical checks with the private corpus and representative
-German and U.S. boundary cases. Verify the labeled-Z shortcuts on German and
-U.S. Mac layouts, named fits, camera lifecycle, notices, generated geographic
-data materials, fullscreen, and split resizing. Keep cluster-selection
-behavior unchanged until further hands-on use chooses among the documented
-alternatives.
+The 0.3.0 package closes the current navigation, photo zoom, GPS-content, and
+map-camera slice. Start the next product refinement with the carousel/thumbnail
+view rather than reopening that delivered interaction surface. Keep alternate
+map layouts, user-authored POIs, and multiple or overlapping GPX presentation
+as later independent backlog work requiring representative fixtures and an
+accepted visibility model.
 
 The post-MVP idea inventory and the shared refinement workflow live in
 [`backlog.md`](../planning/backlog.md). Backlog entries are not accepted
@@ -467,17 +466,20 @@ a new critical MapLibre advisory was found during final publication checks;
 see the [publication record](../delivery/verifications/2026-09-11-v0.2.1-publication.md).
 The 0.2.2 security replacement completes Gates A and B; Gate C remains deferred.
 
-### 0.3.0 navigation and map candidate
+### 0.3.0 navigation and map verified candidate
 
-Version 0.3.0 is the consolidated tester candidate for the implemented desktop
+Version 0.3.0 is the consolidated verified tester candidate for the implemented desktop
 keyboard-navigation and MA-FEAT-008/016/024 map slices. It adds universal quick
 collection navigation, the spatial focus loop, top-level GPX ingestion, three
 cumulative map-content modes, photo and cluster selection, named temporal and
 locally packaged German/U.S. geographic camera scopes, and overlay-aware map
-fits. Release preparation keeps MA-BUG-001 as a documented limitation and
+fits. The release gate and exact installed-app checklist pass. Release
+preparation keeps MA-BUG-001 as a documented limitation and
 defers additional GPX sources, points of interest, alternate map layouts, and
-the carousel to later work. Publication requires the clean macOS gate and the
-combined installed-app checklist against the exact candidate artifact.
+the carousel to later work. The exact candidate and its two caught-and-resolved
+packaged regressions are recorded in the
+[0.3.0 verification](../delivery/verifications/2026-09-14-v0.3.0-publication.md);
+public GitHub download verification remains pending.
 
 ### 0.2.2 security replacement
 

@@ -75,7 +75,7 @@ specifications and later architecture decisions take precedence. Update
 - Product name: **Memory Atlas**. Use “Memory Explorer” only for naming history.
 - Svelte, TypeScript, Vite, and plain CSS; no SvelteKit for the MVP.
 - Node 24.20.0 LTS and npm 11.19.0 for development/releases; Electron 42.11.2
-  and stable Forge 7.11.2 for the 0.3.0 tester candidate. MapLibre is pinned to patched 6.4.1; its ESM
+  and stable Forge 7.11.2 for the verified 0.3.0 tester candidate. MapLibre is pinned to patched 6.4.1; its ESM
   worker is bundled locally. Vitest 4.1.11 supplies the test runner.
 - Browser-native Svelte application core packaged with Electron and bundled
   Chromium as a self-contained macOS `.app` and `.dmg` for MVP testing.

@@ -1,6 +1,6 @@
 # MA-FEAT-002, MA-FEAT-015, and MA-FEAT-018 — Desktop viewer keyboard navigation
 
-**Status:** Implemented and user-tested; next packaged build deferred
+**Status:** Implemented, user-tested, and verified in packaged 0.3.0
 
 **Last updated:** 2026-09-14
 

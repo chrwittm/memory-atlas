@@ -70,10 +70,10 @@ heavy process.
 1. Reproduce and fix MA-BUG-002 before changing the broader keyboard model.
 2. Specify and implement MA-FEAT-001 and MA-FEAT-015 together because zoom,
    collection navigation, and region focus share the Arrow keys.
-3. MA-FEAT-002/015/018 was implemented and user-tested on 2026-09-12; repeat
-   its packaged checks with the next consolidated feature build.
-4. MA-FEAT-008/016/024 is implemented in source. Repeat the combined private-
-   corpus and packaged checks, including the scope-stable cluster drill-down.
+3. MA-FEAT-002/015/018 was implemented, user-tested, and verified in packaged
+   0.3.0.
+4. MA-FEAT-008/016/024 was implemented and verified together in packaged 0.3.0,
+   including the private-corpus, camera-scope, and grouped-marker checks.
 5. Inspect representative trip videos and packaged-runtime codec behavior, then
    specify MA-FEAT-017 as a separate mixed-media vertical slice.
 
@@ -103,7 +103,7 @@ changing the local-first model.
 
 ### MA-FEAT-002 — Return to entry screen
 
-- **State:** Delivered and user-tested 2026-09-12
+- **State:** Delivered, user-tested, and verified in packaged 0.3.0
 - **Specification:**
   [`Desktop viewer keyboard navigation`](../product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **User outcome:** I can leave a collection and choose another folder quickly.
@@ -116,11 +116,12 @@ changing the local-first model.
   entry-screen folder action.
 - **Implementation evidence:**
   [`2026-09-12 verification`](../delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
+  and [`0.3.0 packaged verification`](../delivery/verifications/2026-09-14-v0.3.0-publication.md)
 - **Non-goal:** Recent folders or persistent library history.
 
 ### MA-FEAT-018 — Quick collection navigation
 
-- **State:** Delivered and user-tested 2026-09-12
+- **State:** Delivered, user-tested, and verified in packaged 0.3.0
 - **Specification:**
   [`Desktop viewer keyboard navigation`](../product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **User outcome:** I can quickly inspect a distant part of a large collection,
@@ -145,6 +146,7 @@ changing the local-first model.
   MA-FEAT-002's `H` route back to folder selection.
 - **Implementation evidence:**
   [`2026-09-12 verification`](../delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
+  and [`0.3.0 packaged verification`](../delivery/verifications/2026-09-14-v0.3.0-publication.md)
 
 ### MA-FEAT-003 — Filename on demand
 
@@ -190,7 +192,7 @@ changing the local-first model.
 
 ### MA-FEAT-015 — Minimal viewer focus loop
 
-- **State:** Implemented and user-tested 2026-09-12; packaged verification pending
+- **State:** Delivered, user-tested, and verified in packaged 0.3.0
 - **Specification:**
   [`Desktop viewer keyboard navigation`](../product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **User outcome:** I can move predictably between the large interactive areas
@@ -220,6 +222,7 @@ changing the local-first model.
   with MA-FEAT-002 and MA-FEAT-018 as the accepted combined slice.
 - **Implementation evidence:**
   [`2026-09-12 verification`](../delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
+  and [`0.3.0 packaged verification`](../delivery/verifications/2026-09-14-v0.3.0-publication.md)
 
 ## Exploration views
 
@@ -261,7 +264,7 @@ screens.
 
 ### MA-FEAT-008 — Map all located photos and select from pins
 
-- **State:** Implemented in source 2026-09-14; packaged verification pending
+- **State:** Delivered and verified in packaged 0.3.0
 - **Specification:**
   [`Multi-photo and GPX map modes`](../product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
 - **User outcome:** I can understand a folder spatially and jump from a map pin
@@ -283,10 +286,12 @@ screens.
 - **Non-goal:** Marker previews, GPS editing, reverse geocoding, a standalone
   map screen, or an offline map.
 - **Dependency:** Implement with MA-FEAT-016 under the combined specification.
+- **Implementation evidence:**
+  [`0.3.0 packaged verification`](../delivery/verifications/2026-09-14-v0.3.0-publication.md)
 
 ### MA-FEAT-016 — GPX track overlay
 
-- **State:** Implemented in source 2026-09-14; packaged verification pending
+- **State:** Delivered and verified in packaged 0.3.0
 - **Specification:**
   [`Multi-photo and GPX map modes`](../product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
 - **User outcome:** I can place portable GPX files beside a trip's photos and
@@ -311,10 +316,12 @@ screens.
   planning; live location; waypoints, routes, date filtering, elevation
   profiles, or recursively scanning subfolders.
 - **Dependency:** Implement with MA-FEAT-008 under the combined specification.
+- **Implementation evidence:**
+  [`0.3.0 packaged verification`](../delivery/verifications/2026-09-14-v0.3.0-publication.md)
 
 ### MA-FEAT-024 — Named map camera scopes
 
-- **State:** Implemented in source 2026-09-14; packaged verification pending
+- **State:** Delivered and verified in packaged 0.3.0
 - **Specification:**
   [`Multi-photo and GPX map modes — tester change request`](../product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md#tester-change-request-map-camera-scopes)
 - **User outcome:** With the map focused, I can move directly between the
@@ -357,6 +364,7 @@ screens.
   features together.
 - **Implementation evidence:**
   [`2026-09-14 verification`](../delivery/verifications/2026-09-14-ma-feat-024-named-map-camera-scopes.md)
+  and [`0.3.0 packaged verification`](../delivery/verifications/2026-09-14-v0.3.0-publication.md)
 
 ### MA-FEAT-025 — Geographic context beyond Germany and the United States
 

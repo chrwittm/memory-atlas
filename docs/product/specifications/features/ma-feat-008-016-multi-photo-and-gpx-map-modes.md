@@ -1,6 +1,6 @@
 # MA-FEAT-008, MA-FEAT-016, and MA-FEAT-024 — Multi-photo and GPX map modes
 
-**Status:** Implemented in source; consolidated packaged verification pending
+**Status:** Implemented and verified in packaged 0.3.0
 
 **Last updated:** 2026-09-14
 

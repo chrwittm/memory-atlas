@@ -2,8 +2,7 @@
 
 **Date:** 2026-09-14
 
-**Status:** Source implementation verified; consolidated packaged interaction
-check pending
+**Status:** Source and packaged 0.3.0 interaction verification complete
 
 ## Implemented outcome
 
@@ -126,21 +125,14 @@ with Node.js 24.20.0 and npm 11.19.0. Focused coverage includes:
   and real German/U.S. areas; and
 - geographic asset integrity plus deterministic packaged legal materials.
 
-## Remaining packaged verification
+## Packaged verification
 
-The next consolidated macOS feature build must exercise MA-FEAT-008/016/024
-together. With the private Schloss Herrenrunde collection, verify every `G`
-mode, the four-stop primary `Z` progression, the grouped Zoom menu, both
-persistent pointer controls, direct Day, Complete-track, and All-photos access, camera
-continuity, manual zoom preservation, same-day and next-day navigation, located
-and unlocated photo selection, cluster drill-down, panel-centered toasts,
-universal Page/Home/End navigation, divider Page steps, fullscreen, and split
-resizing without modifying source files. Also verify Current photo and
-geographic fits—including Contiguous and complete U.S. views—at representative
-German and U.S. coordinates, both German
-and U.S. keyboard layouts including Option-produced characters, unavailable-
-scope explanations, and the geographic notice files inside the packaged app.
-
-This pending physical check does not invalidate the verified source behavior,
-but it must pass before MA-FEAT-024 is described as verified in an installed
-tester release.
+The exact 0.3.0 artifact completed the consolidated physical check. The private
+German collection exercised all `G` modes, the primary `Z` cycle on the host's
+German keyboard layout, grouped Zoom-menu access, direct Baden-Württemberg and
+Germany scopes, persistent GPS/Zoom state, scope-preserving Page navigation,
+fullscreen, and split-region focus. Controlled fixtures covered located and
+unlocated transitions plus grouped marker cycling. Automated release gates
+bind U.S. and German catalog behavior, direct modifier variants, padding,
+notices, and packaged asset integrity. See the
+[`0.3.0 verification`](2026-09-14-v0.3.0-publication.md).

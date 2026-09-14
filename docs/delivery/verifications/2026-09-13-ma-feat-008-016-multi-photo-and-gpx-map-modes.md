@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-13
 
-**Status:** Source implementation verified; packaged interaction check pending
+**Status:** Source and packaged 0.3.0 interaction verification complete
 
 ## Implemented outcome
 
@@ -65,15 +65,13 @@ modification through the implemented parser. It produced one track, one segment,
 and all 847 expected points, matching the pre-implementation source findings.
 No private fixture was copied, served, uploaded, or committed.
 
-## Remaining packaged verification
+## Packaged verification
 
-The next consolidated macOS build still needs a physical check with the private
-photo and GPX folder. Verify `G` and the pointer control; the initial close zoom;
-camera continuity across modes; universal photo following; individual,
-clustered, and map-focused keyboard selection; track gaps and layer order; compact overlays;
-fullscreen; split resizing; cancellation and folder replacement; and unchanged
-source-file hashes.
-
-This pending package check does not block the verified source implementation,
-but it must pass before the feature is described as verified in an installed
-tester release.
+The exact 0.3.0 artifact completed the deferred physical check with controlled
+fixtures and the private photo/GPX collection. All three `G` modes, individual
+and exact-coordinate group selection, GPX rendering below markers, camera
+continuity, map-focused collection navigation, compact overlays, fullscreen,
+split focus and resizing, folder replacement, and unchanged source hashes
+passed. Two unpublished candidate defects found by this work were fixed and
+rechecked before release. See the
+[`0.3.0 verification`](2026-09-14-v0.3.0-publication.md).

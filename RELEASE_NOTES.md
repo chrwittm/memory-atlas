@@ -4,7 +4,7 @@ Memory Atlas is a local-first macOS photo viewer for browsing JPEG folders with
 their embedded captions, capture times, and locations. These notes cover the
 public tester prerelease and historical local proof-of-concept builds.
 
-## 0.3.0 — Navigation and map feature candidate
+## 0.3.0 — 2026-09-14 (verified tester candidate)
 
 This release rounds out Memory Atlas's desktop navigation, image inspection,
 and map exploration before work shifts to later views such as the carousel.
@@ -35,12 +35,19 @@ and map exploration before work shifts to later views such as the carousel.
 - Cycle an exact-coordinate photo group only once when its selected marker is
   clicked, without also activating the underlying map layer.
 
-The candidate retains the 0.2.2 dependency-security baseline: production audit
+The verified candidate retains the 0.2.2 dependency-security baseline: production audit
 findings must remain at zero, while reviewed build-tool findings are enforced by
 the release gate. It targets Apple silicon, is ad-hoc signed and unnotarized,
-and still requires network access for map tiles. Publication awaits the clean
-release gate and installed-app checks. The known offline tile-recovery issue
-MA-BUG-001 remains documented.
+and still requires network access for map tiles. The clean release gate, 112
+tests, and installed-app checks passed. Public upload is pending. The known
+offline tile-recovery issue MA-BUG-001 remains documented.
+
+```text
+Memory.Atlas-0.3.0-arm64.dmg
+SHA-256: cc0a71113ceb50e7a810503646a3d81452457bdf8b545a683c717f0577a9691a
+```
+
+See the [release verification](docs/delivery/verifications/2026-09-14-v0.3.0-publication.md).
 
 ## 0.2.2 — 2026-09-11 (public security replacement prerelease)
 

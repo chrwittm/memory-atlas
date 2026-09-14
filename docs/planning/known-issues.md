@@ -5,7 +5,7 @@
 
 ## MA-BUG-005: Selected grouped marker cycles twice on one click
 
-**Status:** Resolved in source on 2026-09-14; packaged re-verification pending
+**Status:** Resolved and verified in packaged 0.3.0 on 2026-09-14
 
 **Severity:** High
 
@@ -21,12 +21,12 @@ starting member.
 
 The selected marker now stops that handled click from reaching the underlying
 map layer before advancing once. A regression test requires one selection and
-no parent click. The exact replacement 0.3.0 DMG must show the photo counter
-advance once per selected-group marker click before publication.
+no parent click. The exact replacement 0.3.0 DMG advanced the photo counter
+`2 / 4` → `4 / 4` → `2 / 4` across two marker clicks.
 
 ## MA-BUG-004: Map opened without GPS stays blank after navigating to GPS
 
-**Status:** Resolved in source on 2026-09-14; packaged re-verification pending
+**Status:** Resolved and verified in packaged 0.3.0 on 2026-09-14
 
 **Severity:** High
 
@@ -49,12 +49,14 @@ Photo navigation now explicitly starts the deferred renderer whenever the open
 map's active mode gains renderable data. A regression test opens the map on an
 unlocated photo, confirms that MapLibre remains deferred, navigates to a located
 photo, and requires the renderer and Current photo camera scope to initialize.
-The exact replacement 0.3.0 DMG must repeat the observed transition before
-publication.
+The exact replacement 0.3.0 DMG repeated the observed transition: the
+placeholder was visible on the unlocated photo and the renderer, tile layer,
+selected marker, attribution, and Current photo scope initialized immediately
+after navigation to the located photo.
 
 ## MA-BUG-003: Map panel collapses after the multi-photo map implementation
 
-**Status:** Resolved in source on 2026-09-13; packaged verification pending
+**Status:** Resolved and verified in packaged 0.3.0 on 2026-09-14
 
 **Severity:** High
 
@@ -78,8 +80,9 @@ The application now sizes the renderer through the more specific
 height. A source regression test protects the cascade boundary. Local browser
 production-preview verification confirmed a non-zero full-panel map container
 and visible basemap, marker, controls, and attribution across the three-mode
-cycle. The next packaged feature build must repeat that check before this issue
-is considered verified in an installed release.
+cycle. The exact packaged 0.3.0 app repeated that check with visible tiles,
+marker, controls, attribution, and GPX geometry throughout the three-mode
+cycle.
 
 ## MA-BUG-001: Map tiles do not recover after an offline request
 

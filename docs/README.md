@@ -33,7 +33,7 @@ planning, operations, or delivery records as the task requires.
   — implemented three-mode current-photo, all-photo, and GPX-track map slice
   with MA-FEAT-024's short primary `Z` cycle and grouped direct-selection Zoom
   menu; cluster drill-down now follows the same stable scope rule as other
-  photo selection, and consolidated packaged verification is pending.
+  photo selection; consolidated packaged verification passed for 0.3.0.
 
 ### Planning
 
@@ -68,17 +68,20 @@ planning, operations, or delivery records as the task requires.
 
 ### Delivery records and history
 
+- [`delivery/verifications/2026-09-14-v0.3.0-publication.md`](delivery/verifications/2026-09-14-v0.3.0-publication.md)
+  — exact 0.3.0 source, release gate, installed interaction checks, candidate
+  defect regressions, artifact identity, and publication evidence.
 - [`delivery/verifications/2026-09-11-v0.2.2-publication.md`](delivery/verifications/2026-09-11-v0.2.2-publication.md)
   — patched MapLibre replacement, installed verification, and public checksum.
 - [`delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md`](delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
   — automated source and successful user verification for the desktop
-  keyboard-navigation slice, with its next packaged check deferred.
+  keyboard-navigation slice plus its completed 0.3.0 packaged check.
 - [`delivery/verifications/2026-09-13-ma-feat-008-016-multi-photo-and-gpx-map-modes.md`](delivery/verifications/2026-09-13-ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
   — source implementation, automated coverage, representative GPX evidence,
-  and the remaining consolidated packaged verification for the map slice.
+  and completed 0.3.0 packaged verification for the map slice.
 - [`delivery/verifications/2026-09-14-ma-feat-024-named-map-camera-scopes.md`](delivery/verifications/2026-09-14-ma-feat-024-named-map-camera-scopes.md)
   — source implementation, catalog provenance, automated evidence, and the
-  remaining packaged checks for named map-camera scopes.
+  completed 0.3.0 packaged checks for named map-camera scopes.
 
 - [`delivery/verifications/2026-09-08-public-source.md`](delivery/verifications/2026-09-08-public-source.md)
   — completed source import, GitHub CI, and repository security settings.

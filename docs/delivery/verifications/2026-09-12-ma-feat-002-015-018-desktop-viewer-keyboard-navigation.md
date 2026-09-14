@@ -2,7 +2,7 @@
 
 **Verification date:** 2026-09-12
 
-**Status:** Source implementation and user interaction verified; next packaged build deferred
+**Status:** Source, user interaction, and packaged 0.3.0 verification complete
 
 ## Implemented outcome
 
@@ -48,9 +48,9 @@ Christian reported successful testing of the complete interaction change on
 region-specific keyboard behavior, one-step return to folder selection, and
 quiet viewer focus treatment in the tested source state.
 
-No new `.app` or `.dmg` was produced, by explicit decision. More features will
-be implemented before the next consolidated macOS build. When that build is
-made, repeat the expanded checklist in
-[`docs/operations/macos-packaging.md`](../../operations/macos-packaging.md) so
-the exact packaged artifact receives the same physical keyboard and focus
-coverage before release.
+No `.app` or `.dmg` was produced during the original feature change, by explicit
+decision. The later exact 0.3.0 artifact completed the deferred packaged check:
+physical Page/Home/End navigation, photo/divider/map focus traversal, divider
+Page resizing, map-focused universal navigation, photo zoom ownership, `H`,
+fullscreen Escape priority, and map-close focus recovery passed. See the
+[`0.3.0 verification`](2026-09-14-v0.3.0-publication.md).
