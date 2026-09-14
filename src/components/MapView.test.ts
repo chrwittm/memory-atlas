@@ -114,8 +114,13 @@ describe('MapView', () => {
     expect(mapState.layers.map((layer) => layer.id)).toEqual([
       'track-casing', 'tracks', 'photo-clusters', 'photo-cluster-count', 'photo-points', 'photo-group-count',
     ])
+    const markerParent = document.createElement('div')
+    const parentClick = vi.fn()
+    markerParent.addEventListener('click', parentClick)
+    markerParent.append(mapState.markerElements.at(-1)!)
     mapState.markerElements.at(-1)?.click()
     expect(onSelectPhoto).toHaveBeenCalledWith(2)
+    expect(parentClick).not.toHaveBeenCalled()
     await mapState.listeners['click:photo-clusters'][0]({
       features: [{ geometry: { type: 'Point', coordinates: [10.95, 47.5] }, properties: { cluster_id: 7 } }],
     })

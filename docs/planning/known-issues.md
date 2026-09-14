@@ -3,6 +3,27 @@
 **Status:** Living issue register
 **Last updated:** 2026-09-14
 
+## MA-BUG-005: Selected grouped marker cycles twice on one click
+
+**Status:** Resolved in source on 2026-09-14; packaged re-verification pending
+
+**Severity:** High
+
+### Behavior and cause
+
+During the 0.3.0 installed-candidate check, clicking the selected marker for two
+photos at the same coordinates could leave the same photo selected. The marker
+button's click bubbled into MapLibre's coincident photo-point layer, so both
+handlers advanced the deterministic group and a two-photo group returned to its
+starting member.
+
+### Resolution and verification
+
+The selected marker now stops that handled click from reaching the underlying
+map layer before advancing once. A regression test requires one selection and
+no parent click. The exact replacement 0.3.0 DMG must show the photo counter
+advance once per selected-group marker click before publication.
+
 ## MA-BUG-004: Map opened without GPS stays blank after navigating to GPS
 
 **Status:** Resolved in source on 2026-09-14; packaged re-verification pending

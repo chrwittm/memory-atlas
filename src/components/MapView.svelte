@@ -156,7 +156,10 @@
     if (group && group.photoIndices.length > 1) {
       element.dataset.count = String(group.photoIndices.length)
       element.title = `${photoAccessibleName(photo)} · ${group.photoIndices.length} photos at this location`
-      element.addEventListener('click', () => onSelectPhoto(nextMemberInGroup(group, currentIndex)))
+      element.addEventListener('click', (event) => {
+        event.stopPropagation()
+        onSelectPhoto(nextMemberInGroup(group, currentIndex))
+      })
     }
     selectedMarker = new maplibregl.Marker({ element })
       .setLngLat([photo.location.longitude, photo.location.latitude])
