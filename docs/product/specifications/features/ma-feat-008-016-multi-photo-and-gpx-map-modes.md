@@ -682,8 +682,8 @@ hidden "after cluster" state.
 - Tester feedback adds
   [`MA-FEAT-024`](../../../planning/backlog.md#ma-feat-024--named-map-camera-scopes)
   as an implemented change request to the same slice. Its `Z` camera model is
-  now part of the source behavior; cluster-selection refinement is explicitly
-  deferred.
+  now part of the source behavior; cluster drill-down and subsequent photo
+  selection use the same accepted scope-preservation rule as other selection.
 - [`ADR 0004`](../../../architecture/decisions/0004-local-geographic-context-catalog.md)
   accepts a build-time-generated, locally packaged geographic boundary catalog
   for the German and U.S. scopes. MA-FEAT-025 tracks other countries and deeper

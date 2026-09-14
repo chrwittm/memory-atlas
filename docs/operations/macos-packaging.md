@@ -1,7 +1,7 @@
 # Deploy Memory Atlas on macOS
 
 **Status:** Current macOS packaging runbook
-**Last updated:** 2026-09-12
+**Last updated:** 2026-09-14
 
 This is the executable deployment runbook for producing the Memory Atlas MVP as
 a macOS application and disk image. The rationale and alternatives remain in
@@ -356,9 +356,10 @@ icon. Check Finder, Dock, the application switcher, and the mounted DMG visually
 Source publication (Gate A), an explicitly unnotarized tester prerelease
 (Gate B), and ordinary notarized distribution (Gate C) are distinct. Follow the
 [publication plan](../delivery/plans/2026-09-04-publication-readiness.md).
-Keep 0.2.0 local artifact records unchanged; the next binary is 0.2.1. Use the
-Releases listing for prereleases because GitHub's `/releases/latest` excludes
-prereleases. Never tag or upload before the installed-app checklist passes.
+Keep every historical artifact record unchanged and assign a new version to
+each materially different binary. Use the Releases listing for prereleases
+because GitHub's `/releases/latest` excludes prereleases. Never tag or upload
+before the installed-app checklist passes.
 
 The Forge asset hook generates [dependency notices, MPL source materials, and
 geographic-data notices](third-party-notices.md) from the exact installed

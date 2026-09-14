@@ -55,6 +55,7 @@ heavy process.
 | --- | --- | --- |
 | Next desktop refinements | File actions and further fullscreen reliability | The coherent keyboard model is implemented; the remaining work preserves the viewer while adding carefully scoped OS integration |
 | Next exploration views | Thumbnail gallery | Named map-camera scopes and stable cluster drill-down are implemented in source; the next nonlinear view is the remaining exploration priority |
+| Future map enrichment | User-authored points of interest and multiple/overlapping GPX tracks | Both needs are demonstrated by the private California corpus, but each requires its own calm presentation model and must remain outside the current release |
 | Media expansion | Videos in the file-name sequence | A demonstrated trip-viewing need that requires codec and playback-boundary research |
 | Context and people | Information-overlay modes, technical camera details, tags, filename, and people regions | Keeps useful embedded context close at hand while requiring representative metadata and a calm presentation model |
 | Platform and OS integration | Open a Finder folder directly in Memory Atlas; later evaluate Windows Explorer integration | Makes the installed desktop app a natural part of the user's existing folder workflow, but requires a narrow native integration boundary |
@@ -374,6 +375,72 @@ screens.
   useful memory context.
 - **Dependency:** Builds on MA-FEAT-024 and ADR 0004 only after real use selects
   another country or area type.
+
+### MA-FEAT-026 — User-authored map points of interest
+
+- **State:** Needs research with representative GPX files
+- **User outcome:** I can add meaningful places that are not photos or traveled
+  tracks—such as Apple Park, Mount Lassen, Mount Shasta, or another visible
+  landmark—and recognize them as reference context on the map.
+- **Source direction:** Evaluate top-level GPX waypoints as the first portable,
+  filesystem-authored source. Preserve waypoint names and useful descriptions
+  when present, while keeping the normalized point-of-interest model distinct
+  from photo locations and track geometry. Do not assume that every future
+  point of interest must remain GPX-specific.
+- **Presentation questions:** Define a visually distinct, quiet marker; when
+  names appear; how dense points avoid clutter; whether points are included in
+  existing `G` modes or receive contextual visibility controls; how keyboard
+  and pointer inspection work without displacing photo selection; and which
+  camera scopes, if any, include them.
+- **Semantic boundary:** A point marks relevant context, not necessarily a place
+  the user visited, photographed from nearby, or climbed. The interface must not
+  imply those relationships merely because a point and photos share a map.
+- **Acceptance direction:** Parse supported points locally and in isolation;
+  distinguish them from photo markers and tracks visually and accessibly;
+  tolerate missing names, malformed coordinates, and files containing mixed
+  GPX content; preserve a useful map when no valid points exist; and never
+  upload or modify the source file.
+- **Non-goal:** Place search, runtime geocoding, route planning, editing points,
+  or inclusion in the current navigation/GPS/zoom release.
+- **Dependency:** Builds on the typed collection ingestion and map-layer model
+  introduced by MA-FEAT-008/016. Coordinate its visibility model with future
+  contextual-panel work rather than adding another permanent control casually.
+
+### MA-FEAT-027 — Multiple and overlapping GPX track presentation
+
+- **State:** Needs research with the private California trip corpus
+- **User outcome:** I can retain a broad, continuously recorded trip track and
+  more detailed activity tracks for individual hikes without turning the map
+  into an indistinguishable set of overlapping lines.
+- **Representative finding:** The private California corpus contains one broad
+  FindPenguins recording spanning roughly fourteen days plus more detailed GPX
+  tracks for selected hikes. It is a valuable local verification profile for
+  track identity, temporal overlap, different sampling detail, partial
+  coverage, and long-distance travel. The private source files remain ignored,
+  read-only, and uncommitted; any tracked derivative must follow MA-FEAT-019's
+  separate rights, privacy, minimization, and provenance requirements.
+- **Interaction options to evaluate:** (a) draw all relevant tracks with a
+  restrained visual hierarchy; (b) switch or toggle named tracks on demand;
+  (c) offer broad-trip and detailed-activity views; or (d) build an explicit,
+  deterministic composite in which a detailed track replaces an overlapping
+  portion of the broad track. Keep these alternatives open until the real data
+  demonstrates which is understandable and useful.
+- **Research needed:** Inspect track names, timestamps, segment boundaries,
+  sampling rates, gaps, overlap, and ordering. Define how tracks are identified;
+  whether relevance follows the current photo, date, or manual selection; how
+  Complete-track framing behaves; how colors, legends, and controls stay calm;
+  and how a composite would establish precedence without inventing movement.
+- **Acceptance direction:** Every source track remains independently recoverable
+  in the normalized model; visibility and selection are deterministic; gaps are
+  never bridged falsely; overlapping geometry remains understandable; missing
+  or incompatible timestamps degrade gracefully; and source GPX files remain
+  local, transient, read-only, and byte-for-byte unchanged.
+- **Non-goal:** Implicit on-the-fly stitching without reviewed precedence rules,
+  editing or exporting tracks, activity analysis, or inclusion in the current
+  navigation/GPS/zoom release.
+- **Dependency:** Extends MA-FEAT-016 after representative-data research. It may
+  share a later map-layer or contextual-panel design with MA-FEAT-026, but the
+  two features should not be forced into one implementation slice.
 
 ### MA-FEAT-009 — Map visual-style evaluation
 
@@ -711,3 +778,4 @@ screens.
 | 2026-09-14 | Preserve the active geographic level across named areas, using Current photo only when no same-level destination exists. | Flight sequences commonly cross states or countries; Washington-to-Oregon should remain a State-level journey, while leaving a park for a place without a park still needs the clear Current-photo fallback. |
 | 2026-09-14 | Make named camera fits overlay-aware while keeping Complete track track-owned. | A tall flight-and-driving track exposed that capped generic padding could leave route geometry or an in-scope marker beneath attribution and other persistent map UI; adding arbitrary current photos to the track extent would instead destabilize or greatly widen the view. |
 | 2026-09-14 | Reduce the map-focused `Z` cycle to Current photo, Day, Complete track, and All photos; expose every available scope through a grouped Zoom menu and add `Command+Option+Z` for All photos. | Eight or more dynamic stops made repeated cycling tedious. A short primary cycle keeps frequent keyboard access simple, while grouped direct selection preserves useful seven-day and geographic scopes without a configuration screen. |
+| 2026-09-14 | Track user-authored points of interest and multiple/overlapping GPX presentation as separate post-release features. | The private California corpus demonstrates both needs, but waypoint semantics and track composition require different data and interaction decisions. Keeping them out of the current release closes the navigation/GPS/zoom slice without losing the richer follow-up options. |

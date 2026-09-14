@@ -467,6 +467,18 @@ a new critical MapLibre advisory was found during final publication checks;
 see the [publication record](../delivery/verifications/2026-09-11-v0.2.1-publication.md).
 The 0.2.2 security replacement completes Gates A and B; Gate C remains deferred.
 
+### 0.3.0 navigation and map candidate
+
+Version 0.3.0 is the consolidated tester candidate for the implemented desktop
+keyboard-navigation and MA-FEAT-008/016/024 map slices. It adds universal quick
+collection navigation, the spatial focus loop, top-level GPX ingestion, three
+cumulative map-content modes, photo and cluster selection, named temporal and
+locally packaged German/U.S. geographic camera scopes, and overlay-aware map
+fits. Release preparation keeps MA-BUG-001 as a documented limitation and
+defers additional GPX sources, points of interest, alternate map layouts, and
+the carousel to later work. Publication requires the clean macOS gate and the
+combined installed-app checklist against the exact candidate artifact.
+
 ### 0.2.2 security replacement
 
 The owner authorized the replacement publication after the 0.2.1 withdrawal.

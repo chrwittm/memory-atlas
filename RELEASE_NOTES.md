@@ -4,6 +4,40 @@ Memory Atlas is a local-first macOS photo viewer for browsing JPEG folders with
 their embedded captions, capture times, and locations. These notes cover the
 public tester prerelease and historical local proof-of-concept builds.
 
+## 0.3.0 — Navigation and map feature candidate
+
+This release rounds out Memory Atlas's desktop navigation, image inspection,
+and map exploration before work shifts to later views such as the carousel.
+
+### What's new
+
+- Navigate the collection from photo or map focus with ten-photo `Page Up` and
+  `Page Down` jumps, first/last `Home` and `End`, and a circular `Tab` loop
+  across the photo, split divider, and map.
+- Press `H` to leave fullscreen, close the current collection, and return focus
+  to folder selection in one step.
+- Keep the viewer visually quiet: fading controls stay pointer-accessible but
+  do not add keyboard focus stops, while the divider retains a local focus cue.
+- Open top-level GPX files alongside JPEGs and cycle the map through Current
+  photo, All photos, and Photos + GPX track with `G`.
+- Select located photos from individual pins and clusters while preserving the
+  current map context; GPX gaps, tracks, and segments remain explicit.
+- Use map-focused `Z` for the short Current photo, Day, Complete track, and All
+  photos camera cycle, or open the grouped Zoom menu for every available time,
+  place, collection, and track scope.
+- Frame locally packaged German and U.S. geographic scopes without uploading
+  photos or requesting runtime geocoding; the U.S. ladder includes a
+  Contiguous United States view.
+- Preserve manual map zoom and applicable camera scope while navigating, with
+  overlay-aware fits that keep relevant markers and routes clear of controls.
+
+The candidate retains the 0.2.2 dependency-security baseline: production audit
+findings must remain at zero, while reviewed build-tool findings are enforced by
+the release gate. It targets Apple silicon, is ad-hoc signed and unnotarized,
+and still requires network access for map tiles. Publication awaits the clean
+release gate and installed-app checks. The known offline tile-recovery issue
+MA-BUG-001 remains documented.
+
 ## 0.2.2 — 2026-09-11 (public security replacement prerelease)
 
 - Fixes MapLibre attribution sanitization vulnerability GHSA-jrc7-96c5-q579

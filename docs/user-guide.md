@@ -1,7 +1,7 @@
 # Memory Atlas User Guide
 
 **Status:** Current user documentation
-**Applies to:** Current source; next packaged release after 0.2.2
+**Applies to:** Memory Atlas 0.3.0 release candidate
 **Last updated:** 2026-09-14
 
 Memory Atlas is a local-first macOS photo viewer. It opens a folder of JPEG
