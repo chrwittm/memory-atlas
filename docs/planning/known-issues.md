@@ -1,7 +1,36 @@
 # Known issues
 
 **Status:** Living issue register
-**Last updated:** 2026-09-08
+**Last updated:** 2026-09-13
+
+## MA-BUG-003: Map panel collapses after the multi-photo map implementation
+
+**Status:** Resolved in source on 2026-09-13; packaged verification pending
+
+**Severity:** High
+
+### Behavior and cause
+
+After MA-FEAT-008/016, opening a map briefly showed **Opening map…** and then
+left the split panel blank in Chrome and Safari. The mode control and legend
+remained available because the map initialized successfully, but the MapLibre
+canvas, marker, navigation controls, and tiles were not visible.
+
+The feature change replaced the map container's inline dimensions with the
+application's `.map-canvas` rule. MapLibre's dynamically imported stylesheet
+then loaded its equally specific `.maplibregl-map { position: relative }` rule
+later in the cascade. That changed the empty container from absolute to relative
+positioning and collapsed its rendered height to zero.
+
+### Resolution and verification
+
+The application now sizes the renderer through the more specific
+`.map-panel > .map-canvas` selector and explicitly retains both full width and
+height. A source regression test protects the cascade boundary. Local browser
+production-preview verification confirmed a non-zero full-panel map container
+and visible basemap, marker, controls, and attribution across the three-mode
+cycle. The next packaged feature build must repeat that check before this issue
+is considered verified in an installed release.
 
 ## MA-BUG-001: Map tiles do not recover after an offline request
 

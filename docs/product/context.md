@@ -1,7 +1,7 @@
 # Memory Atlas: Living Project Context
 
 Status: Browser MVP implemented; macOS packaging accepted  
-Last updated: 2026-09-12
+Last updated: 2026-09-14
 
 ## Purpose of this document
 
@@ -48,8 +48,9 @@ The initial product wedge is intentionally narrower than the vision:
 - A split-screen map for the current geotagged photo
 - No required cloud service and no modification of originals
 
-Thumbnail overview and multi-photo map exploration remain likely follow-on views,
-but they are explicitly outside the accepted MVP.
+Thumbnail overview remains a likely follow-on view. Multi-photo and GPX map
+exploration is now implemented as a post-MVP extension, while both remain
+outside the accepted MVP baseline recorded in the MVP specification.
 
 This is not a retreat from the broader vision. It is the smallest domain in which the central idea—media plus context becoming an explorable memory—can be tested honestly.
 
@@ -86,8 +87,9 @@ This is not a retreat from the broader vision. It is the smallest domain in whic
   the Arrow keys pan. `Z` and double-click cycle through the fitted view, native
   100% view, and a per-photo remembered custom view for the current folder
   session, skipping views that are unavailable or duplicate.
-- The implemented desktop keyboard slice adds photo-focused ten-position
-  `Page Up`/`Page Down` jumps, first/last `Home`/`End` navigation, and a global
+- The implemented desktop keyboard slice adds ten-position `Page Up`/`Page
+  Down` jumps and first/last `Home`/`End` navigation with either photo or map
+  focus, plus a global
   `H` return to folder selection. `Tab` and `Shift`+`Tab` form a circular
   photo/divider/map region loop in split view; shortcut-backed viewer controls
   do not lengthen that loop, and viewer focus no longer draws yellow/gold
@@ -96,8 +98,48 @@ This is not a retreat from the broader vision. It is the smallest domain in whic
   default and toggled with `I`; either value remains useful without the other.
 - Place is a meaningful exploration dimension, not merely a metadata field.
 - Map mode is controlled explicitly by the user and remains open across photos
-  without GPS, using a placeholder until a located photo is selected again.
-- Future thumbnail and multi-photo map views should navigate the same collection as the main viewer.
+  without GPS. Current-photo mode uses a placeholder; overview modes retain
+  their other markers or tracks and show a compact notice.
+- The implemented multi-photo map slice adds exactly three map modes within the existing
+  split panel: current photo, all located photos, and all located photos plus
+  top-level GPX tracks. `G` and the quiet visible **GPS** control cycle the open map;
+  `M` remains the map open/close action. Photo and marker selection stay
+  synchronized, and source GPX files remain local, transient, and read-only.
+- The implemented MA-FEAT-024 map-camera refinement keeps `G` responsible for
+  visible layers. Map-focused `Z` uses the short primary cycle Current photo,
+  Day, Complete track, and All photos, skipping unavailable stops; a grouped
+  Zoom menu provides direct access to every available Focus, Time, Place, and
+  Collection scope. `Shift+Z`, `Control+Z`, `Option+Z`, and
+  `Command+Option+Z` go directly to Current photo, Day, Complete track, and All
+  photos when available, while plain `Command+Z` remains the macOS Undo
+  convention. Day uses recorded local dates, and the wider temporal scope is a
+  rolling current-date ±3-day window available from the menu.
+- Named geographic scopes use a locally packaged boundary catalog rather than
+  approximate zoom levels or runtime geocoding. The first implementation covers
+  German and U.S. national parks, Bundesländer/U.S. states, and countries as
+  independently overlapping contexts. The U.S. ladder also includes a
+  Contiguous United States frame before the complete country;
+  country-specific intermediate frames are explicit and extensible.
+  MA-FEAT-025 tracks additional countries. The committed catalog has
+  reproducible source hashes, simplification settings, output integrity, and
+  packaged notices.
+- Map navigation preserves the active camera scope and manual zoom. Current
+  photo follows a new located pin without resetting zoom; temporal scopes refit
+  when their date context changes; geographic scopes remain fixed within the
+  same named area, switch to an available destination scope at the same level,
+  and otherwise fall back to Current photo at the existing zoom; collection and
+  track scopes remain fixed.
+  Cluster-revealed marker selection follows the same rule. Persistent stacked
+  **GPS** and **Zoom** controls expose the active content mode and camera scope;
+  GPS cycles its modes while Zoom opens grouped direct selection.
+- Named camera fits use viewport-relative base padding expanded by measured
+  persistent overlays and a feature-aware gutter, keeping track geometry and
+  in-scope markers clear of the GPS/Zoom controls, notices, navigation, legend,
+  and required attribution.
+- Transient feedback is centered within the region it describes: photo zoom in
+  the photo panel, map framing in the map panel, and viewer-wide failures in the
+  complete viewer.
+- Future thumbnail views should navigate the same collection as the main viewer.
 - Photo folders are the practical starting input.
 - In the MVP, case-insensitive natural file-name order is the presentation
   sequence. Capture time remains context and does not override that explicit
@@ -132,7 +174,6 @@ The following decisions remain provisional for post-MVP evolution:
 - The exact `album.index.json` schema and its location
 - Cache-directory naming
 - Whether a folder, album, event, and memory are the same concept
-- When map pins for every photo should enter after the MVP
 
 These should be decided in response to demonstrated needs, not inherited
 accidentally from the first specification.
@@ -161,7 +202,7 @@ context belongs inside an image file.
 
 ### Presentation versus exploration
 
-The original intent emphasizes presenting a sequence of travel photos. The later vision emphasizes nonlinear rediscovery. The MVP begins with a calm primary viewer and a split-screen map for the current photo. Thumbnail overview and multi-photo map navigation are the next likely nonlinear views, but are deferred until the core slice is proven.
+The original intent emphasizes presenting a sequence of travel photos. The later vision emphasizes nonlinear rediscovery. The MVP begins with a calm primary viewer and a split-screen map for the current photo. The implemented MA-FEAT-008/016 slice extends that same panel with all-photo selection and a GPX track overlay rather than introducing a separate map screen. Thumbnail overview remains a later nonlinear view.
 
 ### Local-first versus map services
 
@@ -212,14 +253,17 @@ their native dimensions, clamped pointer and Arrow-key panning, and per-photo
 fitted/native/custom view restoration for the current folder session. Photos use
 case-insensitive natural file-name order so a numeric prefix explicitly controls
 the sequence; capture time is retained only as metadata. The
-representative 24-photo corpus established the following metadata behavior:
+original 24-photo corpus established the following metadata behavior; the
+expanded 31-photo corpus retains that coverage and adds representative GPS:
 
 - capture time comes from EXIF `DateTimeOriginal`, then related EXIF/XMP dates;
 - caption text prefers XMP/IPTC descriptions, then EXIF image description, with
   XMP/IPTC title as the fallback;
 - the corpus includes two XMP titles that exercise the caption fallback;
-- the corpus contains no GPS coordinates, so valid and invalid GPS
-  normalization and the geotagged map path use controlled test metadata;
+- all 31 current photos contain valid latitude and longitude with 31 distinct
+  coordinate pairs, so the private corpus now exercises the geotagged map path;
+- controlled test metadata remains necessary for invalid, missing, duplicate,
+  and densely clustered GPS edge cases;
 - browser-native image display is relied on for embedded orientation, avoiding
   a second transform.
 
@@ -267,13 +311,58 @@ browser APIs. See [`macos-packaging.md`](../operations/macos-packaging.md) for t
 and [`0002-macos-electron-packaging.md`](../architecture/decisions/0002-macos-electron-packaging.md) for the comparison and
 release boundary.
 
+## Implemented multi-photo and GPX map slice
+
+[`MA-FEAT-008/016 — Multi-photo and GPX map modes`](specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
+is implemented in source. It provides one three-state `G` cycle while the
+map is visible: current photo, all located photos, and all located photos plus
+every drawable top-level GPX track. The overview modes retain two-way photo
+selection, compact state and legend feedback, intentional missing-data states,
+and the existing map provider and privacy boundary.
+
+The shared scan worker now retains top-level GPX files beside JPEGs, parses GPX
+1.0 and 1.1 tracks locally with bounded concurrency, preserves track and segment
+gaps, and isolates malformed sources. The map derives clustered coordinate
+groups and separate GeoJSON track segments, keeps its selected photo synchronized
+with the viewer, and uses one consistent camera across all modes: `G` preserves
+the current viewpoint, while photo changes follow the active named scope without
+resetting a manual zoom. Page-key ten-photo jumps and Home/End collection
+boundaries are universal across photo and map focus; the divider uses Page keys
+for larger split adjustments.
+
+MA-FEAT-024 adds a second, deliberately separate map concept: `G` still chooses
+visible content, while map-focused `Z` chooses camera framing. Its primary
+cycle contains Current photo, recorded-local-date Day, Complete track, and All
+photos when available. The grouped Zoom menu also exposes rolling ±3-day,
+containing German or U.S. National park/State/country, and Contiguous United
+States scopes. Direct shortcuts reach the four primary scopes, including
+`Command+Option+Z` for All photos, without taking over plain `Command+Z`.
+Manual navigation and `G` preserve the named-scope cursor. Photo selection
+preserves an applicable geographic level by switching to the destination area
+at that level when available, otherwise falling back to Current photo without
+resetting zoom; changed temporal contexts refit;
+closing the map discards the camera and cursor. Geographic matches use a static,
+simplified, locally read catalog; only normal basemap requests remain a network
+operation.
+
+Representative inspection found that the private Schloss Herrenrunde GPX is a
+valid GPX 1.1 document with one named track, one segment, and 847 points. Every
+point has valid distinct coordinates, elevation, and a parseable nondecreasing
+timestamp. Its 31 companion JPEGs all have valid GPS with distinct coordinates,
+so the private corpus provides representative all-photo marker, selection,
+track-line, and combined viewport coverage. The implemented parser was verified
+against all 847 points. Repository-safe controlled test data covers GPS and GPX
+edge cases without copying the private corpus into version control.
+
 ## Suggested starting point for the next session
 
-Select the next focused feature slice after the implemented and user-tested
-[`MA-FEAT-002/015/018 desktop viewer keyboard-navigation specification`](specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md).
-No standalone DMG is needed for this slice; repeat its physical navigation,
-focus-loop, map-control, fullscreen-return, and quiet-focus checks with the next
-consolidated packaged feature build.
+Use the next consolidated packaged feature build to complete the combined
+MA-FEAT-008/016/024 physical checks with the private corpus and representative
+German and U.S. boundary cases. Verify the labeled-Z shortcuts on German and
+U.S. Mac layouts, named fits, camera lifecycle, notices, generated geographic
+data materials, fullscreen, and split resizing. Keep cluster-selection
+behavior unchanged until further hands-on use chooses among the documented
+alternatives.
 
 The post-MVP idea inventory and the shared refinement workflow live in
 [`backlog.md`](../planning/backlog.md). Backlog entries are not accepted
@@ -317,6 +406,46 @@ only once its interaction and boundaries are decided.
   disposal, entry focus, and forced-color-safe focus selectors. Christian
   subsequently confirmed successful interaction testing. A standalone DMG was
   intentionally deferred until more features are ready for the next build.
+- 2026-09-13: MA-FEAT-008 and MA-FEAT-016 were accepted as one map exploration
+  slice with exactly three `G` modes: current photo, all located photos, and all
+  located photos plus top-level GPX tracks. The specification adds two-way
+  marker selection, clustered and duplicate locations, explicit empty states,
+  and local isolated GPX parsing while deferring waypoints, routes, and time-
+  based track filtering.
+- 2026-09-13: MA-FEAT-008/016 was implemented in source. The shared worker now
+  parses top-level GPX files in isolation, the split map cycles through all
+  three modes with clustered and exact-coordinate groups, pointer and
+  map-focused keyboard selection stay synchronized with the viewer. Follow-up
+  browser testing replaced the separate overview-camera behavior with one
+  universal camera: mode changes preserve the viewpoint, and photo changes
+  recenter at the established close zoom in every mode. Automated checks and
+  the production build pass; the consolidated packaged interaction check
+  remains pending.
+- 2026-09-14: Source testing validated the three `G` content modes and prompted
+  MA-FEAT-024. Its release-candidate refinement gives map-focused `Z` the
+  primary Current photo, Day, Complete track, and All photos cycle while a
+  grouped Zoom menu retains direct access to every available named scope.
+  `Shift+Z`, `Control+Z`, `Option+Z`, and `Command+Option+Z` directly select
+  those four primary scopes when available; plain `Command+Z` stays unassigned.
+  Day and rolling ±3-day scopes use
+  recorded local photo dates, and real locally packaged German and U.S.
+  national-park, state/Bundesland, and country polygons supply geographic
+  scopes under ADR 0004. Further countries are MA-FEAT-025. Cluster selection
+  remains unchanged pending more tester use.
+- 2026-09-14: MA-FEAT-024 was implemented in source. Recorded local calendar
+  dates now cross the metadata boundary without timezone conversion; the map
+  computes only mode-appropriate named scopes, supports labeled-Z direct access,
+  and preserves or resets its camera cursor according to the accepted lifecycle.
+  A generated 148-area German/U.S. catalog is committed with exact source
+  hashes, licensing, attribution, simplification parameters, an integrity test,
+  and notices copied into the packaged third-party resources. Consolidated
+  installed-app verification remains pending.
+- 2026-09-14: A second tester pass replaced forced fixed-zoom photo following
+  with scope-aware camera stability, made ten-photo and boundary navigation
+  universal across photo and map focus, added larger divider Page-key steps,
+  placed transient feedback in its owning panel, and added a Contiguous United
+  States scope before the complete country. These refinements preserve manual
+  zoom and remove the post-cluster fixed-zoom reversal.
 
 ## Publication toolchain
 

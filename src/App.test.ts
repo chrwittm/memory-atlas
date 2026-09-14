@@ -30,10 +30,12 @@ describe('application folder journey', () => {
         onProgress({ completed: 0, total: 1, folderName: 'First trip' })
         return {
           photos: [photo({ id: 'first', fileName: 'first.jpg' })],
+          tracks: [],
+          gpxFailures: [],
           folderName: 'First trip',
         }
       })
-      .mockResolvedValueOnce({ photos: [], folderName: 'Empty trip' })
+      .mockResolvedValueOnce({ photos: [], tracks: [], gpxFailures: [], folderName: 'Empty trip' })
 
     render(App)
     expect(screen.getByRole('heading', { name: 'Memory Atlas' })).toBeInTheDocument()
@@ -82,6 +84,8 @@ describe('application folder journey', () => {
       })
       .mockResolvedValueOnce({
         photos: [photo({ id: 'new', fileName: 'new.jpg' })],
+        tracks: [],
+        gpxFailures: [],
         folderName: 'New trip',
       })
 
@@ -95,7 +99,7 @@ describe('application folder journey', () => {
     await select([file('new.jpg', 'New trip/new.jpg')])
     expect(await screen.findByRole('main', { name: 'New trip photo viewer' })).toBeInTheDocument()
 
-    resolveFirst?.({ photos: [], folderName: 'Slow trip' })
+    resolveFirst?.({ photos: [], tracks: [], gpxFailures: [], folderName: 'Slow trip' })
     await waitFor(() => {
       expect(screen.getByRole('main', { name: 'New trip photo viewer' })).toBeInTheDocument()
     })
@@ -105,6 +109,8 @@ describe('application folder journey', () => {
     const revokeObjectUrl = vi.spyOn(URL, 'revokeObjectURL')
     scanFolderMock.mockResolvedValueOnce({
       photos: [photo({ id: 'first', fileName: 'first.jpg' })],
+      tracks: [],
+      gpxFailures: [],
       folderName: 'Trip',
     })
     render(App)
@@ -124,5 +130,23 @@ describe('application folder journey', () => {
     expect(revokeObjectUrl).toHaveBeenCalled()
     expect(document.activeElement).toBe(chooseButton)
     revokeObjectUrl.mockRestore()
+  })
+
+  it('resets the map mode when a different folder is chosen', async () => {
+    scanFolderMock
+      .mockResolvedValueOnce({ photos: [photo({ id: 'first' })], tracks: [], gpxFailures: [], folderName: 'First' })
+      .mockResolvedValueOnce({ photos: [photo({ id: 'second' })], tracks: [], gpxFailures: [], folderName: 'Second' })
+    render(App)
+    await select([file('first.jpg', 'First/first.jpg')])
+    await screen.findByRole('main', { name: 'First photo viewer' })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    await fireEvent.keyDown(window, { key: 'g' })
+    expect(screen.getByRole('button', { name: /GPS content: All photos/ })).toBeInTheDocument()
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Choose another folder' }))
+    await select([file('second.jpg', 'Second/second.jpg')])
+    await screen.findByRole('main', { name: 'Second photo viewer' })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    expect(screen.getByRole('button', { name: /GPS content: Current photo/ })).toBeInTheDocument()
   })
 })

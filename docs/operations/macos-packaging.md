@@ -238,8 +238,9 @@ Test the installed application without a Vite development server running:
   in both directions and verify that fading viewer controls and embedded map
   controls do not add focus stops;
 - verify the physical `Page Up`, `Page Down`, `Home`/`Pos1`, and `End` keys from
-  photo focus at fitted and enlarged scales, including ten-photo jumps, boundary
-  clamping, and key repeat; confirm divider `Home`/`End` still resize the split;
+  photo and map focus at fitted and enlarged scales and in every map mode,
+  including ten-photo jumps, boundary clamping, and key repeat; confirm divider
+  Page keys resize by ten percentage points and `Home`/`End` retain the limits;
 - focus the map and confirm its Arrow-key pan and `+`/`-` zoom behavior, then
   confirm that closing the map from map or divider focus safely returns focus to
   the photo;
@@ -251,6 +252,22 @@ Test the installed application without a Vite development server running:
 - navigate across readable and unreadable files without losing the collection;
 - open map mode for a located photo and confirm the no-GPS placeholder for an
   unlocated photo;
+- use photo- and map-focused `Z` and confirm each toast is centered in its own
+  panel; confirm the stacked **GPS** and **Zoom** controls name their respective
+  map states, GPS cycles content, and Zoom opens the grouped direct-selection
+  menu; confirm plain `Z` cycles only Current photo, Day, Complete track, and
+  All photos while `Command+Option+Z` selects All photos; manually zoom the map, navigate within one day or
+  geographic area, and confirm the camera remains stable; then cross into
+  another day and confirm the temporal scope refits; then move between two
+  states or countries and confirm Zoom remains at that level while naming and
+  fitting the destination area; finally leave an active geographic level with
+  no equivalent destination scope and confirm Zoom changes to Current photo,
+  the map recenters, and the manual zoom is preserved;
+- at U.S. coordinates, confirm Contiguous United States appears before the
+  complete United States scope and excludes Alaska and Hawaii from its extent;
+- select a tall, narrow Complete-track view with a photo at or near a track
+  endpoint; confirm the full route and in-scope marker remain clear of GPS/Zoom
+  controls, notices, navigation buttons, legend, and attribution;
 - disconnect the network and confirm that photo viewing still works while map
   tiles fail gracefully;
 - while offline, navigate far enough for an uncached map area to remain blank,
@@ -343,6 +360,8 @@ Keep 0.2.0 local artifact records unchanged; the next binary is 0.2.1. Use the
 Releases listing for prereleases because GitHub's `/releases/latest` excludes
 prereleases. Never tag or upload before the installed-app checklist passes.
 
-The Forge asset hook generates [dependency notices and MPL source materials](third-party-notices.md)
-from the exact installed lockfile. These ship in `Contents/Resources/third-party`,
-and the release gate verifies every generated file against the packaged bytes.
+The Forge asset hook generates [dependency notices, MPL source materials, and
+geographic-data notices](third-party-notices.md) from the exact installed
+lockfile and committed catalog records. These ship in
+`Contents/Resources/third-party`, and the release gate verifies every generated
+file against the packaged bytes.

@@ -24,6 +24,10 @@ The generator writes ignored `out/legal/third-party/` containing:
   source form of the MPL component alongside the executable distribution.
 - `inventory.json`: exact versions, repository-relative package locations,
   hashes of notice contents, and explicit non-runtime exclusions.
+- `geographic-data/NOTICE.md` and `catalog.provenance.json`: source attribution,
+  license and modification notices, source snapshot hashes, generation
+  parameters, and integrity evidence for the locally packaged camera-scope
+  catalog.
 
 The production dependency closure is included conservatively, so notices can
 also cover compiler/type packages whose code is not distributed. Three
@@ -53,12 +57,14 @@ to `out/legal/third-party` and can be an absolute destination for isolated tests
 The command-line form uses the repository root derived from the script location.
 
 Release verification must assert the notices, source-availability text, source
-license, and source files exist in the finished application's Resources directory.
+license, source files, and geographic-data records exist in the finished
+application's Resources directory.
 Compare packaged notice/source hashes with generated inputs, retain Electron's
 separate notices, and rebuild/sign the complete artifact after changing any legal
 resource. Add a release-note pointer to the bundled `third-party` directory so
 recipients can find the ExifReader source availability instructions.
 
 The focused test verifies repeatable output, complete primary notices,
-MurmurHash notices, absence of host paths, and byte-identical ExifReader
-source files. The generator adds no runtime dependencies or network requests.
+MurmurHash notices, absence of host paths, byte-identical ExifReader source
+files, and inclusion of the geographic notices and recorded catalog digest.
+The generator adds no runtime dependencies or network requests.

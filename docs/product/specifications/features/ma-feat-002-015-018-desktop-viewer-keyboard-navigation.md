@@ -2,7 +2,7 @@
 
 **Status:** Implemented and user-tested; next packaged build deferred
 
-**Last updated:** 2026-09-12
+**Last updated:** 2026-09-14
 
 **Backlog items:** `MA-FEAT-002`, `MA-FEAT-015`, `MA-FEAT-018`
 
@@ -21,8 +21,9 @@ and keyboard focus does not draw a yellow or gold frame around the content.
 
 This specification combines three small, interdependent desktop-viewer changes:
 
-- `MA-FEAT-018` adds ten-photo and collection-boundary navigation to the photo
-  region with `Page Up`, `Page Down`, `Home`, and `End`.
+- `MA-FEAT-018` adds ten-photo and collection-boundary navigation wherever the
+  photo collection owns those keys, including both photo and map focus, with
+  `Page Up`, `Page Down`, `Home`, and `End`.
 - `MA-FEAT-015` replaces the viewer's control-by-control tab order with a
   circular focus loop over its visible spatial interaction regions.
 - `MA-FEAT-002` makes the existing return-to-entry action available through
@@ -111,13 +112,17 @@ Keyboard input is dispatched according to the active region:
 | Left/Right Arrow | Navigate when fitted; pan when enlarged | Resize by the established two-percentage-point step | Pan the map |
 | Up/Down Arrow | Pan when enlarged; otherwise no effect | No effect | Pan the map |
 | `+` / `-` | Zoom the photo | No effect | Zoom the map |
-| `Z` | Cycle the photo's named views | No effect | No effect |
-| `Home` / `End` | First/last photo | Set the existing 20/80 or 80/20 split | No collection action |
-| `Page Up` / `Page Down` | Jump through the collection | No collection action | No collection action |
+| `Z` | Cycle the photo's named views | No effect | Cycle the available Current photo, Day, Complete track, and All photos scopes under MA-FEAT-024 |
+| `Home` / `End` | First/last photo | Set the existing 20/80 or 80/20 split | First/last photo |
+| `Page Up` / `Page Down` | Jump through the collection | Increase/decrease the photo width by ten percentage points | Jump through the collection |
 
 `Tab` and `Shift`+`Tab` always control the spatial focus loop rather than a
-region's internal behavior. Existing global shortcuts—`H`, `I`, `M`, `F`, and
-the established `Escape` priority—remain independent of the active region.
+region's internal behavior. Existing global shortcuts—`H`, `I`, `M`, `G`, `F`,
+and the established `Escape` priority—remain independent of the active region.
+MA-FEAT-024 defines map-focused `Shift+Z`, `Control+Z`, `Option+Z`, and
+`Command+Option+Z` direct camera access while leaving plain `Command+Z`
+untouched. Its grouped Zoom menu provides pointer access to the wider set of
+available named scopes.
 
 Only unmodified shortcut presses invoke collection or viewer actions. `Tab`
 uses `Shift` only to reverse direction; `Control`, `Option`/`Alt`, `Command`/
@@ -127,8 +132,8 @@ repeatable region controls.
 
 ### Quick collection navigation
 
-With the photo region focused, the new navigation keys operate on positions in
-the case-insensitive natural file-name sequence:
+With the photo or map region focused, the navigation keys operate on positions
+in the case-insensitive natural file-name sequence:
 
 | Key | Action |
 | --- | --- |
@@ -151,6 +156,13 @@ photo restores its own transient fitted, native, or custom view under
 Repeated quick navigation must not queue stale transitions or move beyond the
 collection boundary. It adds no new pointer button, numeric jump dialog, or
 intermediate loading screen.
+
+The divider consumes the same physical keys only because it has a meaningful
+local operation: `Page Up` adds ten percentage points to the photo width and
+`Page Down` removes ten, clamped to the same 20/80 limits. This is the larger
+counterpart to its two-point Left/Right Arrow steps. `Home` and `End` keep their
+accepted minimum and maximum split behavior. Divider keys never navigate the
+photo collection.
 
 ### Return to the entry screen
 
@@ -202,11 +214,13 @@ styling on the entry, loading, empty, and error screens is unchanged.
 6. Each region receives only its documented Arrow, zoom, `Home`, `End`, and
    collection-navigation behavior; global viewer shortcuts remain available
    from every region.
-7. `Page Up` and `Page Down` move exactly ten positions when possible and clamp
-   at the collection boundaries; key repeat never crosses a boundary.
-8. With photo focus, `Home` selects the first photo and `End` the last at any
-   zoom scale. With divider focus, the same keys retain their established split
-   resizing behavior and never change photos.
+7. With photo or map focus, `Page Up` and `Page Down` move exactly ten positions
+   when possible and clamp at the collection boundaries; key repeat never
+   crosses a boundary.
+8. With photo or map focus, `Home` selects the first photo and `End` the last at
+   any photo zoom or map mode. With divider focus, `Home` and `End` retain their
+   established split limits, while Page keys resize by ten percentage points;
+   divider keys never change photos.
 9. Quick jumps preserve natural file-name order and synchronize the photo,
    counter, information, map or no-GPS state, and destination photo's remembered
    view without changing unrelated viewer preferences.

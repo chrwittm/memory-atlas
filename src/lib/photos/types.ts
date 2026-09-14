@@ -7,6 +7,7 @@ export type PhotoLocation = {
 
 export type PhotoMetadata = {
   capturedAt?: string
+  capturedLocalDate?: string
   title?: string
   caption?: string
   tags: string[]
@@ -26,16 +27,44 @@ export type Photo = PhotoMetadata & {
   error?: string
 }
 
-export type ScanItem = {
+export type PhotoScanItem = {
+  kind: 'photo'
   file: File
   originalIndex: number
 }
+
+export type GpxScanItem = {
+  kind: 'gpx'
+  file: File
+  originalIndex: number
+}
+
+export type ScanItem = PhotoScanItem | GpxScanItem
 
 export type ScanOutcome = {
   originalIndex: number
   fileName: string
   metadata: PhotoMetadata
   status: Extract<PhotoStatus, 'ready' | 'metadata-error' | 'read-error'>
+  error?: string
+}
+
+export type TrackPoint = [longitude: number, latitude: number]
+
+export type GpxTrack = {
+  id: string
+  fileName: string
+  name?: string
+  originalIndex: number
+  documentIndex: number
+  segments: TrackPoint[][]
+}
+
+export type GpxOutcome = {
+  originalIndex: number
+  fileName: string
+  tracks: GpxTrack[]
+  status: 'ready' | 'error'
   error?: string
 }
 
@@ -47,6 +76,7 @@ export type WorkerRequest = {
 export type WorkerResponse =
   | { type: 'started'; total: number; folderName: string }
   | { type: 'progress'; completed: number; total: number; fileName: string }
-  | { type: 'result'; outcome: ScanOutcome }
+  | { type: 'photo-result'; outcome: ScanOutcome }
+  | { type: 'gpx-result'; outcome: GpxOutcome }
   | { type: 'complete'; total: number }
   | { type: 'failed'; message: string }

@@ -30,7 +30,7 @@
       bind:this={input}
       class="visually-hidden"
       type="file"
-      accept=".jpg,.jpeg"
+      accept=".jpg,.jpeg,.gpx"
       webkitdirectory
       multiple
       onchange={handleChange}

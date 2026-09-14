@@ -5,12 +5,14 @@
   import EmptyState from './components/EmptyState.svelte'
   import Viewer from './components/Viewer.svelte'
   import { scanFolder, type ScanProgress } from './lib/photos/scanner'
-  import type { Photo } from './lib/photos/types'
+  import type { GpxTrack, Photo } from './lib/photos/types'
 
   type Screen = 'entry' | 'loading' | 'empty' | 'error' | 'viewer'
   let screen = $state<Screen>('entry')
   let progress = $state<ScanProgress>({ completed: 0, total: 0 })
   let photos = $state<Photo[]>([])
+  let tracks = $state<GpxTrack[]>([])
+  let gpxFailures = $state<Array<{ fileName: string; error: string }>>([])
   let folderName = $state('')
   let errorMessage = $state('')
   let scanController: AbortController | undefined
@@ -30,6 +32,8 @@
       })
       if (controller.signal.aborted || scanController !== controller) return
       photos = result.photos
+      tracks = result.tracks
+      gpxFailures = result.gpxFailures
       folderName = result.folderName
       screen = photos.length ? 'viewer' : 'empty'
     } catch (error) {
@@ -45,6 +49,8 @@
     scanController?.abort()
     scanController = undefined
     photos = []
+    tracks = []
+    gpxFailures = []
     folderName = ''
     screen = 'entry'
   }
@@ -61,5 +67,5 @@
 {:else if screen === 'error'}
   <EmptyState kind="error" message={errorMessage} onBack={reset} />
 {:else}
-  <Viewer {photos} {folderName} onChooseAnother={reset} />
+  <Viewer {photos} {tracks} {gpxFailures} {folderName} onChooseAnother={reset} />
 {/if}

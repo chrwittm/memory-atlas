@@ -34,4 +34,25 @@ describe('worker scan terminal behavior', () => {
     ])
     consoleError.mockRestore()
   })
+
+  it('scans photos and GPX files together while preserving per-file GPX failure isolation', async () => {
+    const messages: WorkerResponse[] = []
+    await runWorkerScan(
+      [file('photo.jpg', 'Trip/photo.jpg'), file('route.gpx', 'Trip/route.gpx')],
+      (message) => messages.push(message),
+      async (item) => ({
+        originalIndex: item.originalIndex, fileName: item.file.name,
+        metadata: { tags: [], people: [] }, status: 'ready',
+      }),
+      async (item) => ({
+        originalIndex: item.originalIndex, fileName: item.file.name,
+        tracks: [], status: 'error', error: 'Malformed XML',
+      }),
+    )
+
+    expect(messages[0]).toEqual({ type: 'started', total: 2, folderName: 'Trip' })
+    expect(messages.some((message) => message.type === 'photo-result')).toBe(true)
+    expect(messages.some((message) => message.type === 'gpx-result' && message.outcome.status === 'error')).toBe(true)
+    expect(messages.at(-1)).toEqual({ type: 'complete', total: 2 })
+  })
 })

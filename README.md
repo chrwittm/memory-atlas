@@ -7,6 +7,8 @@ where available, location.
 Status: **MVP / proof of concept.** The core app is implemented and can be
 packaged as a self-contained macOS DMG for local testing. The source is public;
 [0.2.2 is available as an unnotarized tester prerelease](https://github.com/chrwittm/memory-atlas/releases/tag/v0.2.2).
+The current source is ahead of that tester build and includes the multi-photo
+and GPX map modes and named map-camera scopes described below.
 
 ![Memory Atlas entry screen with a NASA Earth photograph and a Choose photo folder button](docs/assets/entry-screen.png)
 
@@ -38,14 +40,19 @@ Releases, not committed into the repository.
 
 ## What the MVP does
 
-- Opens a user-selected local folder of top-level `.jpg` and `.jpeg` files.
+- Opens a user-selected local folder of top-level `.jpg`, `.jpeg`, and `.gpx`
+  files; GPX files enrich the map while JPEGs remain the displayed collection.
 - Shows photos in natural file-name order, so names like `001`, `002`, `003`
   control the sequence.
 - Zooms and pans readable photos for detail inspection, with fitted, native
   100%, and per-photo remembered custom views.
 - Reads embedded EXIF, TIFF, IPTC, and XMP metadata in a Web Worker.
 - Shows embedded captions and capture time when available.
-- Opens an optional split photo-and-map view for the current geotagged photo.
+- Opens an optional split map with current-photo, all-located-photo, and
+  photos-plus-GPX-track modes, including clustered marker selection.
+- Uses a short map-focused `Z` cycle for Current photo, Day, Complete track,
+  and All photos, plus a grouped Zoom menu for direct access to every available
+  temporal, German or U.S. geographic, collection, and track scope.
 - Keeps original photo files read-only and local.
 
 Map mode loads map tiles from OpenFreeMap. Photo files and extracted metadata

@@ -8,7 +8,7 @@
   <div class="loader-mark" aria-hidden="true"><span></span></div>
   <p class="eyebrow">Opening {progress.folderName || 'your collection'}</p>
   <h1>Reading the moments</h1>
-  <p>{progress.total ? `${progress.completed} of ${progress.total} photos` : 'Finding JPEG photos…'}</p>
+  <p>{progress.total ? `${progress.completed} of ${progress.total} files` : 'Finding photos and GPX tracks…'}</p>
   <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax={progress.total || 1} aria-valuenow={progress.completed}>
     <span style={`width: ${percentage}%`}></span>
   </div>

@@ -1,6 +1,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { photo } from '../test/factories'
+
+vi.mock('./MapView.svelte', async () => ({
+  default: (await import('../test/MapStub.svelte')).default,
+}))
+
 import Viewer from './Viewer.svelte'
 
 afterEach(() => {
@@ -206,7 +211,10 @@ describe('viewer keyboard behavior', () => {
     await loadPhotoAtSize(surface, image, { width: 800, height: 800 }, { width: 1600, height: 1200 })
 
     await fireEvent.keyDown(window, { key: 'z' })
-    expect(screen.getByRole('status')).toHaveTextContent('Zoom mode · 100%')
+    const photoToast = screen.getByRole('status')
+    expect(photoToast).toHaveTextContent('Zoom mode · 100%')
+    expect(photoToast).toHaveClass('frame-toast')
+    expect(photoToast.closest('.photo-panel')).toBeInTheDocument()
 
     await fireEvent.keyDown(window, { key: '+' })
     await fireEvent.keyDown(window, { key: 'z' })
@@ -221,7 +229,7 @@ describe('viewer keyboard behavior', () => {
 
   it('resizes the photo and map split with the divider', async () => {
     render(Viewer, {
-      photos: [photo({ id: 'located', location: { latitude: 47.45, longitude: 10.99 } })],
+      photos: [photo({ id: 'unlocated' })],
       folderName: 'Trip',
       onChooseAnother: () => undefined,
     })
@@ -267,12 +275,12 @@ describe('viewer keyboard behavior', () => {
 
     expect(screen.getByRole('button', { name: 'Close map' })).toBeInTheDocument()
     expect(screen.getByRole('separator', { name: 'Resize photo and map' })).toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent('This photo doesn’t have GPS coordinates.')
+    expect(screen.getByText('This photo doesn’t have GPS coordinates.')).toBeInTheDocument()
 
     await fireEvent.keyDown(window, { key: 'm' })
     expect(screen.queryByText('This photo doesn’t have GPS coordinates.')).not.toBeInTheDocument()
     await fireEvent.keyDown(window, { key: 'M' })
-    expect(screen.getByRole('status')).toHaveTextContent('This photo doesn’t have GPS coordinates.')
+    expect(screen.getByText('This photo doesn’t have GPS coordinates.')).toBeInTheDocument()
 
     await fireEvent.keyDown(window, { key: 'ArrowRight' })
 
@@ -452,7 +460,7 @@ describe('viewer keyboard behavior', () => {
     expect(screen.getByAltText('photo-1.jpg')).toHaveStyle({ width: rememberedWidth })
   })
 
-  it('scopes collection keys to photo focus and keeps divider Home and End behavior', async () => {
+  it('uses universal collection keys on the map and larger Page-key steps on the divider', async () => {
     const photos = Array.from({ length: 12 }, (_, index) => photo({ id: `photo-${index}` }))
     render(Viewer, { photos, folderName: 'Trip', onChooseAnother: () => undefined })
     await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
@@ -463,14 +471,20 @@ describe('viewer keyboard behavior', () => {
     await fireEvent.keyDown(divider, { key: 'Home' })
     expect(viewer).toHaveStyle('--photo-panel-width: 20%')
     expect(screen.getByLabelText('Photo 1 of 12')).toBeInTheDocument()
+    await fireEvent.keyDown(divider, { key: 'PageUp' })
+    expect(viewer).toHaveStyle('--photo-panel-width: 30%')
     await fireEvent.keyDown(divider, { key: 'PageDown' })
+    expect(viewer).toHaveStyle('--photo-panel-width: 20%')
     expect(screen.getByLabelText('Photo 1 of 12')).toBeInTheDocument()
     await fireEvent.keyDown(divider, { key: 'End' })
     expect(viewer).toHaveStyle('--photo-panel-width: 80%')
 
     screen.getByRole('region', { name: 'Map' }).focus()
     await fireEvent.keyDown(window, { key: 'PageDown' })
+    expect(screen.getByLabelText('Photo 11 of 12')).toBeInTheDocument()
     await fireEvent.keyDown(window, { key: 'End' })
+    expect(screen.getByLabelText('Photo 12 of 12')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'Home' })
     expect(screen.getByLabelText('Photo 1 of 12')).toBeInTheDocument()
   })
 
@@ -639,5 +653,173 @@ describe('viewer keyboard behavior', () => {
 
     await vi.advanceTimersByTimeAsync(2200)
     expect(viewer).not.toHaveClass('controls-hidden')
+  })
+
+  it('shows grouped direct zoom selection while preserving the three GPS modes', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'located', location: { latitude: 47.45, longitude: 10.99 } })],
+      folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    expect(screen.getByRole('button', { name: /GPS content: Current photo/ })).toBeInTheDocument()
+    const zoomControl = await screen.findByRole('button', { name: /Zoom view: Current photo/ })
+    await fireEvent.click(zoomControl)
+    expect(screen.getByRole('menu', { name: 'Choose zoom view' })).toBeInTheDocument()
+    for (const group of ['Focus', 'Time', 'Place', 'Collection']) {
+      expect(screen.getByRole('group', { name: group })).toBeInTheDocument()
+    }
+    expect(screen.getByRole('menuitemradio', { name: 'Current photo' })).toHaveAttribute('aria-checked', 'true')
+    await fireEvent.click(screen.getByRole('menuitemradio', { name: 'California' }))
+    expect(screen.queryByRole('menu', { name: 'Choose zoom view' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Zoom view: California/ })).toBeInTheDocument()
+    expect(await screen.findByText('Map view: California')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: /Zoom view: California/ }))
+    await fireEvent.pointerDown(screen.getByRole('region', { name: 'Current photo' }))
+    expect(screen.queryByRole('menu', { name: 'Choose zoom view' })).not.toBeInTheDocument()
+
+    await fireEvent.keyDown(window, { key: 'g' })
+    expect(await screen.findByRole('button', { name: /GPS content: All photos/ })).toBeInTheDocument()
+    expect(screen.getByText('GPS content: All photos')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'G', shiftKey: true })
+    expect(screen.getByRole('button', { name: /GPS content: Photos \+ GPX track/ })).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'g', repeat: true })
+    expect(screen.getByRole('button', { name: /GPS content: Photos \+ GPX track/ })).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: /GPS content: Photos \+ GPX track/ }))
+    expect(screen.getByRole('button', { name: /GPS content: Current photo/ })).toBeInTheDocument()
+
+    await fireEvent.keyDown(window, { key: 'g' })
+    await fireEvent.keyDown(window, { key: 'm' })
+    await fireEvent.keyDown(window, { key: 'g' })
+    await fireEvent.keyDown(window, { key: 'm' })
+    expect(screen.getByRole('button', { name: /GPS content: All photos/ })).toBeInTheDocument()
+  })
+
+  it('ignores G while closed, modified, composing, or repeating', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'unlocated' })],
+      folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    await fireEvent.keyDown(window, { key: 'g' })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    for (const event of [
+      { key: 'g', ctrlKey: true }, { key: 'g', altKey: true }, { key: 'g', metaKey: true },
+      { key: 'g', isComposing: true }, { key: 'g', repeat: true },
+    ]) await fireEvent.keyDown(window, event)
+    expect(screen.getByRole('button', { name: /GPS content: Current photo/ })).toBeInTheDocument()
+  })
+
+  it('routes labeled-Z camera shortcuts only from map focus and leaves Command+Z untouched', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'located', location: { latitude: 47.45, longitude: 10.99 } })],
+      tracks: [{ id: 'route', fileName: 'route.gpx', originalIndex: 0, documentIndex: 0,
+        segments: [[[10.9, 47.4], [11, 47.5]]] }],
+      folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    await screen.findByTestId('map-stub')
+    const mapRegion = screen.getByRole('region', { name: 'Map' })
+    mapRegion.focus()
+
+    const optionZ = new KeyboardEvent('keydown', {
+      key: 'Ω', code: 'KeyY', altKey: true, bubbles: true, cancelable: true,
+    })
+    window.dispatchEvent(optionZ)
+    expect(optionZ.defaultPrevented).toBe(true)
+    const mapToast = await screen.findByText('Map view: Complete track')
+    expect(mapToast).toHaveClass('frame-toast')
+    expect(mapToast.closest('.map-region')).toBe(mapRegion)
+
+    const commandZ = new KeyboardEvent('keydown', {
+      key: 'z', metaKey: true, bubbles: true, cancelable: true,
+    })
+    window.dispatchEvent(commandZ)
+    expect(commandZ.defaultPrevented).toBe(false)
+
+    const commandOptionZ = new KeyboardEvent('keydown', {
+      key: 'Ω', code: 'KeyY', altKey: true, metaKey: true, bubbles: true, cancelable: true,
+    })
+    window.dispatchEvent(commandOptionZ)
+    expect(commandOptionZ.defaultPrevented).toBe(true)
+    expect(await screen.findByText('Map view: All photos')).toBeInTheDocument()
+
+    const repeated = new KeyboardEvent('keydown', {
+      key: 'z', repeat: true, bubbles: true, cancelable: true,
+    })
+    window.dispatchEvent(repeated)
+    expect(repeated.defaultPrevented).toBe(false)
+  })
+
+  it('explains unavailable camera shortcuts before a no-data map renderer starts', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'unlocated', capturedLocalDate: '2026-06-20' })],
+      folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    const mapRegion = screen.getByRole('region', { name: 'Map' })
+    mapRegion.focus()
+
+    const current = new KeyboardEvent('keydown', {
+      key: 'Z', shiftKey: true, bubbles: true, cancelable: true,
+    })
+    window.dispatchEvent(current)
+    expect(current.defaultPrevented).toBe(true)
+    expect(await screen.findByText('Current photo has no GPS')).toBeInTheDocument()
+
+    await fireEvent.keyDown(window, { key: 'g' })
+    const day = new KeyboardEvent('keydown', {
+      key: 'z', ctrlKey: true, bubbles: true, cancelable: true,
+    })
+    window.dispatchEvent(day)
+    expect(day.defaultPrevented).toBe(true)
+    expect(await screen.findByText('No located photos were found for this day')).toBeInTheDocument()
+
+    const allPhotos = new KeyboardEvent('keydown', {
+      key: 'Ω', code: 'KeyY', altKey: true, metaKey: true, bubbles: true, cancelable: true,
+    })
+    window.dispatchEvent(allPhotos)
+    expect(allPhotos.defaultPrevented).toBe(true)
+    expect(await screen.findByText('No photos in this folder have GPS coordinates')).toBeInTheDocument()
+  })
+
+  it('uses universal ten-photo Page jumps and first/last keys with map focus', async () => {
+    const photos = Array.from({ length: 25 }, (_, index) => photo({
+      id: `photo-${index + 1}`,
+      location: index % 3 === 0 ? { latitude: 47 + index / 100, longitude: 10 + index / 100 } : undefined,
+    }))
+    render(Viewer, {
+      photos,
+      folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    const mapRegion = screen.getByRole('region', { name: 'Map' })
+    mapRegion.focus()
+
+    await fireEvent.keyDown(window, { key: 'PageDown' })
+    expect(screen.getByLabelText('Photo 11 of 25')).toBeInTheDocument()
+    expect(document.activeElement).toBe(mapRegion)
+    await fireEvent.keyDown(window, { key: 'PageDown' })
+    expect(screen.getByLabelText('Photo 21 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'PageUp' })
+    expect(screen.getByLabelText('Photo 11 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'End' })
+    expect(screen.getByLabelText('Photo 25 of 25')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'Home' })
+    expect(screen.getByLabelText('Photo 1 of 25')).toBeInTheDocument()
+  })
+
+  it('shows intentional overview and GPX degraded states without skipping modes', async () => {
+    render(Viewer, {
+      photos: [photo({ id: 'missing' })],
+      tracks: [],
+      gpxFailures: [{ fileName: 'broken.gpx', error: 'Malformed XML' }],
+      folderName: 'Trip', onChooseAnother: () => undefined,
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    expect(screen.getByText('This photo doesn’t have GPS coordinates.')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'g' })
+    expect(screen.getByText('No photos in this folder have GPS coordinates.')).toBeInTheDocument()
+    await fireEvent.keyDown(window, { key: 'g' })
+    expect(screen.getByText('No photos with GPS or drawable GPX track lines were found in this folder.')).toBeInTheDocument()
+    expect(screen.getByText('1 GPX file was unavailable.')).toBeInTheDocument()
   })
 })

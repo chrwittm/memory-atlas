@@ -26,5 +26,10 @@ test('legal materials are deterministic and include full notices and unchanged M
     const pkg = JSON.parse(readFileSync(path.join(root, 'node_modules/exifreader/package.json')))
     assert.deepEqual(hashes(path.join(root, 'node_modules/exifreader/src')), hashes(path.join(temp, `one/source/exifreader-${pkg.version}/src`)))
     assert.match(readFileSync(path.join(temp, 'one/SOURCE_AVAILABILITY.txt'), 'utf8'), /Mozilla Public License 2.0/)
+    const geographicNotice = readFileSync(path.join(temp, 'one/geographic-data/NOTICE.md'), 'utf8')
+    assert.match(geographicNotice, /Made with Natural Earth/)
+    assert.match(geographicNotice, /© Bundesamt für Naturschutz \(BfN\) 2026/)
+    const provenance = JSON.parse(readFileSync(path.join(temp, 'one/geographic-data/catalog.provenance.json'), 'utf8'))
+    assert.equal(provenance.output.sha256, 'ed573540d50260ef7b08fb09554edb535c5d50fdc00845e05692084f0bcb607b')
   } finally { rmSync(temp, { recursive: true, force: true }) }
 })

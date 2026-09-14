@@ -52,13 +52,20 @@ export function generate(projectRoot = root, outputDir = 'out/legal/third-party'
     if (!existsSync(input)) throw new Error(`Missing ExifReader source material: ${name}`)
     cpSync(input, path.join(output, sourcePath, name), { recursive: true })
   }
+  const geographicDataPath = 'geographic-data'
+  mkdirSync(path.join(output, geographicDataPath), { recursive: true })
+  for (const name of ['NOTICE.md', 'catalog.provenance.json']) {
+    const input = path.join(projectRoot, 'src/lib/geo', name)
+    if (!existsSync(input)) throw new Error(`Missing geographic data notice material: ${name}`)
+    cpSync(input, path.join(output, geographicDataPath, name))
+  }
   writeFileSync(path.join(output, 'THIRD_PARTY_NOTICES.txt'), sections.join(''))
   writeFileSync(path.join(output, 'SOURCE_AVAILABILITY.txt'), access)
   writeFileSync(path.join(output, 'inventory.json'), JSON.stringify({ packages: inventory, excludedNonRuntime: excluded }, null, 2) + '\n')
-  return { output, packageCount: inventory.length, sourcePath }
+  return { output, packageCount: inventory.length, sourcePath, geographicDataPath }
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const result = generate()
-  console.log(`Generated out/legal/third-party: ${result.packageCount} component notices and ${result.sourcePath}`)
+  console.log(`Generated out/legal/third-party: ${result.packageCount} component notices, ${result.sourcePath}, and ${result.geographicDataPath}`)
 }

@@ -1,7 +1,7 @@
 import { DOMParser, onErrorStopParsing } from '@xmldom/xmldom'
 import ExifReader, { type ExpandedTags } from 'exifreader'
 import { emptyMetadata, normalizeMetadata } from './normalize'
-import type { ScanItem, ScanOutcome } from './types'
+import type { PhotoScanItem, ScanOutcome } from './types'
 
 type MetadataLoader = (file: File) => Promise<ExpandedTags>
 
@@ -17,7 +17,7 @@ const defaultLoader: MetadataLoader = (file) =>
   })
 
 export async function createScanOutcome(
-  item: ScanItem,
+  item: Pick<PhotoScanItem, 'file' | 'originalIndex'>,
   load: MetadataLoader = defaultLoader,
 ): Promise<ScanOutcome> {
   try {

@@ -12,6 +12,39 @@ The MVP implementation and local macOS DMG packaging path exist. Preserve the
 narrow accepted MVP while keeping the architecture hospitable to later
 thumbnail, multi-photo map, timeline, people, and topic views.
 
+## Guiding product experience
+
+Simplicity, ease of use, and delight are product-wide requirements, not a final
+polish pass. Apply them when exploring ideas, writing specifications, choosing
+architecture, implementing behavior, and reviewing completed work.
+
+- Show only what helps the user with the task at hand. Remove decorative or
+  redundant markers, borders, labels, controls, and persistent status elements
+  when they compete with the memory itself.
+- Prefer direct, calm interactions and strong keyboard support. Common actions
+  should feel obvious and require as little attention and ceremony as possible.
+- Keep powerful features available through context, progressive disclosure,
+  and well-chosen defaults instead of exposing their full complexity at once.
+- Every visible element and interaction must earn its place. Necessary state,
+  feedback, and accessibility cues remain clear, but should not become visual
+  decoration or distraction.
+- When a proposed behavior makes the interface more confusing, visually noisy,
+  or harder to operate, do not implement it as proposed. Find the simpler,
+  more elegant expression of the underlying user need, and reflect that choice
+  in the feature specification and acceptance criteria.
+- Evaluate simplicity from the user's perspective rather than by implementation
+  size. The hard product work is often making a rich capability feel natural,
+  focused, and effortless.
+
+## Project language
+
+- Use American English by default for Memory Atlas conversations, source code,
+  comments, documentation, specifications, plans, UI copy, and repository
+  artifacts.
+- Preserve source material that is intentionally written in another language,
+  and use another language when the user explicitly requests it. The presence
+  of German personal or memory files does not change the repository default.
+
 ## Read this first
 
 Use these documents in this order:
@@ -62,7 +95,8 @@ specifications and later architecture decisions take precedence. Update
   direct reporters there rather than expose a personal email address, and must
   not promise response times, a bounty, or a support contract.
 - Runtime folder selection through `<input type="file" webkitdirectory multiple>`;
-  retain only top-level `.jpg` and `.jpeg` files.
+  retain only top-level `.jpg`, `.jpeg`, and `.gpx` files, with GPX files kept
+  outside the photo sequence.
 - Case-insensitive natural file-name order controls the presentation sequence;
   capture time is context, not a sorting key.
 - ExifReader for required EXIF/TIFF, IPTC, and XMP metadata.
@@ -74,6 +108,19 @@ specifications and later architecture decisions take precedence. Update
   value being absent, and is toggled with `I`.
 - Map mode starts at an 80/20 photo-to-map split and stays open across photos
   without GPS, showing a placeholder until location data is available again.
+- The split map has three cumulative `G` content modes. Map-focused `Z` cycles
+  through the primary Current photo, Day, Complete track, and All photos camera
+  scopes, skipping unavailable stops. A grouped Zoom menu retains direct access
+  to every available temporal, packaged German/U.S. geographic, collection,
+  and track scope; the U.S. ladder adds a Contiguous United States frame before
+  the full country. `G` itself preserves the shared camera. Stacked GPS and Zoom
+  controls expose both states. Photo changes
+  preserve manual zoom and an applicable active scope: temporal contexts refit,
+  geographic scopes move to a destination scope at the same level when
+  available, and otherwise fall back to Current photo.
+- Named map fits use base viewport padding expanded by measured persistent map
+  overlays and a feature-aware gutter, so track geometry and in-scope markers
+  do not sit beneath map UI or attribution.
 - Lazy object URLs and image decoding: current photo plus a small neighbor window;
   revoke URLs when no longer needed.
 - No server backend, database, uploads, accounts, persistence, generated index,

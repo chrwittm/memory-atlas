@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "generatedOn": "2026-09-14",
+  "output": {
+    "path": "src/lib/geo/catalog.json",
+    "sha256": "ed573540d50260ef7b08fb09554edb535c5d50fdc00845e05692084f0bcb607b",
+    "bytes": 3221695,
+    "areaCount": 148,
+    "counts": {
+      "country": 2,
+      "state": 67,
+      "park": 79
+    }
+  },
+  "generator": {
+    "path": "scripts/generate-geographic-catalog.mjs",
+    "nodeVersion": "24.20.0",
+    "algorithm": "Douglas-Peucker per ring",
+    "administrativeToleranceDegrees": 0.002,
+    "parkToleranceDegrees": 0.00035,
+    "coordinateReferenceSystem": "EPSG:4326"
+  },
+  "sources": [
+    {
+      "id": "natural-earth-countries",
+      "title": "Natural Earth 1:10m Admin 0 Countries",
+      "version": "5.1.2",
+      "retrievedOn": "2026-09-14",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson",
+      "sha256": "239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255",
+      "selection": "ADM0_A3 is DEU or USA",
+      "license": "Public domain",
+      "attribution": "Made with Natural Earth"
+    },
+    {
+      "id": "natural-earth-admin1",
+      "title": "Natural Earth 1:10m Admin 1 States and Provinces",
+      "version": "5.1.2",
+      "retrievedOn": "2026-09-14",
+      "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson",
+      "sha256": "22d0e3ad85eb3e27f17cabf8ba2d50e554fbc27a87796ff891d958185da62fb5",
+      "selection": "adm0_a3 is DEU or USA",
+      "license": "Public domain",
+      "attribution": "Made with Natural Earth"
+    },
+    {
+      "id": "nps-national-parks",
+      "title": "NPS Land Resources Division Boundary and Tract Data Service, National Parks",
+      "version": "live FeatureServer snapshot retrieved 2026-09-14",
+      "retrievedOn": "2026-09-14",
+      "url": "https://services1.arcgis.com/fBc8EJBxQRMcHlei/arcgis/rest/services/NPS_Land_Resources_Division_Boundary_and_Tract_Data_Service/FeatureServer/2/query?where=UNIT_TYPE%3D%27National%20Parks%27%20OR%20UNIT_CODE%3D%27NERI%27&outFields=OBJECTID%2CUNIT_CODE%2CUNIT_NAME%2CPARKNAME%2CSTATE%2CDATE_EDIT%2CStatus&outSR=4326&geometryPrecision=6&f=geojson",
+      "sha256": "9fb8f02afca801936c46fbb2478c070e75421e8b1988689525b8b9b5b82188c3",
+      "selection": "UNIT_TYPE = 'National Parks' OR UNIT_CODE = 'NERI'; GeoJSON in EPSG:4326; 63 features",
+      "license": "United States government public data",
+      "attribution": "National Park Service Land Resources Division"
+    },
+    {
+      "id": "bfn-national-parks",
+      "title": "BfN Schutzgebiete WFS, Nationalparke",
+      "version": "data status 2025; WFS snapshot retrieved 2026-09-14",
+      "retrievedOn": "2026-09-14",
+      "url": "https://geodienste.bfn.de/ogc/wfs/schutzgebiet?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=bfn_sch_Schutzgebiet%3ANationalparke&OUTPUTFORMAT=GEOJSON&SRSNAME=EPSG%3A4326",
+      "sha256": "995b76a8576b18fa252fc67ea72ba6ebced5eb9972b416c3846f56f57efc1abe",
+      "selection": "All 16 Nationalparke features; EPSG:4326 latitude/longitude source axes transformed to GeoJSON longitude/latitude order",
+      "license": "GeoNutzV",
+      "attribution": "© Bundesamt für Naturschutz (BfN) 2026"
+    }
+  ]
+}

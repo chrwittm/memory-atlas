@@ -214,6 +214,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .photo-error p { margin: .15rem 0; color: var(--muted); font-size: .8rem; }
 
 .map-region { position: relative; min-width: 0; height: 100%; }
+.map-renderer { position: absolute; inset: 0; }
+.map-renderer.hidden { visibility: hidden; }
 .map-panel { position: relative; width: 100%; min-width: 0; height: 100%; overflow: hidden; border-left: 1px solid rgba(255,255,255,.12); background: #e6e4dc; }
 .split-divider {
   position: absolute;
@@ -231,12 +233,135 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .split-divider::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: rgba(255,255,255,.3); transform: translateX(-50%); }
 .split-divider span { position: absolute; top: 50%; left: 50%; width: .3rem; height: 3.2rem; border: 1px solid rgba(255,255,255,.28); border-radius: 1rem; background: rgba(18,21,20,.65); box-shadow: 0 .2rem .8rem rgba(0,0,0,.25); transform: translate(-50%, -50%); transition: width 140ms ease, background 140ms ease; }
 .split-divider:hover span, .split-divider:focus-visible span, .viewer.resizing .split-divider span { width: .45rem; background: rgba(116,125,120,.95); }
-.map-canvas { position: absolute; inset: 0; z-index: 1; }
+/*
+ * MapLibre adds `.maplibregl-map { position: relative }` from its dynamically
+ * loaded stylesheet. Keep this selector more specific so the renderer cannot
+ * collapse back to its empty-content height when that stylesheet loads later.
+ */
+.map-panel > .map-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; }
+.map-mode-bar {
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+  z-index: 5;
+  display: grid;
+  justify-items: start;
+  gap: .32rem;
+}
+.map-mode-control {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 2rem;
+  padding: .38rem .58rem;
+  border: 1px solid rgba(36, 46, 42, .24);
+  border-radius: .25rem;
+  color: #24302b;
+  background: rgba(247, 246, 241, .92);
+  box-shadow: 0 .15rem .7rem rgba(25, 31, 29, .14);
+  cursor: pointer;
+  font-size: .68rem;
+  font-weight: 680;
+  letter-spacing: .02em;
+}
+.map-mode-control > span:first-child { color: #65716c; font-size: .59rem; font-weight: 600; text-transform: uppercase; }
+.map-mode-control > span:last-child { color: #65716c; font-size: 1rem; line-height: .7; }
+.map-mode-control:hover { background: #fff; }
+.map-mode-control:disabled { cursor: default; opacity: .62; }
+.map-camera-control { position: relative; }
+.map-camera-menu {
+  position: absolute;
+  top: calc(100% + .32rem);
+  left: 0;
+  z-index: 7;
+  width: max-content;
+  min-width: 13.5rem;
+  max-width: min(19rem, calc(100vw - 1.4rem));
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
+  padding: .3rem 0;
+  border: 1px solid rgba(36, 46, 42, .24);
+  border-radius: .3rem;
+  color: #24302b;
+  background: rgba(247, 246, 241, .98);
+  box-shadow: 0 .55rem 1.6rem rgba(25, 31, 29, .2);
+}
+.map-camera-menu-group + .map-camera-menu-group { border-top: 1px solid rgba(36, 46, 42, .12); }
+.map-camera-menu-heading {
+  padding: .5rem .7rem .25rem;
+  color: #65716c;
+  font-size: .57rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.map-camera-menu button {
+  display: grid;
+  grid-template-columns: .8rem minmax(0, 1fr);
+  gap: .35rem;
+  width: 100%;
+  padding: .4rem .7rem;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: .68rem;
+  line-height: 1.25;
+  text-align: left;
+}
+.map-camera-menu button:hover, .map-camera-menu button[aria-checked="true"] { background: rgba(73, 102, 93, .1); }
+.map-camera-menu button > span { color: #49665d; font-weight: 800; }
+.map-legend {
+  position: absolute;
+  bottom: 1.55rem;
+  left: .7rem;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem .6rem;
+  max-width: calc(100% - 5rem);
+  padding: .35rem .48rem;
+  border: 1px solid rgba(36, 46, 42, .2);
+  border-radius: .2rem;
+  color: #35423d;
+  background: rgba(247, 246, 241, .9);
+  box-shadow: 0 .1rem .5rem rgba(25, 31, 29, .1);
+  font-size: .61rem;
+}
+.map-legend span { display: inline-flex; align-items: center; gap: .28rem; white-space: nowrap; }
+.map-legend i { display: inline-grid; place-items: center; flex: 0 0 auto; width: .7rem; height: .7rem; font-style: normal; }
+.legend-selected { border: 2px solid #fff; border-radius: 50% 50% 50% 0; background: #a85832; box-shadow: 0 0 0 1px #35423d; transform: rotate(-45deg); }
+.legend-photo { border: 1px solid #fff; border-radius: 50%; background: #7c8984; box-shadow: 0 0 0 1px #35423d; }
+.map-legend .legend-group { border: 1px solid #35423d; border-radius: 50%; background: #e8e5dc; font-size: .46rem; font-weight: 800; }
+.legend-track { position: relative; height: .45rem !important; border-top: 4px solid #f7f5ee; border-bottom: 2px solid #49665d; }
+.map-notice {
+  position: absolute;
+  top: 5.35rem;
+  left: .7rem;
+  z-index: 5;
+  max-width: calc(100% - 1.4rem);
+  padding: .42rem .55rem;
+  border-radius: .2rem;
+  color: #35423d;
+  background: rgba(247, 246, 241, .9);
+  box-shadow: 0 .1rem .5rem rgba(25, 31, 29, .1);
+  font-size: .65rem;
+  line-height: 1.35;
+}
 .map-loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; color: #60635f; background: #e6e4dc; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
 .map-unavailable { position: absolute; inset: 0; display: grid; place-items: center; padding: 2rem; color: #60635f; font-size: .78rem; line-height: 1.5; text-align: center; }
 .map-error { position: absolute; right: 1rem; bottom: 1rem; left: 1rem; z-index: 3; margin: 0; padding: .85rem 1rem; border-radius: .2rem; color: #f3eee2; background: rgba(33, 37, 35, .9); font-size: .78rem; line-height: 1.4; }
-.memory-marker { width: 1.15rem; height: 1.15rem; border: 3px solid #fff; border-radius: 50% 50% 50% 0; background: #b56d43; box-shadow: 0 2px 8px rgba(0,0,0,.4); transform: rotate(-45deg); }
-.toast { position: absolute; bottom: 1.4rem; left: 50%; z-index: 10; padding: .75rem 1rem; border: 1px solid var(--line); border-radius: .2rem; color: #f0ece2; background: rgba(17, 21, 19, .92); box-shadow: 0 .6rem 2rem rgba(0,0,0,.25); font-size: .78rem; transform: translateX(-50%); animation: toast-in 160ms ease both; }
+.memory-marker { width: 1.2rem; height: 1.2rem; padding: 0; border: 3px solid #fff; border-radius: 50% 50% 50% 0; background: #a85832; box-shadow: 0 0 0 1px #35423d, 0 2px 8px rgba(0,0,0,.4); cursor: pointer; transform: rotate(-45deg); }
+.memory-marker.grouped::after { content: attr(data-count); position: absolute; right: -1rem; top: -1rem; display: grid; place-items: center; min-width: 1.05rem; height: 1.05rem; padding: 0 .18rem; border: 1px solid #35423d; border-radius: 1rem; color: #18201d; background: #f7f5ee; font-size: .58rem; font-weight: 800; transform: rotate(45deg); }
+
+@media (forced-colors: active) {
+  .memory-marker, .legend-selected, .legend-photo, .map-legend .legend-group { forced-color-adjust: auto; border-color: CanvasText; background: Canvas; color: CanvasText; }
+  .legend-track { border-color: CanvasText; }
+}
+.toast { position: absolute; bottom: 1.4rem; left: 50%; z-index: 10; max-width: calc(100% - 2rem); padding: .75rem 1rem; border: 1px solid var(--line); border-radius: .2rem; color: #f0ece2; background: rgba(17, 21, 19, .92); box-shadow: 0 .6rem 2rem rgba(0,0,0,.25); font-size: .78rem; text-align: center; transform: translateX(-50%); animation: toast-in 160ms ease both; }
+.frame-toast { bottom: 4rem; }
+.viewer-toast { bottom: 1.4rem; }
 @keyframes toast-in { from { opacity: 0; transform: translate(-50%, .4rem); } }
 
 @media (max-width: 760px) {

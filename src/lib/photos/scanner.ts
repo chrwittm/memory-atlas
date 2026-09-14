@@ -1,5 +1,5 @@
 import { sortPhotos } from './sort'
-import type { Photo, ScanOutcome, WorkerRequest, WorkerResponse } from './types'
+import type { GpxOutcome, GpxTrack, Photo, ScanOutcome, WorkerRequest, WorkerResponse } from './types'
 
 export type ScanProgress = {
   completed: number
@@ -24,12 +24,18 @@ export async function scanFolder(
   files: File[],
   onProgress: (progress: ScanProgress) => void,
   { signal }: ScanOptions = {},
-): Promise<{ photos: Photo[]; folderName: string }> {
+): Promise<{
+  photos: Photo[]
+  tracks: GpxTrack[]
+  gpxFailures: Array<{ fileName: string; error: string }>
+  folderName: string
+}> {
   if (signal?.aborted) throw cancellationError()
 
   const worker = new Worker(new URL('./metadata.worker.ts', import.meta.url), { type: 'module' })
   const byIndex = new Map(files.map((file, originalIndex) => [originalIndex, file]))
   const outcomes: ScanOutcome[] = []
+  const gpxOutcomes: GpxOutcome[] = []
   let folderName = 'Selected folder'
 
   return new Promise((resolve, reject) => {
@@ -79,8 +85,10 @@ export async function scanFolder(
       if (message.type === 'started') {
         folderName = message.folderName
         reportProgress({ completed: 0, total: message.total, folderName })
-      } else if (message.type === 'result') {
+      } else if (message.type === 'photo-result') {
         outcomes.push(message.outcome)
+      } else if (message.type === 'gpx-result') {
+        gpxOutcomes.push(message.outcome)
       } else if (message.type === 'progress') {
         reportProgress({
           completed: message.completed,
@@ -102,7 +110,15 @@ export async function scanFolder(
             error: outcome.error,
           } satisfies Photo]
         })
-        settle(() => resolve({ photos: sortPhotos(photos), folderName }))
+        const orderedGpx = [...gpxOutcomes].sort((a, b) =>
+          a.fileName.localeCompare(b.fileName, undefined, { sensitivity: 'base', numeric: true }) ||
+          a.originalIndex - b.originalIndex,
+        )
+        const tracks = orderedGpx.flatMap((outcome) => outcome.tracks)
+        const gpxFailures = orderedGpx
+          .filter((outcome) => outcome.status === 'error')
+          .map(({ fileName, error }) => ({ fileName, error: error || 'GPX could not be read.' }))
+        settle(() => resolve({ photos: sortPhotos(photos), tracks, gpxFailures, folderName }))
       } else if (message.type === 'failed') {
         fail(scannerError(message.message))
       } else {

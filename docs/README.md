@@ -1,7 +1,7 @@
 # Memory Atlas Documentation
 
 **Status:** Current documentation guide
-**Last updated:** 2026-09-12
+**Last updated:** 2026-09-14
 
 This directory organizes project documentation by purpose and lifecycle. Start
 with the product context and accepted specification, then consult architecture,
@@ -29,6 +29,11 @@ planning, operations, or delivery records as the task requires.
 - [`product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md`](product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
   — accepted quick collection navigation, spatial focus loop, and return-to-entry
   keyboard behavior for the next desktop viewer slice.
+- [`product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md`](product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
+  — implemented three-mode current-photo, all-photo, and GPX-track map slice
+  with MA-FEAT-024's short primary `Z` cycle and grouped direct-selection Zoom
+  menu; cluster drill-down now follows the same stable scope rule as other
+  photo selection, and consolidated packaged verification is pending.
 
 ### Planning
 
@@ -50,9 +55,16 @@ planning, operations, or delivery records as the task requires.
 
 - [`architecture/decisions/0003-publication-toolchain-and-identity.md`](architecture/decisions/0003-publication-toolchain-and-identity.md)
   — supported publication toolchain, stable identity, and version boundary.
+- [`architecture/decisions/0004-local-geographic-context-catalog.md`](architecture/decisions/0004-local-geographic-context-catalog.md)
+  — accepted build-time, locally packaged boundary catalog for named German and
+  U.S. map-camera scopes without runtime geocoding.
 
 - [`operations/third-party-notices.md`](operations/third-party-notices.md)
-  — packaged dependency notices and ExifReader source availability.
+  — packaged dependency and geographic-data notices plus ExifReader source
+  availability.
+- [`operations/geographic-context-catalog.md`](operations/geographic-context-catalog.md)
+  — reproducible source, generation, integrity, and update procedure for the
+  locally packaged geographic context catalog.
 
 ### Delivery records and history
 
@@ -61,6 +73,12 @@ planning, operations, or delivery records as the task requires.
 - [`delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md`](delivery/verifications/2026-09-12-ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
   — automated source and successful user verification for the desktop
   keyboard-navigation slice, with its next packaged check deferred.
+- [`delivery/verifications/2026-09-13-ma-feat-008-016-multi-photo-and-gpx-map-modes.md`](delivery/verifications/2026-09-13-ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
+  — source implementation, automated coverage, representative GPX evidence,
+  and the remaining consolidated packaged verification for the map slice.
+- [`delivery/verifications/2026-09-14-ma-feat-024-named-map-camera-scopes.md`](delivery/verifications/2026-09-14-ma-feat-024-named-map-camera-scopes.md)
+  — source implementation, catalog provenance, automated evidence, and the
+  remaining packaged checks for named map-camera scopes.
 
 - [`delivery/verifications/2026-09-08-public-source.md`](delivery/verifications/2026-09-08-public-source.md)
   — completed source import, GitHub CI, and repository security settings.

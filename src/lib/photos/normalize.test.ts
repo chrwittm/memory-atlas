@@ -1,6 +1,6 @@
 import type { ExpandedTags } from 'exifreader'
 import { describe, expect, it } from 'vitest'
-import { normalizeMetadata, parseExifDate } from './normalize'
+import { normalizeMetadata, parseExifDate, parseExifLocalDate } from './normalize'
 
 describe('metadata normalization', () => {
   it('uses a real-corpus XMP title as the caption fallback', () => {
@@ -30,6 +30,9 @@ describe('metadata normalization', () => {
 
   it('parses EXIF local timestamps deterministically', () => {
     expect(parseExifDate('2026:06:20 10:58:52')).toBe(new Date(2026, 5, 20, 10, 58, 52).toISOString())
+    expect(parseExifLocalDate('2026:06:20 23:58:52')).toBe('2026-06-20')
+    expect(normalizeMetadata({
+      exif: { DateTimeOriginal: { description: '2026:06:20 23:58:52' } },
+    } as unknown as ExpandedTags).capturedLocalDate).toBe('2026-06-20')
   })
 })
-

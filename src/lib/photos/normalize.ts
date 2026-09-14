@@ -60,6 +60,25 @@ export function parseExifDate(value?: string): string | undefined {
   return Number.isNaN(date.getTime()) ? undefined : date.toISOString()
 }
 
+export function parseExifLocalDate(value?: string): string | undefined {
+  if (!value) return undefined
+  const match = value.match(/^(\d{4})[:\-](\d{2})[:\-](\d{2})(?:[ T]|$)/)
+  if (match) {
+    const year = Number(match[1])
+    const month = Number(match[2])
+    const day = Number(match[3])
+    const parsed = new Date(Date.UTC(year, month - 1, day))
+    if (
+      parsed.getUTCFullYear() === year
+      && parsed.getUTCMonth() === month - 1
+      && parsed.getUTCDate() === day
+    ) return `${match[1]}-${match[2]}-${match[3]}`
+    return undefined
+  }
+  const timestamp = Date.parse(value)
+  return Number.isNaN(timestamp) ? undefined : new Date(timestamp).toISOString().slice(0, 10)
+}
+
 export function normalizeMetadata(tags: ExpandedTags): PhotoMetadata {
   const exif = tags.exif as TagGroup
   const iptc = tags.iptc as TagGroup
@@ -83,10 +102,12 @@ export function normalizeMetadata(tags: ExpandedTags): PhotoMetadata {
     longitude >= -180 &&
     longitude <= 180
 
+  const capturedSource = text(exif, 'DateTimeOriginal', 'DateTimeDigitized')
+    || text(xmp, 'DateCreated', 'CreateDate')
+
   return {
-    capturedAt: parseExifDate(
-      text(exif, 'DateTimeOriginal', 'DateTimeDigitized') || text(xmp, 'DateCreated', 'CreateDate'),
-    ),
+    capturedAt: parseExifDate(capturedSource),
+    capturedLocalDate: parseExifLocalDate(capturedSource),
     title,
     caption: description || title,
     tags: (() => {

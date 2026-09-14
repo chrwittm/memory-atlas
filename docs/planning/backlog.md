@@ -2,7 +2,7 @@
 
 **Status:** Living post-MVP backlog
 
-**Last updated:** 2026-09-12
+**Last updated:** 2026-09-14
 
 **Purpose:** Capture, refine, and sequence product ideas without accidentally
 turning them into accepted scope.
@@ -54,7 +54,7 @@ heavy process.
 | Horizon | Theme | Why it belongs here |
 | --- | --- | --- |
 | Next desktop refinements | File actions and further fullscreen reliability | The coherent keyboard model is implemented; the remaining work preserves the viewer while adding carefully scoped OS integration |
-| Next exploration views | Thumbnail gallery, all-photo map, and GPX overlays | Natural extensions of the existing temporary collection and shared selection |
+| Next exploration views | Thumbnail gallery | Named map-camera scopes and stable cluster drill-down are implemented in source; the next nonlinear view is the remaining exploration priority |
 | Media expansion | Videos in the file-name sequence | A demonstrated trip-viewing need that requires codec and playback-boundary research |
 | Context and people | Information-overlay modes, technical camera details, tags, filename, and people regions | Keeps useful embedded context close at hand while requiring representative metadata and a calm presentation model |
 | Platform and OS integration | Open a Finder folder directly in Memory Atlas; later evaluate Windows Explorer integration | Makes the installed desktop app a natural part of the user's existing folder workflow, but requires a narrow native integration boundary |
@@ -71,11 +71,9 @@ heavy process.
    collection navigation, and region focus share the Arrow keys.
 3. MA-FEAT-002/015/018 was implemented and user-tested on 2026-09-12; repeat
    its packaged checks with the next consolidated feature build.
-4. Extend the present map with MA-FEAT-008's all-photo mode and two-way pin
-   selection.
-5. Inspect representative GPX files, then specify MA-FEAT-016 on top of that
-   map-layer foundation.
-6. Inspect representative trip videos and packaged-runtime codec behavior, then
+4. MA-FEAT-008/016/024 is implemented in source. Repeat the combined private-
+   corpus and packaged checks, including the scope-stable cluster drill-down.
+5. Inspect representative trip videos and packaged-runtime codec behavior, then
    specify MA-FEAT-017 as a separate mixed-media vertical slice.
 
 ## Candidate next slice: desktop viewer essentials
@@ -191,7 +189,7 @@ changing the local-first model.
 
 ### MA-FEAT-015 — Minimal viewer focus loop
 
-- **State:** Ready to build
+- **State:** Implemented and user-tested 2026-09-12; packaged verification pending
 - **Specification:**
   [`Desktop viewer keyboard navigation`](../product/specifications/features/ma-feat-002-015-018-desktop-viewer-keyboard-navigation.md)
 - **User outcome:** I can move predictably between the large interactive areas
@@ -237,8 +235,10 @@ screens.
   Map, Tags, or future Details replaces the panel content; closing it restores
   the full photo. Desktop begins with the current 80/20 split, while mobile
   receives a separate responsive interaction design.
-- **Decision needed:** Whether the multi-photo map is a panel mode, an overview
-  mode, or both. Resolve before MA-FEAT-008.
+- **Resolved boundary for MA-FEAT-008/016:** Multi-photo and GPX map content
+  remains inside the existing split map panel. The general one-panel framework
+  is not a prerequisite and still needs its own design before unrelated context
+  types are added.
 - **Non-goal:** A permanent dashboard/sidebar.
 
 ### MA-FEAT-007 — Thumbnail gallery / carousel
@@ -260,76 +260,120 @@ screens.
 
 ### MA-FEAT-008 — Map all located photos and select from pins
 
-- **State:** Ready to specify
+- **State:** Implemented in source 2026-09-14; packaged verification pending
+- **Specification:**
+  [`Multi-photo and GPX map modes`](../product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
 - **User outcome:** I can understand a folder spatially and jump from a map pin
   to the associated photo.
-- **Proposed interaction:** While the map is open, `G` changes its content from
-  the current-photo-only view to a view containing every photo with valid GPS.
-  The current photo and other photos use distinct marker colors documented in a
-  compact legend. Clicking another photo marker changes the current photo;
-  selecting a photo in the viewer updates the selected marker.
-- **Evolution:** MA-FEAT-016 extends the same `G` cycle with cumulative GPX
-  point-of-interest and track layers. `M` continues to open or close the map;
-  `G` changes what an open map displays.
-- **Questions to settle:** Entry point and relationship to MA-FEAT-006; initial
-  viewport (fit all points versus current photo); duplicate coordinates;
-  filtering/photos without GPS; marker previews; dense-set clustering; mode
-  persistence; and keyboard-accessible marker navigation.
-- **Acceptance checks:** Metadata is normalized once during scan; two-way
-  selection is reliable; the current and other-photo categories stay visually
-  distinct; all-photo mode still shows located photos when the selected photo
-  has no GPS; the active mode is understandable without memorizing `G`; map
-  attribution/network disclosure remains visible; and no photo or metadata is
-  uploaded beyond normal map-tile location requests.
-- **Non-goal:** GPX parsing, route recording, editing GPS, or an offline map.
+- **Accepted interaction:** With the map open, `G` and the quiet visible **GPS** control
+  cycle through current photo, all photos, and photos plus GPX track. All-photo
+  mode distinguishes the current photo, clusters dense or duplicate positions,
+  and supports two-way pointer and keyboard selection. All modes share one
+  camera: `G` preserves its viewpoint, while photo selection preserves the
+  applicable camera scope and manual zoom. Current photo follows the pin;
+  temporal scopes refit when their date context changes, and geographic scopes
+  switch to an available destination scope at the same level before falling
+  back to Current photo at the existing zoom.
+- **Acceptance checks:** Metadata is normalized once during scan; photos without
+  GPS remain selectable without an invented marker; every located photo remains
+  keyboard reachable; the active mode and visible categories are explained
+  compactly; attribution/network disclosure remains visible; and source data is
+  not uploaded beyond normal basemap requests for the displayed area.
+- **Non-goal:** Marker previews, GPS editing, reverse geocoding, a standalone
+  map screen, or an offline map.
+- **Dependency:** Implement with MA-FEAT-016 under the combined specification.
 
-### MA-FEAT-016 — GPX points of interest, tracks, and layered map modes
+### MA-FEAT-016 — GPX track overlay
 
-- **State:** Needs research with representative trip GPX files
+- **State:** Implemented in source 2026-09-14; packaged verification pending
+- **Specification:**
+  [`Multi-photo and GPX map modes`](../product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md)
 - **User outcome:** I can place portable GPX files beside a trip's photos and
-  see noteworthy places and the traveled path as additional map context.
-- **Source model:** Read one or more top-level `.gpx` files from the selected
-  folder without modifying them. GPX waypoints are the first candidate for
-  points of interest; GPX tracks, and routes if present in the real files, are
-  rendered as lines. One invalid GPX file must not prevent photos or other GPX
-  files from loading.
-- **Proposed interaction:** With the map open, `G` cycles through cumulative
-  modes: (1) current photo, (2) all located photos, (3) photos plus GPX points
-  of interest, and (4) photos, points of interest, and GPX tracks. On entering
-  the track mode, show by default every timed track whose time span intersects
-  the current photo's capture date. This allows a trip-wide track and a
-  same-day hike track to appear together while suppressing tracks from unrelated
-  days. The cycle wraps and has a quiet visible mode indicator or control.
-  Layers with no data must produce an intentional state rather than a misleading
-  empty map, and the user must be able to understand when the default date
-  filter excludes otherwise available tracks.
-- **Legend:** Define stable, distinguishable treatments for the current photo,
-  other photos, GPX points of interest, and tracks. When multiple matching
-  tracks overlap, draw broader context such as a whole-trip track first in a
-  quieter color, then draw a shorter, more specific track such as an individual
-  hike above it in a stronger highlight color. Evaluate a small stable palette
-  and the definition of track specificity against real files; do not assume
-  that every track needs a unique color if labels, grouping, or selection
-  communicates the distinction more clearly.
-- **Research needed:** Inspect the trip files for GPX version, waypoints, routes,
-  track segments, names, timestamps, duplicate points, and multiple tracks per
-  file. Decide how a photo's local calendar date is compared with GPX timestamps
-  and time zones, how untimed or partially timed tracks behave, how broad versus
-  specific tracks are identified, viewport fitting, layer ordering,
-  malformed-coordinate handling, and whether `G` visits unavailable modes or
-  skips them while announcing the result.
+  see the traveled path with every located photo as additional map context.
+- **Accepted interaction:** The third and final `G` mode adds every drawable
+  track from valid top-level `.gpx` files to the all-photo map. Tracks fit with
+  photo locations, preserve segment gaps, remain below markers, and are not
+  filtered by photo date or time. Missing or invalid tracks leave photo markers
+  useful and produce an intentional notice instead of an empty or failed map.
+- **Representative finding:** The private Schloss Herrenrunde GPX is valid GPX
+  1.1 with one named, 847-point track segment. Every point has valid distinct
+  coordinates, elevation, and a parseable nondecreasing timestamp. The updated
+  folder's 31 JPEGs all have GPS with distinct coordinates, so the private
+  corpus now provides real all-photo selection and track-line coverage;
+  controlled fixtures remain necessary for malformed and partial-data cases.
 - **Acceptance checks:** Multiple top-level GPX files are parsed locally and in
-  isolation; entering track mode for a photo with a capture date shows all and
-  only the timed tracks intersecting that date by default; overlapping broad and
-  specific tracks remain distinguishable, with the specific track visible on
-  top; navigating to a photo on another date updates the default track set;
-  tracks do not obscure photo markers; the legend matches every visible
-  category; the mode cycle and pointer control agree; and coordinates are not
-  uploaded beyond ordinary basemap requests for the displayed area.
+  isolation; invalid points never create false connecting lines; drawable
+  segments render below photo markers; missing photo GPS and missing track data
+  remain understandable; and no GPX content or coordinates are directly
+  uploaded.
 - **Non-goal:** Recording, editing, correcting, or exporting tracks; route
-  planning; live location; or recursively scanning subfolders.
-- **Dependencies:** Builds on MA-FEAT-008's photo-marker and selection model and
-  may require a lasting ingestion/data-model architecture decision.
+  planning; live location; waypoints, routes, date filtering, elevation
+  profiles, or recursively scanning subfolders.
+- **Dependency:** Implement with MA-FEAT-008 under the combined specification.
+
+### MA-FEAT-024 — Named map camera scopes
+
+- **State:** Implemented in source 2026-09-14; packaged verification pending
+- **Specification:**
+  [`Multi-photo and GPX map modes — tester change request`](../product/specifications/features/ma-feat-008-016-multi-photo-and-gpx-map-modes.md#tester-change-request-map-camera-scopes)
+- **User outcome:** With the map focused, I can move directly between the
+  current photo and meaningful day, surrounding-seven-day, named geographic,
+  collection, and complete-track context without manually reconstructing each
+  view.
+- **Accepted interaction:** Keep `G` as the visible-layer cycle. Map-focused
+  `Z` cycles only through Current photo, Day, Complete track, and All photos,
+  skipping unavailable stops. `Shift+Z`, `Control+Z`, `Option+Z`, and
+  `Command+Option+Z` directly select those four views; plain `Command+Z`
+  remains unassigned. Every result receives a brief named toast in the map
+  panel. Photo-focused `Z` remains unchanged and reports in the photo panel.
+  Stacked **GPS** and **Zoom** controls persistently name both map dimensions;
+  GPS cycles content while Zoom opens a grouped menu containing every
+  available Focus, Time, Place, and Collection scope.
+- **Accepted camera stability:** Photo changes preserve manual zoom and an
+  applicable active scope. Current photo follows the new pin without resetting
+  zoom; temporal scopes refit when their date context changes, and geographic
+  scopes switch to an available destination scope at the same level before
+  falling back to Current photo at the existing zoom. This same rule removes
+  the fixed-close-zoom reversal after cluster expansion.
+- **Accepted scope rules:** Day uses recorded local dates; the former Week scope
+  is an inclusive current-date ±3-day window; untimestamped photos and GPX
+  points do not participate. Germany and the United States gain locally bundled
+  National park, State/Bundesland, and Country boundary scopes. The U.S. ladder
+  adds Contiguous United States before the full country through an explicit
+  country-specific frame. All photos and Complete track remain
+  distinct even when their extents match; earlier visually duplicate scopes
+  are skipped. Every named fit expands its base padding to clear measured
+  persistent overlays plus a feature-aware gutter.
+- **Acceptance direction:** Available scopes cycle deterministically according
+  to the mode/scope matrix; direct access matches the corresponding cycle
+  result; `Z` never changes the active `G` mode; unavailable direct access is
+  explained; geographic matching makes no runtime lookup; and all computation
+  retains the local, transient, read-only boundary.
+- **Non-goal:** Automatic route/photo matching, runtime reverse geocoding,
+  persistent map state, or changing photo zoom behavior.
+- **Dependency:** Extend the combined MA-FEAT-008/016 specification, follow
+  ADR 0004 for boundary generation and provenance, and verify the three
+  features together.
+- **Implementation evidence:**
+  [`2026-09-14 verification`](../delivery/verifications/2026-09-14-ma-feat-024-named-map-camera-scopes.md)
+
+### MA-FEAT-025 — Geographic context beyond Germany and the United States
+
+- **State:** Idea
+- **User outcome:** Named map scopes remain meaningful when a memory is located
+  outside the two initially supported countries.
+- **Scope:** Add countries deliberately, selecting administrative and
+  experience-oriented areas that are locally meaningful rather than assuming
+  one universal hierarchy. Consider provinces, regions, national parks, and
+  other large protected areas through the same packaged-catalog boundary.
+- **Questions to settle:** Which trips demonstrate the next need; authoritative
+  boundary sources and redistribution terms; local naming; disputed-boundary
+  policy; useful area categories and ordering; and acceptable package size.
+- **Non-goal:** Runtime reverse geocoding, downloading an entire global high-
+  resolution boundary database, or treating every administrative level as a
+  useful memory context.
+- **Dependency:** Builds on MA-FEAT-024 and ADR 0004 only after real use selects
+  another country or area type.
 
 ### MA-FEAT-009 — Map visual-style evaluation
 
@@ -655,3 +699,15 @@ screens.
 | 2026-09-12 | Add embedded photo elevation as a context-display research item without selecting its UI surface. | Elevation can enrich place context, but representative metadata, units, validity handling, and its relationship to the information overlay, details, and map need refinement first. |
 | 2026-09-12 | Add an `I`-key information cycle for off, title, caption, and technical camera details, with transient mode feedback and reciprocal title/caption fallback. | Some photos carry distinct titles and captions while others use only one field; the available text should remain visible in either textual mode, and a Lightroom-like camera summary makes useful embedded exposure context available without permanently cluttering the viewer. |
 | 2026-09-12 | Add future internationalization and localization, with American English as the source/default language and German as the first likely localization. | Memory Atlas should eventually serve users in additional languages, but localization is an idea rather than accepted near-term scope and needs deliberate formatting, accessibility, fallback, and layout decisions. |
+| 2026-09-13 | Accept MA-FEAT-008 and MA-FEAT-016 as one slice with exactly three `G` modes: current photo, all photos, and photos plus GPX track. | A single cumulative cycle in the existing map panel keeps spatial exploration direct and understandable while sharing selection, camera, legend, and ingestion behavior. |
+| 2026-09-13 | Show every drawable top-level GPX track in the third mode and defer waypoints, routes, and date-based filtering. | The selected interaction calls for one track layer rather than separate GPX submodes; the representative source is one timed track without waypoints or routes, so additional modes and inferred date grouping are not justified in this slice. |
+| 2026-09-14 | Add MA-FEAT-024 as an in-refinement change request to MA-FEAT-008/016: map-focused `Z` should provide named camera scopes, while `G` continues to control visible layers. | Tester use validated the three map-content modes but created a repeated need to recover current-photo, temporal, geographic, collection, and track framing without manual zoom. |
+| 2026-09-14 | Keep the post-cluster selection camera rule open and document that the current zoom reversal is product-owned rather than imposed by MapLibre. | MapLibre calculates cluster expansion, but Memory Atlas currently forces zoom 15 after marker selection; real use shows that these two individually reasonable rules may form a contradictory drill-down. |
+| 2026-09-14 | Accept MA-FEAT-024 with mode-dependent camera scopes and direct shortcuts for Current photo, Day, and Complete track while leaving plain `Command+Z` unassigned. | Only framing currently drawn layers keeps `G` and camera scope conceptually separate, while direct access avoids taking over macOS Undo. The later release-candidate refinement narrows the plain-key cycle and adds an explicit Command+Option combination. |
+| 2026-09-14 | Replace calendar Week with a rolling current-date ±3-day photo window and use recorded local wall-clock dates without GPX time matching. | A centered seven-day context follows the current experience across arbitrary week boundaries and does not imply timezone precision absent from typical photo metadata. |
+| 2026-09-14 | Package real German and U.S. country, state/Bundesland, and national-park boundaries locally; track further country-specific context as MA-FEAT-025. | Real polygons produce meaningful place framing without runtime geocoding. Parks and administrative areas may overlap, so they form a deterministic context ladder rather than a false universal hierarchy. |
+| 2026-09-14 | Replace forced photo-change zoom resets with scope-aware camera stability, place feedback in its owning panel, make collection navigation universal across photo and map focus, and add Contiguous United States before the full-country frame. | Hands-on multi-day and U.S. testing showed that spatial context should remain stable until the user selects another scope or navigation changes that scope's underlying day or area. |
+| 2026-09-14 | Fall back from an exited geographic scope to Current photo at the existing zoom, and expose stacked GPS and Zoom controls. | A pin silently leaving a park or country frame made the retained scope misleading; explicit persistent labels keep content and camera state understandable while the zoom-preserving fallback avoids disruptive reframing. |
+| 2026-09-14 | Preserve the active geographic level across named areas, using Current photo only when no same-level destination exists. | Flight sequences commonly cross states or countries; Washington-to-Oregon should remain a State-level journey, while leaving a park for a place without a park still needs the clear Current-photo fallback. |
+| 2026-09-14 | Make named camera fits overlay-aware while keeping Complete track track-owned. | A tall flight-and-driving track exposed that capped generic padding could leave route geometry or an in-scope marker beneath attribution and other persistent map UI; adding arbitrary current photos to the track extent would instead destabilize or greatly widen the view. |
+| 2026-09-14 | Reduce the map-focused `Z` cycle to Current photo, Day, Complete track, and All photos; expose every available scope through a grouped Zoom menu and add `Command+Option+Z` for All photos. | Eight or more dynamic stops made repeated cycling tedious. A short primary cycle keeps frequent keyboard access simple, while grouped direct selection preserves useful seven-day and geographic scopes without a configuration screen. |

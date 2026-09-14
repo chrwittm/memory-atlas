@@ -9,3 +9,10 @@ describe('viewer focus appearance', () => {
     expect(styles).toContain('.photo-surface, .map-region, .split-divider, button):focus-visible')
   })
 })
+
+describe('map canvas layout', () => {
+  it('keeps the dynamically styled MapLibre container filling its panel', () => {
+    expect(styles).toContain('.map-panel > .map-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; }')
+    expect(styles).not.toMatch(/(?:^|\n)\.map-canvas\s*\{[^}]*position:\s*absolute/)
+  })
+})

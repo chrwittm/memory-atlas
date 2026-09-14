@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import LazyMap from './LazyMap.svelte'
   import { ObjectUrlWindow } from '../lib/photos/objectUrls'
   import {
@@ -16,14 +16,30 @@
     type Size,
   } from '../lib/viewer/imageView'
   import type { Photo } from '../lib/photos/types'
-  import type { MapKeyboardHandler } from '../lib/map/keyboard'
+  import type {
+    MapCameraScopeGroup,
+    MapCameraScopeOption,
+    MapCameraScopeSelector,
+  } from '../lib/map/cameraScopes'
+  import { mapCameraCommand, type MapKeyboardHandler } from '../lib/map/keyboard'
+  import {
+    coordinateGroups,
+    MAP_MODE_LABELS,
+    nextMapMode,
+    type MapMode,
+  } from '../lib/map/model'
+  import type { GpxTrack } from '../lib/photos/types'
 
   let {
     photos,
+    tracks = [],
+    gpxFailures = [],
     folderName,
     onChooseAnother,
   }: {
     photos: Photo[]
+    tracks?: GpxTrack[]
+    gpxFailures?: Array<{ fileName: string; error: string }>
     folderName: string
     onChooseAnother: () => void
   } = $props()
@@ -31,10 +47,18 @@
   let currentIndex = $state(0)
   let informationVisible = $state(true)
   let mapOpen = $state(false)
+  let mapRendererStarted = $state(false)
+  let mapMode = $state<MapMode>('current')
+  let mapModeAnnouncement = $state('')
+  let mapCameraScopeLabel = $state<string | undefined>()
+  let mapCameraScopes = $state<MapCameraScopeOption[]>([])
+  let mapCameraScopeSelector = $state<MapCameraScopeSelector | undefined>()
+  let mapCameraMenuOpen = $state(false)
   let splitPercent = $state(80)
   let resizingSplit = $state(false)
   let controlsVisible = $state(true)
   let notice = $state('')
+  let noticeRegion = $state<'viewer' | 'photo' | 'map'>('viewer')
   let decodeErrorIds = $state(new Set<string>())
   let viewState = $state<ImageViewState>(createImageViewState())
   let intrinsicSize = $state<Size | undefined>()
@@ -50,13 +74,18 @@
   let narrowLayoutQuery: MediaQueryList | undefined
   let syncNarrowLayout: (() => void) | undefined
   let narrowLayout = $state(false)
-  let mapKeyboardHandler: MapKeyboardHandler | undefined
+  let mapKeyboardHandler = $state<MapKeyboardHandler | undefined>()
   let returningToEntry = false
   let previousDragPoint: Point | undefined
   const urlWindow = new ObjectUrlWindow()
   const viewStates = new Map<string, ImageViewState>()
   const intrinsicSizes = new Map<string, Size>()
-
+  const cameraScopeGroups: Array<{ id: MapCameraScopeGroup; label: string }> = [
+    { id: 'focus', label: 'Focus' },
+    { id: 'time', label: 'Time' },
+    { id: 'place', label: 'Place' },
+    { id: 'collection', label: 'Collection' },
+  ]
   let current = $derived(photos[currentIndex])
   let currentUrl = $derived(urlWindow.sync(photos, currentIndex))
   let currentHasDecodeError = $derived(
@@ -67,6 +96,15 @@
     intrinsicSize && viewportSize.width > 0 && viewportSize.height > 0
       ? calculateImageGeometry(viewState, intrinsicSize, viewportSize)
       : undefined,
+  )
+  let locatedPhotoCount = $derived(photos.filter((photo) => photo.location).length)
+  let duplicateCoordinateCount = $derived(
+    coordinateGroups(photos).filter((group) => group.photoIndices.length > 1).length,
+  )
+  let hasTracks = $derived(tracks.length > 0)
+  let mapHasRenderableData = $derived(
+    mapMode === 'current' ? Boolean(current.location) :
+      mapMode === 'all' ? locatedPhotoCount > 0 : locatedPhotoCount > 0 || hasTracks,
   )
 
   function showControls() {
@@ -84,13 +122,19 @@
     if (!(next instanceof Node) || !viewer.contains(next)) showControls()
   }
 
+  function handleWindowPointerDown(event: PointerEvent) {
+    if (!mapCameraMenuOpen) return
+    const target = event.target
+    if (target instanceof Element && target.closest('.map-camera-control')) return
+    mapCameraMenuOpen = false
+  }
+
   function move(delta: number) {
     const next = Math.max(0, Math.min(photos.length - 1, currentIndex + delta))
     if (next === currentIndex) return
     stopDraggingPhoto()
     currentIndex = next
     const nextPhoto = photos[next]
-    if (!nextPhoto.location) mapKeyboardHandler = undefined
     viewState = viewStates.get(nextPhoto.id) ?? createImageViewState()
     intrinsicSize = intrinsicSizes.get(nextPhoto.id)
     showControls()
@@ -100,8 +144,13 @@
     move(index - currentIndex)
   }
 
-  function showNotice(message: string, duration = 2600) {
+  function showNotice(
+    message: string,
+    duration = 2600,
+    region: 'viewer' | 'photo' | 'map' = 'viewer',
+  ) {
     notice = message
+    noticeRegion = region
     clearTimeout(noticeTimer)
     noticeTimer = setTimeout(() => (notice = ''), duration)
   }
@@ -110,7 +159,12 @@
     stopDraggingPhoto()
     const focusNeedsRecovery = divider === document.activeElement || mapRegion?.contains(document.activeElement)
     mapOpen = false
+    mapRendererStarted = false
     mapKeyboardHandler = undefined
+    mapCameraScopeLabel = undefined
+    mapCameraScopes = []
+    mapCameraScopeSelector = undefined
+    mapCameraMenuOpen = false
     showControls()
     if (focusNeedsRecovery) queueMicrotask(focusPhoto)
   }
@@ -120,8 +174,70 @@
     else {
       stopDraggingPhoto()
       mapOpen = true
+      mapRendererStarted = mapHasRenderableData
       showControls()
     }
+  }
+
+  function cycleMapMode() {
+    mapCameraMenuOpen = false
+    mapMode = nextMapMode(mapMode)
+    mapModeAnnouncement = `GPS content: ${MAP_MODE_LABELS[mapMode]}`
+    queueMicrotask(() => {
+      if (mapHasRenderableData) mapRendererStarted = true
+    })
+    showControls()
+  }
+
+  function toggleMapCameraMenu() {
+    if (!mapCameraScopeSelector || !mapCameraScopes.length) return
+    mapCameraMenuOpen = !mapCameraMenuOpen
+    showControls()
+  }
+
+  async function selectMapCameraScope(scopeId: string) {
+    mapCameraMenuOpen = false
+    await tick()
+    mapCameraScopeSelector?.(scopeId)
+    focusMap()
+    showControls()
+  }
+
+  function mapEmptyMessage() {
+    if (mapMode === 'current') return 'This photo doesn’t have GPS coordinates.'
+    if (mapMode === 'all') return 'No photos in this folder have GPS coordinates.'
+    return 'No photos with GPS or drawable GPX track lines were found in this folder.'
+  }
+
+  function mapNotice() {
+    const notices: string[] = []
+    if (mapMode !== 'current' && !current.location && locatedPhotoCount > 0) notices.push('Current photo has no GPS')
+    if (mapMode === 'track' && locatedPhotoCount === 0 && hasTracks) notices.push('No photos have GPS.')
+    if (mapMode === 'track' && !hasTracks && locatedPhotoCount > 0) notices.push('No drawable GPX track line was found in this folder.')
+    if (mapMode === 'track' && gpxFailures.length) {
+      notices.push(`${gpxFailures.length} GPX ${gpxFailures.length === 1 ? 'file was' : 'files were'} unavailable.`)
+    }
+    return notices.join(' ')
+  }
+
+  function handleCameraShortcutWithoutRenderer(event: KeyboardEvent): boolean {
+    const command = mapCameraCommand(event)
+    if (!command) return false
+    if (command === 'cycle') showNotice('No named map view is available', 1600, 'map')
+    else if (command === 'current') showNotice('Current photo has no GPS', 1600, 'map')
+    else if (command === 'day') {
+      if (mapMode === 'current') showNotice('Day view requires All photos or Photos + GPX track', 1600, 'map')
+      else if (!current.capturedAt && !current.capturedLocalDate) {
+        showNotice('Current photo has no capture time', 1600, 'map')
+      } else showNotice('No located photos were found for this day', 1600, 'map')
+    } else if (command === 'complete-track' && mapMode !== 'track') {
+      showNotice('Complete track view requires Photos + GPX track', 1600, 'map')
+    } else if (command === 'complete-track') {
+      showNotice('No drawable GPX track line was found in this folder', 1600, 'map')
+    } else if (mapMode === 'current') {
+      showNotice('All photos view requires All photos or Photos + GPX track', 1600, 'map')
+    } else showNotice('No photos in this folder have GPS coordinates', 1600, 'map')
+    return true
   }
 
   function toggleInformation() {
@@ -295,7 +411,7 @@
     if (!context) return
     const next = cycleImageView(viewState, context.image, context.viewport)
     commitView(next)
-    if (announce) showNotice(zoomModeLabel(next, context.image, context.viewport), 1200)
+    if (announce) showNotice(zoomModeLabel(next, context.image, context.viewport), 1200, 'photo')
   }
 
   function zoomModeLabel(state: ImageViewState, image: Size, viewport: Size) {
@@ -336,7 +452,12 @@
 
   function handleDividerKeydown(event: KeyboardEvent) {
     if (hasShortcutModifier(event) || event.shiftKey) return
-    const steps: Record<string, number> = { ArrowLeft: -2, ArrowRight: 2 }
+    const steps: Record<string, number> = {
+      ArrowLeft: -2,
+      ArrowRight: 2,
+      PageUp: 10,
+      PageDown: -10,
+    }
     if (event.key in steps) splitPercent = Math.max(20, Math.min(80, splitPercent + steps[event.key]))
     else if (event.key === 'Home') splitPercent = 20
     else if (event.key === 'End') splitPercent = 80
@@ -351,6 +472,10 @@
 
   function isPlainLetterShortcut(event: KeyboardEvent, letter: string) {
     return !hasShortcutModifier(event) && !event.shiftKey && event.key.toLowerCase() === letter
+  }
+
+  function isLetterShortcutWithShift(event: KeyboardEvent, letter: string) {
+    return !hasShortcutModifier(event) && event.key.toLowerCase() === letter
   }
 
   async function returnToEntry() {
@@ -370,7 +495,11 @@
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.defaultPrevented) return
-    if (event.key === 'Tab' && !hasShortcutModifier(event)) {
+    if (mapCameraMenuOpen && event.key === 'Escape') {
+      event.preventDefault()
+      mapCameraMenuOpen = false
+      focusMap()
+    } else if (event.key === 'Tab' && !hasShortcutModifier(event)) {
       event.preventDefault()
       moveRegionFocus(event.shiftKey)
     } else if (isPlainLetterShortcut(event, 'h') && !event.repeat) {
@@ -382,6 +511,9 @@
     } else if (isPlainLetterShortcut(event, 'm') && !event.repeat) {
       event.preventDefault()
       toggleMap()
+    } else if (mapOpen && isLetterShortcutWithShift(event, 'g') && !event.repeat) {
+      event.preventDefault()
+      cycleMapMode()
     } else if (
       isPlainLetterShortcut(event, 'f') &&
       !event.repeat &&
@@ -393,9 +525,31 @@
       closeMap()
     } else if (document.activeElement === photoSurface) {
       handlePhotoKeydown(event)
-    } else if (mapRegion?.contains(document.activeElement) && !hasShortcutModifier(event)) {
-      const shiftAllowedForPlus = event.key === '+'
-      if ((!event.shiftKey || shiftAllowedForPlus) && mapKeyboardHandler?.(event)) {
+    } else if (mapRegion?.contains(document.activeElement)) {
+      if (
+        !hasShortcutModifier(event)
+        && !event.shiftKey
+        && (event.key === 'PageUp' || event.key === 'PageDown')
+      ) {
+        event.preventDefault()
+        move(event.key === 'PageUp' ? -10 : 10)
+        return
+      }
+      if (!hasShortcutModifier(event) && !event.shiftKey && event.key === 'Home') {
+        event.preventDefault()
+        moveTo(0)
+        return
+      }
+      if (!hasShortcutModifier(event) && !event.shiftKey && event.key === 'End') {
+        event.preventDefault()
+        moveTo(photos.length - 1)
+        return
+      }
+      if (
+        mapKeyboardHandler?.(event)
+        || (!mapRendererStarted && handleCameraShortcutWithoutRenderer(event))
+      ) {
+        mapCameraMenuOpen = false
         event.preventDefault()
       }
     }
@@ -520,7 +674,7 @@
   })
 </script>
 
-<svelte:window onkeydown={handleKeydown} onmousemove={showControls} />
+<svelte:window onkeydown={handleKeydown} onmousemove={showControls} onpointerdown={handleWindowPointerDown} />
 
 <main
   bind:this={viewer}
@@ -649,6 +803,10 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 10.5v6m0-9h.01" /></svg>
       </button>
     </div>
+
+    {#if notice && noticeRegion === 'photo'}
+      <div class="toast frame-toast" role="status">{notice}</div>
+    {/if}
   </section>
 
   {#if mapOpen}
@@ -675,19 +833,110 @@
       tabindex="0"
       onpointerdown={() => queueMicrotask(focusMap)}
     >
-      {#if current.location}
-        <LazyMap
-          location={current.location}
-          onKeyboardHandlerChange={(handler) => (mapKeyboardHandler = handler)}
-        />
-      {:else}
-        <div class="map-panel">
-          <div class="map-unavailable" role="status">This photo doesn’t have GPS coordinates.</div>
+      {#if mapRendererStarted}
+        <div
+          class:hidden={!mapHasRenderableData}
+          class="map-renderer"
+          aria-hidden={!mapHasRenderableData}
+        >
+          <LazyMap
+            {photos}
+            {currentIndex}
+            {tracks}
+            mode={mapMode}
+            onSelectPhoto={moveTo}
+            onCameraStatus={(message) => showNotice(message, 1600, 'map')}
+            onCameraScopeChange={(label) => (mapCameraScopeLabel = label)}
+            onCameraScopesChange={(scopes) => (mapCameraScopes = scopes)}
+            onCameraScopeSelectorChange={(selector) => (mapCameraScopeSelector = selector)}
+            onKeyboardHandlerChange={(handler) => (mapKeyboardHandler = handler)}
+          />
         </div>
       {/if}
+      {#if !mapHasRenderableData}
+        <div class="map-panel">
+          <div class="map-unavailable" role="status">{mapEmptyMessage()}</div>
+        </div>
+      {/if}
+
+      <div class="map-mode-bar">
+        <button
+          type="button"
+          class="map-mode-control"
+          tabindex="-1"
+          aria-label={`GPS content: ${MAP_MODE_LABELS[mapMode]}. Show ${MAP_MODE_LABELS[nextMapMode(mapMode)]}`}
+          title={`Show ${MAP_MODE_LABELS[nextMapMode(mapMode)]} (G)`}
+          onclick={cycleMapMode}
+        >
+          <span aria-hidden="true">GPS</span>
+          {MAP_MODE_LABELS[mapMode]}
+          <span aria-hidden="true">›</span>
+        </button>
+        <div class="map-camera-control">
+          <button
+            type="button"
+            class="map-mode-control"
+            tabindex="-1"
+            disabled={!mapCameraScopeSelector || !mapCameraScopes.length}
+            aria-label={`Zoom view: ${mapCameraScopeLabel ?? 'Not selected'}. Choose a view`}
+            aria-haspopup="menu"
+            aria-expanded={mapCameraMenuOpen}
+            aria-controls="map-camera-menu"
+            title="Choose a zoom view (Z cycles primary views)"
+            onclick={toggleMapCameraMenu}
+          >
+            <span aria-hidden="true">Zoom</span>
+            {mapCameraScopeLabel ?? (mapRendererStarted ? 'Loading…' : 'Not available')}
+            <span aria-hidden="true">⌄</span>
+          </button>
+          {#if mapCameraMenuOpen}
+            <div id="map-camera-menu" class="map-camera-menu" role="menu" aria-label="Choose zoom view">
+              {#each cameraScopeGroups as group}
+                {@const options = mapCameraScopes.filter((scope) => scope.group === group.id)}
+                {#if options.length}
+                  <div class="map-camera-menu-group" role="group" aria-label={group.label}>
+                    <div class="map-camera-menu-heading" aria-hidden="true">{group.label}</div>
+                    {#each options as option}
+                      <button
+                        type="button"
+                        role="menuitemradio"
+                        aria-checked={option.label === mapCameraScopeLabel}
+                        tabindex="-1"
+                        onclick={() => selectMapCameraScope(option.id)}
+                      >
+                        <span aria-hidden="true">{option.label === mapCameraScopeLabel ? '✓' : ''}</span>
+                        {option.label}
+                      </button>
+                    {/each}
+                  </div>
+                {/if}
+              {/each}
+            </div>
+          {/if}
+        </div>
+      </div>
+
+      {#if mapHasRenderableData}
+        <div class="map-legend" aria-label="Map legend">
+          {#if current.location}<span><i class="legend-selected"></i> Current</span>{/if}
+          {#if mapMode !== 'current' && locatedPhotoCount > (current.location ? 1 : 0)}
+            <span><i class="legend-photo"></i> Photos</span>
+          {/if}
+          {#if mapMode !== 'current' && (locatedPhotoCount > 1 || duplicateCoordinateCount > 0)}
+            <span><i class="legend-group">2</i> Group</span>
+          {/if}
+          {#if mapMode === 'track' && hasTracks}<span><i class="legend-track"></i> GPX</span>{/if}
+        </div>
+      {/if}
+
+      {#if mapNotice()}<div class="map-notice" role="status">{mapNotice()}</div>{/if}
+      {#if notice && noticeRegion === 'map'}
+        <div class="toast frame-toast" role="status">{notice}</div>
+      {/if}
+      <span class="visually-hidden" aria-live="polite">{mapModeAnnouncement}</span>
     </div>
   {/if}
 
-  {#if notice}<div class="toast" role="status">{notice}</div>{/if}
+  {#if notice && noticeRegion === 'viewer'}<div class="toast viewer-toast" role="status">{notice}</div>{/if}
   <span class="visually-hidden">{readableCount} readable photos</span>
 </main>
