@@ -134,6 +134,7 @@
     if (next === currentIndex) return
     stopDraggingPhoto()
     currentIndex = next
+    startMapRendererWhenAvailable()
     const nextPhoto = photos[next]
     viewState = viewStates.get(nextPhoto.id) ?? createImageViewState()
     intrinsicSize = intrinsicSizes.get(nextPhoto.id)
@@ -179,13 +180,17 @@
     }
   }
 
+  function startMapRendererWhenAvailable() {
+    queueMicrotask(() => {
+      if (mapOpen && mapHasRenderableData) mapRendererStarted = true
+    })
+  }
+
   function cycleMapMode() {
     mapCameraMenuOpen = false
     mapMode = nextMapMode(mapMode)
     mapModeAnnouncement = `GPS content: ${MAP_MODE_LABELS[mapMode]}`
-    queueMicrotask(() => {
-      if (mapHasRenderableData) mapRendererStarted = true
-    })
+    startMapRendererWhenAvailable()
     showControls()
   }
 

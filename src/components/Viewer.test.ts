@@ -271,6 +271,7 @@ describe('viewer keyboard behavior', () => {
     })
 
     await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    await screen.findByTestId('map-stub')
     await fireEvent.keyDown(window, { key: 'ArrowRight' })
 
     expect(screen.getByRole('button', { name: 'Close map' })).toBeInTheDocument()
@@ -286,6 +287,27 @@ describe('viewer keyboard behavior', () => {
 
     expect(screen.getByRole('button', { name: 'Close map' })).toBeInTheDocument()
     expect(screen.queryByText('This photo doesn’t have GPS coordinates.')).not.toBeInTheDocument()
+  })
+
+  it('starts the map renderer when a map opened without GPS reaches a located photo', async () => {
+    render(Viewer, {
+      photos: [
+        photo({ id: 'unlocated' }),
+        photo({ id: 'located', location: { latitude: 47.45, longitude: 10.99 } }),
+      ],
+      folderName: 'Trip',
+      onChooseAnother: () => undefined,
+    })
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
+    expect(screen.getByText('This photo doesn’t have GPS coordinates.')).toBeInTheDocument()
+    expect(screen.queryByTestId('map-stub')).not.toBeInTheDocument()
+
+    await fireEvent.keyDown(window, { key: 'ArrowRight' })
+
+    expect(await screen.findByTestId('map-stub')).toBeInTheDocument()
+    expect(screen.queryByText('This photo doesn’t have GPS coordinates.')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Zoom view: Current photo/ })).toBeInTheDocument()
   })
 
   it('loops focus through the visible spatial regions in both directions', async () => {

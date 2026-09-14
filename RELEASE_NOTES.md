@@ -30,6 +30,8 @@ and map exploration before work shifts to later views such as the carousel.
   Contiguous United States view.
 - Preserve manual map zoom and applicable camera scope while navigating, with
   overlay-aware fits that keep relevant markers and routes clear of controls.
+- Reliably initialize the deferred map renderer when a map opened on a photo
+  without GPS later reaches a located photo.
 
 The candidate retains the 0.2.2 dependency-security baseline: production audit
 findings must remain at zero, while reviewed build-tool findings are enforced by

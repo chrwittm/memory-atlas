@@ -1,7 +1,35 @@
 # Known issues
 
 **Status:** Living issue register
-**Last updated:** 2026-09-13
+**Last updated:** 2026-09-14
+
+## MA-BUG-004: Map opened without GPS stays blank after navigating to GPS
+
+**Status:** Resolved in source on 2026-09-14; packaged re-verification pending
+
+**Severity:** High
+
+### Behavior and cause
+
+During the 0.3.0 installed-candidate check, opening the map on a photo without
+GPS correctly showed the placeholder, but navigating to the next located photo
+left the map panel blank. Closing and reopening the map on that photo started
+the renderer successfully.
+
+The viewer deliberately deferred loading MapLibre while the active mode had no
+renderable data. It started the renderer when the map opened with data or when
+`G` changed to a mode with data, but omitted the equivalent transition after a
+photo change. Earlier coverage began on a located photo, so its renderer was
+already running before navigation crossed the no-GPS state.
+
+### Resolution and verification
+
+Photo navigation now explicitly starts the deferred renderer whenever the open
+map's active mode gains renderable data. A regression test opens the map on an
+unlocated photo, confirms that MapLibre remains deferred, navigates to a located
+photo, and requires the renderer and Current photo camera scope to initialize.
+The exact replacement 0.3.0 DMG must repeat the observed transition before
+publication.
 
 ## MA-BUG-003: Map panel collapses after the multi-photo map implementation
 
